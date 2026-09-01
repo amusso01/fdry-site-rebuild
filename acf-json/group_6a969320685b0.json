@@ -21,6 +21,95 @@
             "selected": 0
         },
         {
+            "key": "field_6a971hero0001",
+            "label": "Small autoplay video",
+            "name": "hero_autoplay_video",
+            "aria-label": "",
+            "type": "file",
+            "instructions": "Muted background video that autoplays on load.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "return_format": "url",
+            "library": "all",
+            "min_size": "",
+            "max_size": "",
+            "mime_types": "mp4,webm,mov",
+            "allow_in_bindings": 0
+        },
+        {
+            "key": "field_6a971hero0002",
+            "label": "Full video",
+            "name": "hero_full_video",
+            "aria-label": "",
+            "type": "file",
+            "instructions": "Full showreel video. Used by the showreel button (modal to be added later).",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "return_format": "url",
+            "library": "all",
+            "min_size": "",
+            "max_size": "",
+            "mime_types": "mp4,webm,mov",
+            "allow_in_bindings": 0
+        },
+        {
+            "key": "field_6a971hero0003",
+            "label": "Showreel label",
+            "name": "hero_showreel_label",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "SEE FULL SHOWREEL",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_6a971hero0004",
+            "label": "Showreel thumbnail",
+            "name": "hero_showreel_thumb",
+            "aria-label": "",
+            "type": "image",
+            "instructions": "Circular thumbnail shown inside the showreel button.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "return_format": "array",
+            "library": "all",
+            "min_width": "",
+            "min_height": "",
+            "min_size": "",
+            "max_width": "",
+            "max_height": "",
+            "max_size": "",
+            "mime_types": "",
+            "allow_in_bindings": 0,
+            "preview_size": "thumbnail"
+        },
+        {
             "key": "field_6a96934058ac4",
             "label": "Marquee",
             "name": "",
@@ -101,6 +190,205 @@
             "placement": "top",
             "endpoint": 0,
             "selected": 0
+        },
+        {
+            "key": "field_6a971intro0001",
+            "label": "Tagline",
+            "name": "intro_tagline",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "70",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_6a971intro0002",
+            "label": "Tagline tag",
+            "name": "intro_tagline_tag",
+            "aria-label": "",
+            "type": "button_group",
+            "instructions": "Semantic heading level for the tagline. Styled the same regardless of choice.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "30",
+                "class": "",
+                "id": ""
+            },
+            "choices": {
+                "h1": "H1",
+                "h2": "H2",
+                "h3": "H3",
+                "h4": "H4"
+            },
+            "default_value": "h2",
+            "return_format": "value",
+            "allow_null": 0,
+            "layout": "horizontal"
+        },
+        {
+            "key": "field_6a971intro0003",
+            "label": "Section title",
+            "name": "intro_title",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_6a971intro0004",
+            "label": "Content",
+            "name": "intro_content",
+            "aria-label": "",
+            "type": "wysiwyg",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "tabs": "visual",
+            "toolbar": "basic",
+            "media_upload": 0,
+            "delay": 0
+        },
+        {
+            "key": "field_6a971intro0005",
+            "label": "Logo 1",
+            "name": "intro_logo_1",
+            "aria-label": "",
+            "type": "image",
+            "instructions": "Upload PNG logo.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "33",
+                "class": "",
+                "id": ""
+            },
+            "return_format": "array",
+            "library": "all",
+            "min_width": "",
+            "min_height": "",
+            "min_size": "",
+            "max_width": "",
+            "max_height": "",
+            "max_size": "",
+            "mime_types": "png",
+            "allow_in_bindings": 0,
+            "preview_size": "thumbnail"
+        },
+        {
+            "key": "field_6a971intro0006",
+            "label": "Logo 2",
+            "name": "intro_logo_2",
+            "aria-label": "",
+            "type": "image",
+            "instructions": "Upload PNG logo.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "33",
+                "class": "",
+                "id": ""
+            },
+            "return_format": "array",
+            "library": "all",
+            "min_width": "",
+            "min_height": "",
+            "min_size": "",
+            "max_width": "",
+            "max_height": "",
+            "max_size": "",
+            "mime_types": "png",
+            "allow_in_bindings": 0,
+            "preview_size": "thumbnail"
+        },
+        {
+            "key": "field_6a971intro0007",
+            "label": "Logo 3",
+            "name": "intro_logo_3",
+            "aria-label": "",
+            "type": "image",
+            "instructions": "Upload PNG logo.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "33",
+                "class": "",
+                "id": ""
+            },
+            "return_format": "array",
+            "library": "all",
+            "min_width": "",
+            "min_height": "",
+            "min_size": "",
+            "max_width": "",
+            "max_height": "",
+            "max_size": "",
+            "mime_types": "png",
+            "allow_in_bindings": 0,
+            "preview_size": "thumbnail"
+        },
+        {
+            "key": "field_6a971intro0008",
+            "label": "Button 1",
+            "name": "intro_button_1",
+            "aria-label": "",
+            "type": "link",
+            "instructions": "Primary button (label and URL from link field).",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "return_format": "array",
+            "allow_in_bindings": 0
+        },
+        {
+            "key": "field_6a971intro0009",
+            "label": "Button 2",
+            "name": "intro_button_2",
+            "aria-label": "",
+            "type": "link",
+            "instructions": "White button (label and URL from link field).",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "return_format": "array",
+            "allow_in_bindings": 0
         }
     ],
     "location": [
@@ -124,5 +412,5 @@
     "display_title": "",
     "allow_ai_access": false,
     "ai_description": "",
-    "modified": 1788275435
+    "modified": 1788290217
 }
