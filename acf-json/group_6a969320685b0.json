@@ -479,6 +479,109 @@
                     "parent_repeater": "field_6a971work0002"
                 }
             ]
+        },
+        {
+            "key": "field_6a971nav0001",
+            "label": "Navigation Content",
+            "name": "",
+            "aria-label": "",
+            "type": "tab",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "placement": "top",
+            "endpoint": 0,
+            "selected": 0
+        },
+        {
+            "key": "field_6a971nav0002",
+            "label": "Navigation Content",
+            "name": "navigation_content",
+            "aria-label": "",
+            "type": "repeater",
+            "instructions": "Add up to three rows. Each row has a main link and a list of sublink pills.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "layout": "block",
+            "pagination": 0,
+            "min": 0,
+            "max": 3,
+            "collapsed": "field_6a971nav0003",
+            "button_label": "Add row",
+            "rows_per_page": 20,
+            "sub_fields": [
+                {
+                    "key": "field_6a971nav0003",
+                    "label": "Main link",
+                    "name": "main_link",
+                    "aria-label": "",
+                    "type": "link",
+                    "instructions": "",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "return_format": "array",
+                    "allow_in_bindings": 0,
+                    "parent_repeater": "field_6a971nav0002"
+                },
+                {
+                    "key": "field_6a971nav0004",
+                    "label": "Sublinks",
+                    "name": "sublinks",
+                    "aria-label": "",
+                    "type": "repeater",
+                    "instructions": "",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "layout": "table",
+                    "pagination": 0,
+                    "min": 0,
+                    "max": 0,
+                    "collapsed": "",
+                    "button_label": "Add sublink",
+                    "rows_per_page": 20,
+                    "sub_fields": [
+                        {
+                            "key": "field_6a971nav0005",
+                            "label": "Sublink",
+                            "name": "sublink",
+                            "aria-label": "",
+                            "type": "link",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "return_format": "array",
+                            "allow_in_bindings": 0,
+                            "parent_repeater": "field_6a971nav0004"
+                        }
+                    ],
+                    "parent_repeater": "field_6a971nav0002"
+                }
+            ]
         }
     ],
     "location": [
@@ -502,5 +605,5 @@
     "display_title": "",
     "allow_ai_access": false,
     "ai_description": "",
-    "modified": 1788291897
+    "modified": 1788294316
 }
