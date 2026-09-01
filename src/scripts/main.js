@@ -12,7 +12,7 @@ import navAccordion from './part/navAccordion'
 document.addEventListener('DOMContentLoaded', () => {
 	smoothscroll.polyfill()
 	gsapMotion.init()
-	hamburger()
+	// hamburger() // temporarily disabled: hamburger click must not open the nav overlay
 	navMenu()
 	navAccordion()
 	marquee()

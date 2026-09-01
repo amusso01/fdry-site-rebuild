@@ -18,15 +18,24 @@ get_header('new');
 
 <main class="main homepage-main" role="main">
 
-  <?php get_template_part('components/page/hero-video'); ?>
-  <?php get_template_part('components/page/marquee'); ?>
-  <?php get_template_part('components/page/intro-content'); ?>
-  <?php get_template_part('components/page/work-parallax'); ?>
-  <?php get_template_part('components/page/navigation-content'); ?>
-  <?php get_template_part('components/page/work-row'); ?>
-  <?php get_template_part('components/page/two-column-content'); ?>
-  <?php get_template_part('components/page/work-row', null, array('field' => 'work_row_2')); ?>
-  <?php get_template_part('components/page/two-column-content', null, array('prefix' => 'two_column_2')); ?>
+  <?php // get_template_part('components/page/hero-video'); 
+  ?>
+  <?php // get_template_part('components/page/marquee'); 
+  ?>
+  <?php // get_template_part('components/page/intro-content'); 
+  ?>
+  <?php // get_template_part('components/page/work-parallax'); 
+  ?>
+  <?php // get_template_part('components/page/navigation-content'); 
+  ?>
+  <?php // get_template_part('components/page/work-row'); 
+  ?>
+  <?php // get_template_part('components/page/two-column-content'); 
+  ?>
+  <?php // get_template_part('components/page/work-row', null, array('field' => 'work_row_2')); 
+  ?>
+  <?php // get_template_part('components/page/two-column-content', null, array('prefix' => 'two_column_2')); 
+  ?>
 </main>
 
 <?php get_footer(); ?>

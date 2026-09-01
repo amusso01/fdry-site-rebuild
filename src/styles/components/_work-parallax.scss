@@ -12,7 +12,7 @@
 	&__card {
 		position: sticky;
 		top: 0;
-		height: 100svh;
+		height: min(100svh, 850px);
 	}
 
 	&__link {
@@ -150,10 +150,6 @@
 	}
 
 	@include media('<phone') {
-		&__card {
-			height: 85svh;
-		}
-
 		&__title {
 			font-size: 28px;
 		}
