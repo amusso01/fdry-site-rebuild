@@ -21,8 +21,7 @@ get_header('new');
   <?php get_template_part('components/page/hero-video'); ?>
   <?php get_template_part('components/page/marquee'); ?>
   <?php get_template_part('components/page/intro-content'); ?>
-
-
+  <?php get_template_part('components/page/work-parallax'); ?>
 </main>
 
 <?php get_footer(); ?>

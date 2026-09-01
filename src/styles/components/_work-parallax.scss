@@ -1,0 +1,171 @@
+@use '../common/variables' as *;
+@use '../common/media' as *;
+
+.work-parallax {
+	padding-block: clamp(2rem, 4vw, 3rem);
+	background-color: $color__white;
+
+	&__stack {
+		position: relative;
+	}
+
+	&__card {
+		position: sticky;
+		top: 0;
+		height: 100svh;
+	}
+
+	&__link {
+		position: relative;
+		display: block;
+		height: 100%;
+		overflow: hidden;
+		border-radius: 12px;
+		color: $color__white;
+		text-decoration: none;
+
+		&:link,
+		&:visited,
+		&:hover,
+		&:focus,
+		&:active {
+			color: $color__white;
+			text-decoration: none;
+		}
+	}
+
+	&__link:hover &__arrow,
+	&__link:focus-visible &__arrow {
+		width: 56px;
+		border-radius: 999px;
+
+		svg {
+			transform: translateX(4px);
+		}
+	}
+
+	&__media {
+		position: absolute;
+		inset: 0;
+		overflow: hidden;
+	}
+
+	&__image {
+		display: block;
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+
+	&__overlay {
+		position: absolute;
+		inset: 0;
+		z-index: 1;
+		pointer-events: none;
+	}
+
+	&__meta {
+		position: absolute;
+		top: 34px;
+		left: 32px;
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		max-width: calc(100% - 64px);
+	}
+
+	&__title {
+		margin: 0 0 4px;
+		font-size: 32px;
+		font-weight: 400;
+		line-height: 1.1;
+	}
+
+	&__tagline {
+		margin: 0 0 16px;
+		font-size: 16px;
+		font-weight: 400;
+		line-height: 20px;
+	}
+
+	&__arrow {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 32px;
+		height: 32px;
+		border-radius: 50%;
+		background-color: $color__white;
+		color: $color__black;
+		transform-origin: left center;
+		transition:
+			width 0.4s ease-in-out,
+			border-radius 0.4s ease-in-out,
+			transform 0.4s ease-in-out;
+
+		svg {
+			display: block;
+			transition: transform 0.4s ease-in-out;
+		}
+	}
+
+	&__categories {
+		position: absolute;
+		top: 83px;
+		right: 32px;
+		display: flex;
+		flex-direction: column;
+		align-items: flex-end;
+		gap: 12px;
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	&__category {
+		padding: 0.375rem 0.875rem;
+		border: 1px dashed rgba($color__white, 0.85);
+		border-radius: 999px;
+		font-size: 14px;
+		font-weight: 500;
+		line-height: 1;
+		letter-spacing: 1px;
+		text-transform: uppercase;
+		white-space: nowrap;
+	}
+
+	@include media('<tablet') {
+		&__meta {
+			max-width: calc(100% - 32px);
+		}
+
+		&__categories {
+			top: auto;
+			bottom: 32px;
+			right: 32px;
+			flex-direction: row;
+			flex-wrap: wrap;
+			justify-content: flex-end;
+		}
+	}
+
+	@include media('<phone') {
+		&__card {
+			height: 85svh;
+		}
+
+		&__title {
+			font-size: 28px;
+		}
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.work-parallax__arrow {
+		transition: none;
+
+		svg {
+			transition: none;
+		}
+	}
+}

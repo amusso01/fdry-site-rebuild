@@ -266,6 +266,13 @@ function fdry_get_vite_assets(): ?array
  */
 function fdry_enqueue_assets()
 {
+	wp_enqueue_style(
+		'foundry-typekit',
+		'https://use.typekit.net/rdq4arx.css',
+		array(),
+		null
+	);
+
 	$assets = fdry_get_vite_assets();
 
 	if (! $assets) {
@@ -276,7 +283,7 @@ function fdry_enqueue_assets()
 		wp_enqueue_style(
 			'fdry-overrides',
 			$assets['css'],
-			array('understrap-styles'),
+			array('understrap-styles', 'foundry-typekit'),
 			null
 		);
 	}
