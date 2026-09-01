@@ -91,9 +91,8 @@ if ($rows === array()) {
 ?>
 
 <section class="navigation-content" aria-label="<?php esc_attr_e('Services navigation', 'foundry'); ?>">
-	<div class="content-block">
-		<div class="content-max">
-			<ul class="navigation-content__list">
+	<div class="navigation-content__inner">
+		<ul class="navigation-content__list">
 				<?php foreach ($rows as $row) : ?>
 					<li class="navigation-content__row">
 						<a
@@ -136,6 +135,5 @@ if ($rows === array()) {
 					</li>
 				<?php endforeach; ?>
 			</ul>
-		</div>
 	</div>
 </section>

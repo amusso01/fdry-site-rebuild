@@ -92,8 +92,7 @@ if ($cards === array()) {
 ?>
 
 <section class="work-row" aria-label="<?php esc_attr_e('Featured work', 'foundry'); ?>">
-	<div class="content-max">
-		<div class="work-row__grid">
+	<div class="work-row__grid">
 			<?php foreach ($cards as $index => $card) : ?>
 				<article class="work-row__card">
 					<a
@@ -138,5 +137,4 @@ if ($cards === array()) {
 				</article>
 			<?php endforeach; ?>
 		</div>
-	</div>
 </section>

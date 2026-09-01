@@ -4,9 +4,14 @@
 $nav-main-arrow-size: 2.75rem;
 
 .navigation-content {
-	padding-block: clamp(2rem, 4vw, 3rem);
+	padding: 0;
 	background-color: $color__text;
 	color: $color__white;
+
+	&__inner {
+		padding: 32px;
+		background-color: #010100;
+	}
 
 	&__list {
 		margin: 0;
@@ -16,23 +21,20 @@ $nav-main-arrow-size: 2.75rem;
 
 	&__row {
 		display: grid;
-		grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr);
-		gap: clamp(1.5rem, 3vw, 3rem);
+		grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+		gap: 90px;
 		align-items: center;
-		padding-block: clamp(2rem, 4vw, 3rem);
+		padding: 70px 32px;
+		background-color: $color__text;
 		border-bottom: 1px solid rgba($color__white, 0.15);
 
-		&:first-child {
-			padding-top: 0;
-		}
-
 		&:last-child {
-			padding-bottom: 0;
 			border-bottom: 0;
 		}
 
 		@include media('<tablet') {
 			grid-template-columns: 1fr;
+			gap: 1.5rem;
 			align-items: start;
 		}
 	}
@@ -114,15 +116,11 @@ $nav-main-arrow-size: 2.75rem;
 	&__sublinks {
 		display: flex;
 		flex-wrap: wrap;
-		justify-content: flex-end;
-		gap: 0.75rem;
+		justify-content: flex-start;
+		gap: 12px;
 		margin: 0;
 		padding: 0;
 		list-style: none;
-
-		@include media('<tablet') {
-			justify-content: flex-start;
-		}
 	}
 
 	&__sublink-item {

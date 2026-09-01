@@ -2,12 +2,12 @@
 @use '../common/media' as *;
 
 .work-row {
-	padding-block: clamp(2rem, 4vw, 3rem);
+	padding: 0;
 	background-color: $color__white;
 
 	&__grid {
 		display: flex;
-		height: 85svh;
+		height: 680px;
 		overflow: hidden;
 	}
 
@@ -136,7 +136,7 @@
 
 		&__card {
 			flex: none;
-			height: 70svh;
+			height: 680px;
 
 			&:hover,
 			&:focus-within {
@@ -154,10 +154,6 @@
 	}
 
 	@include media('<phone') {
-		&__card {
-			height: 60svh;
-		}
-
 		&__title {
 			font-size: 28px;
 		}
