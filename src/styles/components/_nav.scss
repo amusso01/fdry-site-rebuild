@@ -47,6 +47,11 @@ $nav-media-size: 280px;
 			justify-content: center;
 			padding: 13px 8px;
 			color: $color__white;
+
+			@include media('<tablet') {
+				height: 38px;
+				padding: 0 6px;
+			}
 		}
 
 		img,
@@ -352,34 +357,6 @@ html.menu-open {
 	}
 }
 
-@include media('<tablet') {
-	.site-header__menu .menu {
-		gap: 1rem;
-		padding-inline: 0.75rem;
-		overflow-x: auto;
-		-webkit-overflow-scrolling: touch;
-	}
-
-	.site-nav-overlay {
-		&__layout {
-			grid-template-columns: 1fr;
-			overflow-y: auto;
-		}
-
-		&__primary {
-			border-bottom: 1px solid rgba($color__white, 0.15);
-		}
-
-		&__panel,
-		&__panel.is-active {
-			grid-template-columns: 1fr;
-		}
-
-		&__media {
-			display: none;
-		}
-	}
-}
 
 @media (prefers-reduced-motion: reduce) {
 	html.menu-open .site-nav-overlay {

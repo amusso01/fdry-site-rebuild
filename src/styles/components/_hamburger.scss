@@ -1,4 +1,5 @@
 @use '../common/variables' as *;
+@use '../common/media' as *;
 
 .hamburger {
 	--hamburger-width: 83px;
@@ -15,6 +16,11 @@
 	background-color: transparent;
 	cursor: pointer;
 	appearance: none;
+
+	@include media('<tablet') {
+		--hamburger-height: 38px;
+		--hamburger-width: 45px;
+	}
 
 	&__line {
 		position: absolute;
@@ -59,6 +65,10 @@
 
 html.menu-open .site-header__hamburger {
 	--hamburger-width: 48px;
+
+	@include media('<tablet') {
+		--hamburger-width: 45px;
+	}
 }
 
 @media (prefers-reduced-motion: reduce) {

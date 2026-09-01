@@ -6,11 +6,13 @@ import gsapMotion from './part/gsap'
 import hamburger from './part/hamburger'
 import marquee from './part/marquee'
 import navMenu from './part/navMenu'
+import navAccordion from './part/navAccordion'
 
 document.addEventListener('DOMContentLoaded', () => {
 	smoothscroll.polyfill()
 	gsapMotion.init()
 	hamburger()
 	navMenu()
+	navAccordion()
 	marquee()
 })

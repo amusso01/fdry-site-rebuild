@@ -1,20 +1,30 @@
 @use '../common/variables' as *;
+@use '../common/media' as *;
 
 .btn {
 	display: inline-flex;
 	border: 1px solid transparent;
 	border-radius: 6px;
+	padding: 14px 28px;
+
+	@include media('<tablet') {
+		padding: 12px 20px;
+	}
 
 	a {
 		display: inline-flex;
 		align-items: center;
 		gap: 0.5rem;
-		padding: 14px 28px;
 		color: inherit;
 		font-size: 16px;
 		font-weight: 600;
 		line-height: 20px;
 		text-transform: uppercase;
+
+		@include media('<tablet') {
+			font-size: 14px;
+			line-height: 18px;
+		}
 	}
 
 	svg {
