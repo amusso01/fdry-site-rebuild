@@ -23,64 +23,7 @@ if (! isset($args) || ! is_array($args)) {
 }
 
 $post_id = isset($args['post_id']) ? (int) $args['post_id'] : (int) get_queried_object_id();
-
-if (! $post_id || ! have_rows('work_parallax', $post_id)) {
-	return;
-}
-
-$cards = array();
-
-while (have_rows('work_parallax', $post_id)) {
-	the_row();
-
-	$work = get_sub_field('work');
-
-	if (! $work instanceof WP_Post) {
-		continue;
-	}
-
-	$work_id = (int) $work->ID;
-
-	if (! has_post_thumbnail($work_id)) {
-		continue;
-	}
-
-	$thumbnail_id = (int) get_post_thumbnail_id($work_id);
-	$image        = wp_get_attachment_image_src($thumbnail_id, 'large');
-
-	if (! is_array($image) || empty($image[0])) {
-		continue;
-	}
-
-	$tagline = get_sub_field('work_tagline');
-	$tagline = is_string($tagline) ? trim($tagline) : '';
-
-	$categories = array();
-
-	foreach (get_the_category($work_id) as $category) {
-		if (! $category instanceof WP_Term) {
-			continue;
-		}
-
-		if ($category->slug === 'uncategorized') {
-			continue;
-		}
-
-		$categories[] = $category->name;
-	}
-
-	$cards[] = array(
-		'id'           => $work_id,
-		'title'        => get_the_title($work_id),
-		'permalink'    => get_permalink($work_id),
-		'image_url'    => $image[0],
-		'image_width'  => isset($image[1]) ? (int) $image[1] : 0,
-		'image_height' => isset($image[2]) ? (int) $image[2] : 0,
-		'image_alt'    => (string) get_post_meta($thumbnail_id, '_wp_attachment_image_alt', true),
-		'tagline'      => $tagline,
-		'categories'   => $categories,
-	);
-}
+$cards   = fdry_get_work_parallax_cards($post_id);
 
 if ($cards === array()) {
 	return;
@@ -104,8 +47,11 @@ if ($cards === array()) {
 									class="work-parallax__image"
 									src="<?= esc_url($card['image_url']); ?>"
 									alt="<?= esc_attr($card['image_alt'] !== '' ? $card['image_alt'] : $card['title']); ?>"
-									loading="<?= $index === 0 ? 'eager' : 'lazy'; ?>"
+									loading="eager"
 									decoding="async"
+									<?php if ($index === 0) : ?>
+										fetchpriority="high"
+									<?php endif; ?>
 									<?php if ($card['image_width'] > 0) : ?>
 										width="<?= esc_attr((string) $card['image_width']); ?>"
 									<?php endif; ?>

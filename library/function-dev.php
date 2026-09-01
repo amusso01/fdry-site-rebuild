@@ -325,6 +325,116 @@ function fdry_acf_link_parts($link): array
 }
 
 /**
+ * Build work parallax card data from the homepage ACF repeater.
+ *
+ * @return array<int, array{
+ *     id: int,
+ *     title: string,
+ *     permalink: string,
+ *     image_url: string,
+ *     image_width: int,
+ *     image_height: int,
+ *     image_alt: string,
+ *     tagline: string,
+ *     categories: string[]
+ * }>
+ */
+function fdry_get_work_parallax_cards(int $post_id): array
+{
+	if ($post_id <= 0 || ! function_exists('have_rows') || ! have_rows('work_parallax', $post_id)) {
+		return array();
+	}
+
+	$cards = array();
+
+	while (have_rows('work_parallax', $post_id)) {
+		the_row();
+
+		$work = get_sub_field('work');
+
+		if (! $work instanceof WP_Post) {
+			continue;
+		}
+
+		$work_id = (int) $work->ID;
+
+		if (! has_post_thumbnail($work_id)) {
+			continue;
+		}
+
+		$thumbnail_id = (int) get_post_thumbnail_id($work_id);
+		$image        = wp_get_attachment_image_src($thumbnail_id, 'large');
+
+		if (! is_array($image) || empty($image[0])) {
+			continue;
+		}
+
+		$tagline = get_sub_field('work_tagline');
+		$tagline = is_string($tagline) ? trim($tagline) : '';
+
+		$categories = array();
+
+		foreach (get_the_category($work_id) as $category) {
+			if (! $category instanceof WP_Term) {
+				continue;
+			}
+
+			if ($category->slug === 'uncategorized') {
+				continue;
+			}
+
+			$categories[] = $category->name;
+		}
+
+		$cards[] = array(
+			'id'           => $work_id,
+			'title'        => get_the_title($work_id),
+			'permalink'    => (string) get_permalink($work_id),
+			'image_url'    => $image[0],
+			'image_width'  => isset($image[1]) ? (int) $image[1] : 0,
+			'image_height' => isset($image[2]) ? (int) $image[2] : 0,
+			'image_alt'    => (string) get_post_meta($thumbnail_id, '_wp_attachment_image_alt', true),
+			'tagline'      => $tagline,
+			'categories'   => $categories,
+		);
+	}
+
+	return $cards;
+}
+
+/**
+ * Preload work parallax card images on the homepage template.
+ */
+function fdry_preload_work_parallax_images(): void
+{
+	if (! is_singular('page') || get_page_template_slug() !== 'template-home.php') {
+		return;
+	}
+
+	$post_id = (int) get_queried_object_id();
+	$cards   = fdry_get_work_parallax_cards($post_id);
+
+	if ($cards === array()) {
+		return;
+	}
+
+	foreach ($cards as $index => $card) {
+		if ($card['image_url'] === '') {
+			continue;
+		}
+
+		$fetchpriority = $index === 0 ? ' fetchpriority="high"' : '';
+
+		printf(
+			'<link rel="preload" as="image" href="%1$s"%2$s />' . "\n",
+			esc_url($card['image_url']),
+			$fetchpriority
+		);
+	}
+}
+add_action('wp_head', 'fdry_preload_work_parallax_images', 1);
+
+/**
  * Return SVG markup from an ACF file field (URL or path).
  *
  * Uses the local filesystem when possible to avoid slow HTTP loopback requests.
