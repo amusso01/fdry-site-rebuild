@@ -124,9 +124,97 @@ function fdry_register_theme_menus()
 add_action('init', 'fdry_register_theme_menus');
 
 /**
- * Read fdry asset paths and cache-bust version from dist/manifest.json.
+ * Build a parent/children tree from a theme menu location.
  *
- * @return array{css: string, js: string, version: string}|null
+ * @param string $location Registered menu location slug.
+ * @return array<int, array{item: WP_Post, children: WP_Post[]}>
+ */
+function fdry_get_nav_menu_tree(string $location): array
+{
+	$locations = get_nav_menu_locations();
+
+	if (empty($locations[$location])) {
+		return array();
+	}
+
+	$items = wp_get_nav_menu_items((int) $locations[$location]);
+
+	if (! is_array($items) || $items === array()) {
+		return array();
+	}
+
+	$children_map = array();
+
+	foreach ($items as $item) {
+		$parent_id = (int) $item->menu_item_parent;
+
+		if (! isset($children_map[$parent_id])) {
+			$children_map[$parent_id] = array();
+		}
+
+		$children_map[$parent_id][] = $item;
+	}
+
+	$tree = array();
+
+	foreach ($children_map[0] ?? array() as $parent) {
+		$tree[] = array(
+			'item'     => $parent,
+			'children' => $children_map[(int) $parent->ID] ?? array(),
+		);
+	}
+
+	return $tree;
+}
+
+/**
+ * Secondary menu 2026 grouped as parent items with optional children.
+ *
+ * @return array<int, array{item: WP_Post, children: WP_Post[]}>
+ */
+function fdry_get_secondary_menu_tree(): array
+{
+	return fdry_get_nav_menu_tree('secondarymenu');
+}
+
+/**
+ * Nav menu term ID assigned to a theme location.
+ *
+ * @param string $location Registered menu location slug.
+ */
+function fdry_get_nav_menu_term_id(string $location): int
+{
+	$locations = get_nav_menu_locations();
+
+	if (empty($locations[$location])) {
+		return 0;
+	}
+
+	return (int) $locations[$location];
+}
+
+/**
+ * Read an ACF field stored on a nav menu term (menu-level, not menu item).
+ *
+ * @param string $field_name ACF field name.
+ * @param string $location   Registered menu location slug.
+ * @return mixed Field value or null when unset / menu missing.
+ */
+function fdry_get_nav_menu_acf_field(string $field_name, string $location)
+{
+	$menu_id = fdry_get_nav_menu_term_id($location);
+
+	if ($menu_id <= 0) {
+		return null;
+	}
+
+	return get_field($field_name, 'nav_menu_' . $menu_id);
+}
+
+/**
+ * Read hashed asset URLs from the Vite manifest (dist/.vite/manifest.json).
+ *
+ * @return array{css: string, js: string}|null
  */
 function fdry_get_vite_assets(): ?array
 {
@@ -136,7 +224,8 @@ function fdry_get_vite_assets(): ?array
 		return $assets;
 	}
 
-	$manifest_path = get_template_directory() . '/dist/manifest.json';
+	$manifest_path = get_template_directory() . '/dist/.vite/manifest.json';
+	$entry_key     = 'src/scripts/main.js';
 
 	if (! file_exists($manifest_path)) {
 		$assets = null;
@@ -145,16 +234,17 @@ function fdry_get_vite_assets(): ?array
 
 	$manifest = json_decode((string) file_get_contents($manifest_path), true);
 
-	if (! is_array($manifest)) {
+	if (! is_array($manifest) || empty($manifest[$entry_key])) {
 		$assets = null;
 		return null;
 	}
 
-	$js_file  = $manifest['js'] ?? '';
-	$css_file = $manifest['css'] ?? '';
-	$version  = $manifest['version'] ?? '';
+	$entry     = $manifest[$entry_key];
+	$js_file   = $entry['file'] ?? '';
+	$css_files = $entry['css'] ?? array();
+	$css_file  = is_array($css_files) && $css_files !== array() ? $css_files[0] : '';
 
-	if ((! $js_file && ! $css_file) || ! $version) {
+	if (! $js_file && ! $css_file) {
 		$assets = null;
 		return null;
 	}
@@ -162,9 +252,8 @@ function fdry_get_vite_assets(): ?array
 	$base_uri = get_stylesheet_directory_uri() . '/dist/';
 
 	$assets = array(
-		'js'      => $js_file ? $base_uri . $js_file : '',
-		'css'     => $css_file ? $base_uri . $css_file : '',
-		'version' => $version,
+		'js'  => $js_file ? $base_uri . $js_file : '',
+		'css' => $css_file ? $base_uri . $css_file : '',
 	);
 
 	return $assets;
@@ -173,7 +262,7 @@ function fdry_get_vite_assets(): ?array
 /**
  * Enqueue fdry assets built from src/ via Vite.
  *
- * Fixed filenames (fdry.js, fdry.css); cache bust via manifest version query string.
+ * Filenames are content-hashed; paths come from dist/.vite/manifest.json.
  */
 function fdry_enqueue_assets()
 {
@@ -188,7 +277,7 @@ function fdry_enqueue_assets()
 			'fdry-overrides',
 			$assets['css'],
 			array('understrap-styles'),
-			$assets['version']
+			null
 		);
 	}
 
@@ -197,12 +286,36 @@ function fdry_enqueue_assets()
 			'fdry-scripts',
 			$assets['js'],
 			array('jquery'),
-			$assets['version'],
+			null,
 			true
 		);
 	}
 }
 add_action('wp_enqueue_scripts', 'fdry_enqueue_assets', 11);
+
+/**
+ * Normalise an ACF link field to url + target parts.
+ *
+ * @param array|string|false|null $link ACF link field value.
+ * @return array{url: string, target: string}
+ */
+function fdry_acf_link_parts($link): array
+{
+	$url    = '#';
+	$target = '';
+
+	if (is_array($link)) {
+		$url    = is_string($link['url'] ?? null) && $link['url'] !== '' ? $link['url'] : '#';
+		$target = is_string($link['target'] ?? null) ? $link['target'] : '';
+	} elseif (is_string($link) && $link !== '') {
+		$url = $link;
+	}
+
+	return array(
+		'url'    => $url,
+		'target' => $target,
+	);
+}
 
 /**
  * Return SVG markup from an ACF file field (URL or path).

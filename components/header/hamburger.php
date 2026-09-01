@@ -15,7 +15,7 @@
   type="button"
   aria-label="<?php esc_attr_e('Menu', 'foundry'); ?>"
   aria-expanded="false"
-  aria-controls="menu_main">
+  aria-controls="site-nav-overlay">
   <span class="hamburger__line"></span>
   <span class="hamburger__line"></span>
 </button><!-- hamburger  -->

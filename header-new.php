@@ -180,6 +180,7 @@ if ( ! defined( 'FDRY_USING_NEW_HEADER' ) ) {
         <div class="site-header__brand">
           <?php get_template_part('components/header/logo'); ?>
           <?php get_template_part('components/header/hamburger'); ?>
+          <?php get_template_part('components/navigation/primary'); ?>
         </div>
         <div class="site-header__cta">
           <?php
@@ -218,7 +219,7 @@ if ( ! defined( 'FDRY_USING_NEW_HEADER' ) ) {
           ?>
         </div>
       </div>
-      <?php get_template_part('components/navigation/primary'); ?>
+      <?php get_template_part('components/navigation/secondary'); ?>
     </header><!-- .site-header -->
 
     <div id="content" class="site-content">

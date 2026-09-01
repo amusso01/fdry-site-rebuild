@@ -57,6 +57,10 @@
 	}
 }
 
+html.menu-open .site-header__hamburger {
+	--hamburger-width: 48px;
+}
+
 @media (prefers-reduced-motion: reduce) {
 	.hamburger__line {
 		transition: none;

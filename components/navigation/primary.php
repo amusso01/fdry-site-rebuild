@@ -14,6 +14,6 @@ if (has_nav_menu('mainmenu')) :
     'menu_id'           => 'menu_main',
     'container'         => 'nav',
     'container_class'   => 'site-header__menu primary-menu',
-    'depth'             => 2
+    'depth'             => 1
   ]);
 endif;

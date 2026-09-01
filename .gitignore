@@ -1,8 +1,8 @@
 # pnpm / npm install output — never commit
 node_modules/
 
-# Vite cache
-.vite/
+# Vite cache (project root only — dist/.vite/manifest.json is committed)
+/.vite/
 
 # Logs
 *.log

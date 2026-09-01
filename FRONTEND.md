@@ -11,7 +11,7 @@ This theme is an old Understrap build. **Never edit compiled legacy assets**, in
 - `js/theme.js`, `js/theme.min.js`
 - Page scripts under `js/` and `mainjs/` (e.g. `about.js`, `filterCategory.js`, `app.min.js`)
 
-All **new** styling and JavaScript goes in `src/`, compiles to fixed files in `dist/` (`fdry.css`, `fdry.js`), and loads **after** the old files so cascade and load order win.
+All **new** styling and JavaScript goes in `src/`, compiles to hashed files in `dist/` (e.g. `fdry.[hash].css`, `fdry.[hash].js`), and loads **after** the old files so cascade and load order win.
 
 New dev PHP (menus, enqueue, helpers, theme supports) lives in [`library/function-dev.php`](library/function-dev.php), loaded from [`functions.php`](functions.php). Legacy [`inc/enqueue.php`](inc/enqueue.php) is unchanged.
 
@@ -32,9 +32,10 @@ src/
     main.scss        # SCSS entry; @use partials from here
     _overrides.scss  # Override rules (replaces css/london.css)
 dist/
-  fdry.css           # Compiled CSS (same filename every build — overwrite on deploy)
-  fdry.js            # Compiled JS
-  manifest.json      # Content hash used as ?ver= for cache busting (read by PHP)
+  fdry.[hash].css    # Hashed CSS (filename changes when content changes)
+  fdry.[hash].js     # Hashed JS
+  .vite/
+    manifest.json    # Maps entry to current hashed filenames (read by PHP)
 components/          # PHP partials for header-new templates
 header-new.php       # New header (legacy <head>, new body markup)
 ```
@@ -55,29 +56,29 @@ All **new dev site (2026/27)** logic goes in [`library/function-dev.php`](librar
 |---------|-----------------|--------|
 | Block editor palette | `ea_setup()` | `after_setup_theme` |
 | Nav menu locations | `fdry_register_theme_menus()` | `mainmenu`, `footermenu_1`, `footermenu_2` |
-| Vite assets | `fdry_get_vite_assets()`, `fdry_enqueue_assets()` | Reads `dist/manifest.json` |
+| Vite assets | `fdry_get_vite_assets()`, `fdry_enqueue_assets()` | Reads `dist/.vite/manifest.json` |
 | ACF SVG helper | `acfFile_toSvg()` | Used by components (e.g. marquee logos) |
 
 Add new helpers, CPTs, ACF hooks, and enqueue rules to this file as the new site grows.
 
 ### Enqueue (new dev assets)
 
-`fdry_enqueue_assets()` reads [`dist/manifest.json`](dist/manifest.json) via `fdry_get_vite_assets()`. WordPress enqueues fixed paths with a version query string from the manifest.
+`fdry_enqueue_assets()` reads [`dist/.vite/manifest.json`](dist/.vite/manifest.json) via `fdry_get_vite_assets()`. WordPress enqueues the current hashed filenames with no `?ver=` query string — the hash in the filename busts caches (including WP Rocket).
 
-| Handle           | Source            | Depends on          |
-|------------------|-------------------|---------------------|
-| `fdry-overrides` | `dist/fdry.css`   | `understrap-styles` |
-| `fdry-scripts`   | `dist/fdry.js`    | `jquery`            |
+| Handle           | Source                 | Depends on          |
+|------------------|------------------------|---------------------|
+| `fdry-overrides` | `dist/fdry.[hash].css` | `understrap-styles` |
+| `fdry-scripts`   | `dist/fdry.[hash].js`  | `jquery`            |
 
-**Cache busting:** each build writes a short content hash to `manifest.json` (e.g. `"version": "a1b2c3d4"`). WordPress enqueues `fdry.js?ver=a1b2c3d4` — browsers fetch fresh files when content changes, but filenames stay the same so FTP uploads simply overwrite the old files.
+**Cache busting:** each build emits new hashed filenames. PHP reads the manifest to resolve the current paths. Upload the new hashed files plus `dist/.vite/manifest.json`; remove old `fdry.*` files from the server when convenient.
 
-**Deploy:** upload/overwrite these three files in `dist/`:
+**Deploy:** after `pnpm build`, upload/commit from `dist/`:
 
-- `fdry.css`
-- `fdry.js`
-- `manifest.json`
+- `fdry.[hash].css`
+- `fdry.[hash].js`
+- `.vite/manifest.json`
 
-If `manifest.json` is missing (no build yet), assets are not enqueued and the site still loads.
+If the manifest is missing (no build yet), assets are not enqueued and the site still loads.
 
 Legacy assets remain in [`inc/enqueue.php`](inc/enqueue.php) (`understrap-styles`, `understrap-scripts`, page-specific old JS).
 
@@ -137,7 +138,7 @@ pnpm build     # one-off production build
 
 - `library/` — new dev PHP (`function-dev.php`)
 - `src/` — source of truth
-- `dist/` — `fdry.css`, `fdry.js`, `manifest.json` (required on server without Node)
+- `dist/` — hashed assets + `.vite/manifest.json` (required on server without Node)
 - `package.json`, `pnpm-lock.yaml`, `vite.config.js`
 
 **Ignored** (see [`.gitignore`](.gitignore)):
@@ -153,4 +154,4 @@ Commit `pnpm-lock.yaml` so installs stay reproducible.
 
 [Vite](https://vite.dev/) with the `sass` package. Config: [`vite.config.js`](vite.config.js).
 
-Build output is always `fdry.js`, `fdry.css`, and `manifest.json`. A Vite plugin writes `manifest.json` with a content hash used as the WordPress `?ver=` parameter — overwrite the same three files on each deploy.
+Build output is hashed `fdry.[hash].js`, `fdry.[hash].css`, and `dist/.vite/manifest.json`. WordPress reads the manifest to enqueue the current filenames — no query-string cache busting, so CDN and WP Rocket pick up new assets automatically.
