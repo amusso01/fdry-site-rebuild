@@ -10,7 +10,8 @@
  * @param array $args {
  *     Optional. Pass to override ACF values on any page.
  *
- *     @type int $post_id Post ID for ACF fallback. Default queried object.
+ *     @type string $field   ACF repeater field name. Default work_row.
+ *     @type int    $post_id Post ID for ACF fallback. Default queried object.
  * }
  */
 
@@ -24,13 +25,16 @@ if (! isset($args) || ! is_array($args)) {
 
 $post_id = isset($args['post_id']) ? (int) $args['post_id'] : (int) get_queried_object_id();
 
-if (! $post_id || ! have_rows('work_row', $post_id)) {
+$field = $args['field'] ?? 'work_row';
+$field = is_string($field) && $field !== '' ? $field : 'work_row';
+
+if (! $post_id || ! have_rows($field, $post_id)) {
 	return;
 }
 
 $cards = array();
 
-while (have_rows('work_row', $post_id)) {
+while (have_rows($field, $post_id)) {
 	the_row();
 
 	$work = get_sub_field('work');
