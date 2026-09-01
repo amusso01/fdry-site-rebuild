@@ -18,7 +18,6 @@ if ( ! function_exists( 'understrap_scripts' ) ) {
 		
 		$css_version = $theme_version . '.' . filemtime(get_template_directory() . '/css/theme.min.css');
 		wp_enqueue_style( 'understrap-styles', get_stylesheet_directory_uri() . '/css/theme.min.css', array(), $css_version );
-		wp_enqueue_style( 'fdry-style', get_stylesheet_directory_uri() . '/css/london.css', array(), 1.0 );
 		function load_wpcf7_scripts() {
 			if (is_page('brief-1') || is_page('brief-2') || is_page( 'brief-final' )){
 				if ( function_exists( 'wpcf7_enqueue_scripts' ) ) {

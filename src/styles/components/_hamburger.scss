@@ -1,0 +1,64 @@
+@use '../common/variables' as *;
+
+.hamburger {
+	--hamburger-width: 83px;
+	--hamburger-height: 48px;
+	--hamburger-line-width: 18px;
+	--hamburger-line-height: 1px;
+	--hamburger-offset: 3.8px;
+
+	position: relative;
+	width: var(--hamburger-width);
+	height: var(--hamburger-height);
+	padding: 0;
+	border: 0;
+	background-color: transparent;
+	cursor: pointer;
+	appearance: none;
+
+	&__line {
+		position: absolute;
+		left: 0;
+		right: 0;
+		width: var(--hamburger-line-width);
+		height: var(--hamburger-line-height);
+		margin-inline: auto;
+		background-color: $color__white;
+		opacity: 1;
+		border-radius: 0;
+		transition:
+			transform 0.4s ease,
+			top 0.4s ease,
+			box-shadow 0.4s ease;
+
+		&:first-child {
+			top: calc(50% - var(--hamburger-offset));
+		}
+
+		&:last-child {
+			top: calc(50% + var(--hamburger-offset));
+		}
+	}
+
+	&.is-active {
+		.hamburger__line:first-child,
+		.hamburger__line:last-child {
+			top: 50%;
+			box-shadow: 0 0 0.35px $color__white;
+		}
+
+		.hamburger__line:first-child {
+			transform: rotate(45deg);
+		}
+
+		.hamburger__line:last-child {
+			transform: rotate(-45deg);
+		}
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.hamburger__line {
+		transition: none;
+	}
+}

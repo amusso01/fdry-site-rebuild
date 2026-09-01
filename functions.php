@@ -376,3 +376,6 @@ function my_load_more_posts_handler() {
     wp_send_json_success( $response );
     wp_die();
 }
+
+// NEW DEV SITE 2026/27 logic
+require_once get_template_directory() . '/library/function-dev.php';

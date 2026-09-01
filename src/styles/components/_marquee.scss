@@ -1,0 +1,64 @@
+@use '../common/variables' as *;
+
+.marquee {
+	overflow: hidden;
+	color: #b8b8b8;
+	background-color: $color__white;
+	border-bottom: 1px solid #e5e5e5;
+	padding-block: 1.5rem;
+
+	&__track {
+		display: flex;
+		width: max-content;
+		gap: 108px;
+		animation: marquee-scroll 80s linear infinite;
+	}
+
+	&__list {
+		display: flex;
+		flex-shrink: 0;
+		align-items: center;
+		gap: 108px;
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	&__item {
+		display: flex;
+		flex-shrink: 0;
+		align-items: center;
+	}
+
+	&__logo {
+		display: flex;
+		align-items: center;
+
+		svg {
+			display: block;
+			height: 56px;
+			width: auto;
+			max-width: none;
+
+			:is(path, polygon, circle, rect, ellipse) {
+				fill: currentColor;
+			}
+		}
+	}
+}
+
+@keyframes marquee-scroll {
+	from {
+		transform: translateX(0);
+	}
+
+	to {
+		transform: translateX(-50%);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.marquee__track {
+		animation: none;
+	}
+}

@@ -1,0 +1,25 @@
+@use 'overrides';
+
+//Custom styles start here
+
+// Vendors
+
+// Common
+@use 'common/reset';
+@use 'common/variables';
+
+@use 'common/mixin';
+@use 'common/general';
+@use 'common/helper';
+
+// Components
+@use 'components/hamburger';
+@use 'components/button';
+@use 'components/nav';
+@use 'components/marquee';
+
+// Templates
+
+// Vendors (after @use)
+@import 'swiper/css';
+@import 'swiper/css/pagination';

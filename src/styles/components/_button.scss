@@ -1,0 +1,47 @@
+@use '../common/variables' as *;
+
+.btn {
+	display: inline-flex;
+	border: 1px solid transparent;
+	border-radius: 6px;
+
+	a {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+		padding: 14px 28px;
+		color: inherit;
+		font-size: 16px;
+		font-weight: 600;
+		line-height: 20px;
+		text-transform: uppercase;
+	}
+
+	svg {
+		display: block;
+		flex-shrink: 0;
+		transition: transform 0.4s ease;
+	}
+
+	&:hover svg {
+		transform: translateX(4px);
+	}
+
+	&--primary {
+		background-color: $color__black;
+		border-color: $color__black;
+		color: $color__white;
+	}
+
+	&--white {
+		background-color: $color__white;
+		border-color: $color__black;
+		color: $color__black;
+	}
+
+	&--yellow {
+		background-color: $color__btn-yellow;
+		border-color: $color__btn-yellow-border;
+		color: $color__black;
+	}
+}

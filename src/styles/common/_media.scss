@@ -1,0 +1,15 @@
+// Breakpoints for include-media (single source of truth for the media() mixin).
+$breakpoints: (
+	'phone': 640px,
+	'phone-land': 920px,
+	'tablet': 1140px,
+	'desktop': 1440px,
+	'wideScreen': 1920px,
+) !default;
+
+@forward 'include-media/dist/include-media' with (
+	$breakpoints: $breakpoints
+);
+
+// @use "media" as *;
+// This is how to include media in each scss file we want to expose it

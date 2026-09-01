@@ -1,0 +1,19 @@
+# pnpm / npm install output — never commit
+node_modules/
+
+# Vite cache
+.vite/
+
+# Logs
+*.log
+.pnpm-debug.log*
+
+# OS / editor
+.DS_Store
+.idea/
+*.swp
+
+# Agents
+.agents/
+.cursor/
+.claude/

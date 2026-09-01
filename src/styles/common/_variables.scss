@@ -1,0 +1,60 @@
+/**
+  * Variables
+  * Contains re-usable variables like colors, sizes, etc.
+  * Breakpoints for the media() live in common/_media.scss.
+  *
+  *
+  */
+/*==================================================================================
+  FONT
+==================================================================================*/
+$text__fontname: 'proxima-nova', sans-serif;
+$header__fontname: 'proxima-nova', sans-serif;
+
+/*==================================================================================
+  COLORS
+==================================================================================*/
+
+/* from customiser root -> see function-customiser.php
+/––––––––––––––––––––––––*/
+$color__main: var(--main_color);
+$color__text: var(--text_color);
+$color__link: var(--link_color);
+$color__footerBg: var(--footer-color);
+$color__white: #ffffff;
+$color__black: #000000;
+$color__yellow: #f59d19;
+
+$colors:
+	('yellow', $color__yellow), ('white', $color__white), ('black', $color__black);
+
+/* Color Options for guttenberg
+--------------------------------------------- */
+
+@each $name, $color in $colors {
+	.has-#{$name}-color {
+		color: $color;
+	}
+
+	.has-#{$name}-background-color {
+		background-color: $color;
+	}
+}
+
+/*==================================================================================
+  BUTTONS
+==================================================================================*/
+$color__btn-yellow: #ffd10a;
+$color__btn-yellow-border: #d2ae0f;
+
+/*==================================================================================
+  TYPOGRAPHY
+==================================================================================*/
+
+$text__h1: var(--text-h1);
+$text__h2: var(--text-h2);
+$text__h3: var(--text-h3);
+$text__h4: var(--text-h4);
+$text__h5: var(--text-h5);
+$text__h6: var(--text-h6);
+$text__p: var(--text-p);

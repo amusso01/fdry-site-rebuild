@@ -1,0 +1,67 @@
+/* PRESETS
+/––––––––––––––––––––––––*/
+@use 'media' as *;
+
+.content-block {
+	//create the "container" with this applied to any row or any 100% width element
+	padding: 0 54px;
+
+	@include media('<desktop') {
+		padding: 0 32px;
+	}
+	@include media('<phone') {
+		padding: 0 25px;
+	}
+}
+
+.content-max {
+	max-width: 1920px;
+	margin: 0 auto;
+
+	@include media('<wideScreen') {
+		max-width: 1520px;
+	}
+	@include media('<desktop') {
+		max-width: 1360px;
+	}
+}
+
+.noscroll {
+	overflow: hidden;
+}
+
+[data-reveal]:not([data-reveal='stagger-up']) {
+	opacity: 0;
+}
+
+[data-reveal='stagger-up'] > * {
+	opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	[data-reveal]:not([data-reveal='stagger-up']),
+	[data-reveal='stagger-up'] > * {
+		opacity: 1;
+	}
+}
+
+.parallax-clip {
+	overflow: hidden;
+}
+
+:focus {
+	outline: 0;
+}
+
+.img-fluid {
+	max-width: 100%;
+	height: auto;
+}
+
+%cover {
+	height: 100%;
+	left: 0;
+	position: absolute;
+	top: 0;
+	width: 100%;
+}

@@ -13,6 +13,12 @@ if (! defined('ABSPATH')) {
 }
 
 $container = get_theme_mod('understrap_container_type');
+
+if ( defined( 'FDRY_USING_NEW_HEADER' ) && FDRY_USING_NEW_HEADER ) :
+	?>
+	</div><!-- #content -->
+	<?php
+endif;
 ?>
 
 
@@ -583,11 +589,9 @@ function myFunction() {
 
 <br><br>
 
-
-
-
-
-
+<?php if ( defined( 'FDRY_USING_NEW_HEADER' ) && FDRY_USING_NEW_HEADER ) : ?>
+	</div><!-- #page -->
+<?php endif; ?>
 
 </body>
 
