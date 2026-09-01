@@ -1,0 +1,14 @@
+#home-wrapper #main .brief .col-lg-6.box-grey 
+{padding-top: 0!important;}
+
+#home-wrapper #main .brief .col-lg-6.box-grey h1
+{  font-size: 45px!important;
+  line-height: 55px!important;
+}
+
+.wp-block-columns{ display:flex;  gap: 25px;} 
+
+@media screen and (max-width: 767px) {
+  
+  .wp-block-columns{ display:block;} 
+}
