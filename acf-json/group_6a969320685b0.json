@@ -481,6 +481,74 @@
             ]
         },
         {
+            "key": "field_6a971wrow0001",
+            "label": "Work Row",
+            "name": "",
+            "aria-label": "",
+            "type": "tab",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "placement": "top",
+            "endpoint": 0,
+            "selected": 0
+        },
+        {
+            "key": "field_6a971wrow0002",
+            "label": "Work Row",
+            "name": "work_row",
+            "aria-label": "",
+            "type": "repeater",
+            "instructions": "Pick up to three featured works for the full-width hover row.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "layout": "block",
+            "pagination": 0,
+            "min": 0,
+            "max": 3,
+            "collapsed": "field_6a971wrow0003",
+            "button_label": "Add work",
+            "rows_per_page": 20,
+            "sub_fields": [
+                {
+                    "key": "field_6a971wrow0003",
+                    "label": "Work",
+                    "name": "work",
+                    "aria-label": "",
+                    "type": "post_object",
+                    "instructions": "",
+                    "required": 1,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "post_type": [
+                        "works_post"
+                    ],
+                    "post_status": "",
+                    "taxonomy": "",
+                    "return_format": "object",
+                    "multiple": 0,
+                    "allow_null": 0,
+                    "ui": 1,
+                    "bidirectional_target": [],
+                    "parent_repeater": "field_6a971wrow0002"
+                }
+            ]
+        },
+        {
             "key": "field_6a971nav0001",
             "label": "Navigation Content",
             "name": "",
@@ -605,5 +673,5 @@
     "display_title": "",
     "allow_ai_access": false,
     "ai_description": "",
-    "modified": 1788294316
+    "modified": 1788295562
 }

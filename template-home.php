@@ -22,6 +22,7 @@ get_header('new');
   <?php get_template_part('components/page/marquee'); ?>
   <?php get_template_part('components/page/intro-content'); ?>
   <?php get_template_part('components/page/work-parallax'); ?>
+  <?php get_template_part('components/page/work-row'); ?>
   <?php get_template_part('components/page/navigation-content'); ?>
 </main>
 
