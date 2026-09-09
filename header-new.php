@@ -221,5 +221,6 @@ if ( ! defined( 'FDRY_USING_NEW_HEADER' ) ) {
       </div>
       <?php get_template_part('components/navigation/secondary'); ?>
     </header><!-- .site-header -->
+    <?php get_template_part('components/header/nav-backdrop'); ?>
 
     <div id="content" class="site-content">

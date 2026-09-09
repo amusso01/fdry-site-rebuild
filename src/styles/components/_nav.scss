@@ -9,6 +9,18 @@ $nav-muted: rgba(255, 255, 255, 0.45);
 $nav-panels-bg: #1b1b1b;
 $nav-media-size: 280px;
 
+.site-nav-backdrop {
+	position: fixed;
+	inset: 0;
+	width: 100vw;
+	height: 100vh;
+	padding: 0;
+	border: 0;
+	background: transparent;
+	z-index: 99;
+	cursor: default;
+}
+
 .site-header {
 	position: fixed;
 	top: 0;
@@ -96,12 +108,36 @@ $nav-media-size: 280px;
 		}
 
 		a {
+			position: relative;
+			padding-bottom: 0.4rem;
 			color: $color__white;
 			font-size: 0.875rem;
 			font-weight: 600;
 			letter-spacing: 0.02em;
 			text-transform: uppercase;
 			white-space: nowrap;
+
+			&::after {
+				content: '';
+				position: absolute;
+				left: 50%;
+				bottom: 0;
+				width: 5px;
+				height: 5px;
+				border-radius: 50%;
+				background-color: currentColor;
+				transform: translateX(-50%) scale(0);
+				opacity: 0;
+				transition:
+					transform 0.25s ease,
+					opacity 0.25s ease;
+			}
+
+			&:hover::after,
+			&:focus-visible::after {
+				transform: translateX(-50%) scale(1);
+				opacity: 1;
+			}
 		}
 	}
 }
@@ -308,6 +344,10 @@ $nav-media-size: 280px;
 html.menu-open {
 	overflow: hidden;
 
+	.site-nav-backdrop {
+		display: block;
+	}
+
 	.site-header {
 		display: flex;
 		flex-direction: column;
@@ -343,6 +383,10 @@ html.menu-open {
 		opacity: 1;
 		animation: site-nav-overlay-in 0.35s ease;
 	}
+
+	&.menu-closing .site-nav-overlay {
+		animation: site-nav-overlay-out 0.35s ease forwards;
+	}
 }
 
 @keyframes site-nav-overlay-in {
@@ -357,14 +401,31 @@ html.menu-open {
 	}
 }
 
+@keyframes site-nav-overlay-out {
+	from {
+		opacity: 1;
+		transform: translateY(0);
+	}
+
+	to {
+		opacity: 0;
+		transform: translateY(0.75rem);
+	}
+}
+
 
 @media (prefers-reduced-motion: reduce) {
-	html.menu-open .site-nav-overlay {
+	html.menu-open .site-nav-overlay,
+	html.menu-open.menu-closing .site-nav-overlay {
 		animation: none;
 	}
 
 	.site-nav-overlay__parent,
 	.site-nav-overlay__child {
+		transition: none;
+	}
+
+	.site-header__menu a::after {
 		transition: none;
 	}
 }
