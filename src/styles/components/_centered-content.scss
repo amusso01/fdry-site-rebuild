@@ -1,0 +1,79 @@
+@use '../common/variables' as *;
+@use '../common/media' as *;
+
+.centered-content {
+	padding-block: clamp(3rem, 6vw, 5rem);
+	background-color: $color__white;
+
+	&--dark {
+		// Dark palette to be added when Centered Content Dark is built.
+	}
+
+	&__inner {
+		max-width: 120ch;
+		margin-inline: auto;
+		text-align: center;
+	}
+
+	&__tagline {
+		margin: 0;
+		font-family: $text__fontname;
+		font-size: 11px;
+		font-weight: 600;
+		line-height: 16px;
+		letter-spacing: 1px;
+		text-transform: uppercase;
+	}
+
+	&__tagline + * {
+		margin-top: 12px;
+	}
+
+	&__title {
+		margin: 0;
+		font-size: 32px;
+		font-weight: 400;
+		line-height: 36px;
+		text-align: center;
+	}
+
+	&__title + * {
+		margin-top: 24px;
+	}
+
+	&__body {
+		max-width: 75ch;
+		margin-inline: auto;
+		font-size: 16px;
+		font-weight: 300;
+		line-height: 20px;
+		text-align: center;
+
+		> :first-child {
+			margin-top: 0;
+		}
+
+		> :last-child {
+			margin-bottom: 0;
+		}
+
+		p + p {
+			margin-top: 1.25rem;
+		}
+	}
+
+	&__body + * {
+		margin-top: 24px;
+	}
+
+	&__actions {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: center;
+		gap: 0.75rem;
+
+		.btn a {
+			text-transform: none;
+		}
+	}
+}
