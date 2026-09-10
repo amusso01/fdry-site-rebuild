@@ -11,6 +11,13 @@
 		overflow: hidden;
 	}
 
+	&__more {
+		display: flex;
+		justify-content: center;
+		padding: 40px 0;
+		background-color: $color__white;
+	}
+
 	&__card {
 		flex: 1 1 0;
 		min-width: 0;

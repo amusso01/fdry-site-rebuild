@@ -11,7 +11,13 @@
 	}
 
 	&--dark {
-		// Dark palette to be added when Centered Content Dark is built.
+		padding-block: 96px;
+		background-color: $color__text;
+		color: $color__white;
+
+		.centered-content__body + * {
+			margin-top: 32px;
+		}
 	}
 
 	&__inner {
@@ -64,6 +70,37 @@
 
 		p + p {
 			margin-top: 1.25rem;
+		}
+
+		.centered-content--dark & {
+			max-width: 52ch;
+			font-size: 24px;
+			font-weight: 400;
+			line-height: 1.4;
+
+			p,
+			ul,
+			ol,
+			li,
+			a,
+			blockquote {
+				font-size: inherit;
+				font-weight: inherit;
+				line-height: inherit;
+				color: inherit;
+				text-align: inherit;
+			}
+
+			a:hover,
+			a:focus {
+				color: inherit;
+			}
+
+			ul,
+			ol {
+				list-style-position: inside;
+				padding-left: 0;
+			}
 		}
 	}
 

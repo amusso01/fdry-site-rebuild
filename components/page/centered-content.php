@@ -76,6 +76,10 @@ $button_1 = $args['button_1'] ?? null;
 
 if ($button_1 === null && $post_id) {
 	$button_1 = get_field($prefix . '_button_1', $post_id);
+
+	if (empty($button_1)) {
+		$button_1 = get_field($prefix . '_button', $post_id);
+	}
 }
 
 $button_2 = $args['button_2'] ?? null;
@@ -92,6 +96,8 @@ $button_2_label = is_array($button_2) && ! empty($button_2['title']) ? $button_2
 
 $has_button_1 = $button_1_label !== '' && $button_1_parts['url'] !== '#';
 $has_button_2 = $button_2_label !== '' && $button_2_parts['url'] !== '#';
+
+$button_1_variant = $appearance === 'dark' ? 'yellow' : 'primary';
 
 if ($tagline === '' && $title === '' && $content === '' && ! $has_button_1 && ! $has_button_2) {
 	return;
@@ -124,7 +130,7 @@ if ($tagline === '' && $title === '' && $content === '' && ! $has_button_1 && ! 
 								'components/partials/button',
 								null,
 								array(
-									'variant' => 'primary',
+									'variant' => $button_1_variant,
 									'label'   => $button_1_label,
 									'url'     => $button_1,
 									'target'  => $button_1_parts['target'],

@@ -54,4 +54,14 @@
 		border-color: $color__btn-yellow-border;
 		color: $color__black;
 	}
+
+	&--transparent {
+		background-color: transparent;
+		border-color: $color__black;
+		color: $color__text;
+
+		a {
+			text-transform: none;
+		}
+	}
 }

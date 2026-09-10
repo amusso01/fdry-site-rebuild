@@ -10,8 +10,9 @@
  * @param array $args {
  *     Optional. Pass to override ACF values on any page.
  *
- *     @type string $field   ACF repeater field name. Default work_row.
- *     @type int    $post_id Post ID for ACF fallback. Default queried object.
+ *     @type string $field          ACF repeater field name. Default work_row.
+ *     @type bool   $show_more_work When true, show a More work CTA below the grid. Default false.
+ *     @type int    $post_id        Post ID for ACF fallback. Default queried object.
  * }
  */
 
@@ -27,6 +28,8 @@ $post_id = isset($args['post_id']) ? (int) $args['post_id'] : (int) get_queried_
 
 $field = $args['field'] ?? 'work_row';
 $field = is_string($field) && $field !== '' ? $field : 'work_row';
+
+$show_more_work = ! empty($args['show_more_work']);
 
 if (! $post_id || ! have_rows($field, $post_id)) {
 	return;
@@ -141,4 +144,20 @@ if ($cards === array()) {
 				</article>
 			<?php endforeach; ?>
 		</div>
+
+	<?php if ($show_more_work) : ?>
+		<div class="work-row__more">
+			<?php
+			get_template_part(
+				'components/partials/button',
+				null,
+				array(
+					'variant' => 'transparent',
+					'label'   => __('More work', 'foundry'),
+					'url'     => site_url('/work/'),
+				)
+			);
+			?>
+		</div>
+	<?php endif; ?>
 </section>

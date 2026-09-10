@@ -20,6 +20,12 @@ get_header('new');
 
   <?php get_template_part('components/page/centered-content', null, array('is_first' => true)); ?>
   <?php get_template_part('components/page/showreel'); ?>
+  <?php get_template_part('components/page/navigation-content'); ?>
+  <?php get_template_part('components/page/work-row', null, array('show_more_work' => true)); ?>
+  <?php get_template_part('components/page/centered-content', null, array(
+    'prefix'     => 'centered_dark',
+    'appearance' => 'dark',
+  )); ?>
 
 </main>
 
