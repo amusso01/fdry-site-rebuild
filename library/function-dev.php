@@ -50,6 +50,7 @@ function fdry_acf_only_page_templates(): array
 	return array(
 		'template-home.php',
 		'template-service.php',
+		'template-service-child.php',
 	);
 }
 

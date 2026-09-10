@@ -60,6 +60,7 @@
 
 		@include media('>=tablet') {
 			margin-top: 40px;
+			padding-right: 200px !important;
 		}
 
 		@include media('<tablet') {
