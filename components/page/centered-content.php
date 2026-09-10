@@ -18,6 +18,7 @@
  *     @type string       $content     WYSIWYG body content.
  *     @type array        $button_1    ACF link array for primary button.
  *     @type array        $button_2    ACF link array for white button.
+ *     @type bool         $is_first    When true, adds top spacing below the fixed header.
  *     @type int          $post_id     Post ID for ACF fallback. Default queried object.
  * }
  */
@@ -38,6 +39,8 @@ $prefix = is_string($prefix) && $prefix !== '' ? $prefix : 'centered';
 $allowed_appearances = array('light', 'dark');
 $appearance          = $args['appearance'] ?? 'light';
 $appearance          = is_string($appearance) && in_array($appearance, $allowed_appearances, true) ? $appearance : 'light';
+
+$is_first = ! empty($args['is_first']);
 
 $allowed_tags = array('h1', 'h2', 'h3', 'h4');
 
@@ -95,7 +98,7 @@ if ($tagline === '' && $title === '' && $content === '' && ! $has_button_1 && ! 
 }
 ?>
 
-<section class="centered-content centered-content--<?= esc_attr($appearance); ?>">
+<section class="centered-content centered-content--<?= esc_attr($appearance); ?><?= $is_first ? ' centered-content--first' : ''; ?>">
 	<div class="content-block">
 		<div class="content-max">
 			<div class="centered-content__inner">

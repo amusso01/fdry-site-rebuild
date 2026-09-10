@@ -3,6 +3,7 @@
 
 $nav-open-height: 700px;
 $nav-header-height: 78px;
+$site-header-height: 88px;
 $nav-bg: #212121;
 $nav-brand-bg: #1b1b1b;
 $nav-muted: rgba(255, 255, 255, 0.45);
@@ -22,6 +23,8 @@ $nav-media-size: 280px;
 }
 
 .site-header {
+	--site-header-height: #{$site-header-height};
+
 	position: fixed;
 	top: 0;
 	inset-inline: 0;
@@ -32,7 +35,7 @@ $nav-media-size: 280px;
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		min-height: 88px;
+		min-height: $site-header-height;
 		flex-shrink: 0;
 	}
 

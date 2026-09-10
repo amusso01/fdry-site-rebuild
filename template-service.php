@@ -18,7 +18,7 @@ get_header('new');
 
 <main class="main service-main" role="main">
 
-  <?php get_template_part('components/page/centered-content'); ?>
+  <?php get_template_part('components/page/centered-content', null, array('is_first' => true)); ?>
   <?php get_template_part('components/page/showreel'); ?>
 
 </main>
