@@ -14,6 +14,8 @@
  *     @type string $full_video     URL for the full showreel (modal hook only).
  *     @type string $showreel_label Showreel button label.
  *     @type array  $showreel_thumb ACF image array for the showreel thumbnail.
+ *     @type string $variant        Layout variant: hero (default) or inline.
+ *     @type string $aria_label     Accessible section label. Default Hero.
  *     @type int    $post_id        Post ID for ACF fallback. Default queried object.
  * }
  */
@@ -118,9 +120,25 @@ if ($showreel_thumb === null && $post_id) {
 }
 
 $showreel_thumb = $normalize_image($showreel_thumb);
+
+$allowed_variants = array('hero', 'inline');
+$variant          = $args['variant'] ?? 'hero';
+$variant          = is_string($variant) && in_array($variant, $allowed_variants, true) ? $variant : 'hero';
+
+$aria_label = $args['aria_label'] ?? null;
+
+if (! is_string($aria_label) || $aria_label === '') {
+	$aria_label = $variant === 'inline' ? __('Showreel', 'foundry') : __('Hero', 'foundry');
+}
+
+$section_classes = array('hero-video');
+
+if ($variant === 'inline') {
+	$section_classes[] = 'hero-video--inline';
+}
 ?>
 
-<section class="hero-video" aria-label="<?php esc_attr_e('Hero', 'foundry'); ?>">
+<section class="<?= esc_attr(implode(' ', $section_classes)); ?>" aria-label="<?= esc_attr($aria_label); ?>">
 	<video
 		class="hero-video__media"
 		src="<?php echo esc_url($autoplay_video); ?>"

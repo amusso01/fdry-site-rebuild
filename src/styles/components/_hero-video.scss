@@ -8,6 +8,13 @@
 	overflow: hidden;
 	background-color: $color__black;
 
+	&--inline {
+		min-height: 0;
+		height: 600px;
+		width: 100%;
+		border-radius: 8px;
+	}
+
 	&__media {
 		position: absolute;
 		inset: 0;
