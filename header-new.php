@@ -9,12 +9,12 @@
  * 
  */
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
+if (! defined('ABSPATH')) {
+  exit;
 }
 
-if ( ! defined( 'FDRY_USING_NEW_HEADER' ) ) {
-	define( 'FDRY_USING_NEW_HEADER', true );
+if (! defined('FDRY_USING_NEW_HEADER')) {
+  define('FDRY_USING_NEW_HEADER', true);
 }
 
 ?>
@@ -32,9 +32,9 @@ if ( ! defined( 'FDRY_USING_NEW_HEADER' ) ) {
   <?php if (is_front_page()) {
   ?>
     <script>
-      $(window).on('load', function() {
-        $('#loading-animation').fadeOut(500);
-      })
+      jQuery(window).on('load', function() {
+        jQuery('#loading-animation').fadeOut(500);
+      });
     </script>
   <?php
   }
@@ -89,7 +89,8 @@ if ( ! defined( 'FDRY_USING_NEW_HEADER' ) ) {
 
 
   <!-- Start cookieyes banner -->
-  <script id="cookieyes" type="text/javascript" src="https://cdn-cookieyes.com/client_data/025fa60311aef15b7fe2e817/script.js"></script> <!-- End cookieyes banner -->
+  <script id="cookieyes" type="text/javascript" src="https://cdn-cookieyes.com/client_data/025fa60311aef15b7fe2e817/script.js"></script>
+  <!-- End cookieyes banner
 
   <script type="text/javascript" src="https://secure.office-insightdetails.com/js/788650.js"></script>
 

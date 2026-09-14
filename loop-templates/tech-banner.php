@@ -57,16 +57,6 @@
                   transform: scale(1.5); 
               }
 
-              #fake-pointer {
-                  position: fixed;
-                  left: 0;
-                  top: 0;
-                  pointer-events: none;
-                  z-index: 1001;
-                  width: 24px;
-                  height: 24px;
-              }
-
               #traveling-train {
                   position: absolute; 
                   height: 2px;
@@ -316,9 +306,13 @@
 
                     // --- 1. SELECCIONAR ELEMENTOS ---
                     const customCursor = document.getElementById('custom-cursor-shadow');
-                    const fakePointer = document.getElementById('fake-pointer');
                     const line = document.getElementById('traveling-train');
                     const gridContainer = document.getElementById('grid-container');
+
+                    if (!customCursor || !line || !gridContainer) {
+                        return;
+                    }
+
                     let gridItems = document.querySelectorAll('.grid-item:not([data-row="0"]):not([data-row="2"]):not([data-col="0"]):not([data-col="7"])'); // Interactivos
 
                     const numColsDesktop = 8;
@@ -339,7 +333,6 @@
                         shadowPos.x += (mouse.x - shadowPos.x) * speed;
                         shadowPos.y += (mouse.y - shadowPos.y) * speed;
                         gsap.set(customCursor, { x: shadowPos.x - 20, y: shadowPos.y - 20 });
-                        gsap.set(fakePointer, { x: mouse.x, y: mouse.y });
                     });
 
                     // --- 3. FUNCIÓN PARA CALCULAR POSICIONES ---

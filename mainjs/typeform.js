@@ -1,4 +1,5 @@
-//btn start
+jQuery(function ($) {
+	//btn start
 	$( "#startbtn" ).click(function() {
 	  $( "#step2" ).addClass( "active" );
 	  $( "#step2 .ui-step-content" ).addClass( "in" );
@@ -120,4 +121,5 @@
 				$( ".areaother" ).addClass( "on" );
 			}
 		}
-	); 
+	);
+});

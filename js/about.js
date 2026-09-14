@@ -1,3 +1,4 @@
+jQuery(function ($) {
 // ======== Scroll Counter ========
 var iterator = 0;
 $(window).scroll(function() {
@@ -117,3 +118,4 @@ if($(window).width()>576){
     };
   }
 }
+});

@@ -1,6 +1,7 @@
 
 
 /*------------------- GALLERY GRID ------------------*/
+jQuery(function ($) {
 $('#category-menu').on('click', 'a', function(e){
 
   var listSelect = $('.cat-item');
@@ -20,7 +21,7 @@ $('#category-menu').on('click', 'a', function(e){
     }
   });
 });
-  
+});
 
 //transition on menu
 

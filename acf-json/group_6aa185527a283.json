@@ -164,8 +164,8 @@
             "label": "Small autoplay video",
             "name": "showreel_autoplay_video",
             "aria-label": "",
-            "type": "file",
-            "instructions": "Muted background video that autoplays on load.",
+            "type": "url",
+            "instructions": "Paste a Vimeo link (e.g. https://vimeo.com/1225631324). Plays muted, looping in the background.",
             "required": 0,
             "conditional_logic": 0,
             "wrapper": {
@@ -173,12 +173,8 @@
                 "class": "",
                 "id": ""
             },
-            "return_format": "url",
-            "library": "all",
-            "min_size": "",
-            "max_size": "",
-            "mime_types": "mp4,webm,mov",
-            "allow_in_bindings": 0
+            "default_value": "",
+            "placeholder": "https://vimeo.com/1225631324"
         },
         {
             "key": "field_6aa185527a012",
@@ -542,5 +538,5 @@
     "display_title": "",
     "allow_ai_access": false,
     "ai_description": "",
-    "modified": 1788970322
+    "modified": 1789052201
 }

@@ -327,6 +327,94 @@ function fdry_acf_link_parts($link): array
 }
 
 /**
+ * Parse a Vimeo URL into video ID and optional unlisted hash.
+ *
+ * @param string $url Vimeo page or player URL.
+ * @return array{id: string, hash: string}|null
+ */
+function fdry_parse_vimeo_url(string $url): ?array
+{
+	$url = trim($url);
+
+	if ($url === '') {
+		return null;
+	}
+
+	$parts = wp_parse_url($url);
+
+	if (! is_array($parts) || empty($parts['host'])) {
+		return null;
+	}
+
+	$host = strtolower((string) $parts['host']);
+
+	if (! str_contains($host, 'vimeo.com')) {
+		return null;
+	}
+
+	$id   = '';
+	$hash = '';
+
+	if (! empty($parts['path']) && preg_match('#/(?:video/)?(\d+)#', (string) $parts['path'], $matches)) {
+		$id = $matches[1];
+	}
+
+	if ($id === '' && ! empty($parts['query'])) {
+		parse_str((string) $parts['query'], $query);
+
+		if (! empty($query['clip_id']) && is_numeric($query['clip_id'])) {
+			$id = (string) $query['clip_id'];
+		}
+	}
+
+	if ($id === '') {
+		return null;
+	}
+
+	if (! empty($parts['query'])) {
+		parse_str((string) $parts['query'], $query);
+
+		if (! empty($query['h']) && is_string($query['h'])) {
+			$hash = sanitize_text_field($query['h']);
+		}
+	}
+
+	return array(
+		'id'   => $id,
+		'hash' => $hash,
+	);
+}
+
+/**
+ * Build a Vimeo background-player embed URL (muted, looping autoplay).
+ *
+ * @param string $url Vimeo page or player URL.
+ */
+function fdry_vimeo_background_embed_url(string $url): string
+{
+	$parsed = fdry_parse_vimeo_url($url);
+
+	if ($parsed === null) {
+		return '';
+	}
+
+	$params = array(
+		'background' => '1',
+		'autoplay'   => '1',
+		'muted'      => '1',
+		'loop'       => '1',
+		'autopause'  => '0',
+		'dnt'        => '1',
+	);
+
+	if ($parsed['hash'] !== '') {
+		$params['h'] = $parsed['hash'];
+	}
+
+	return add_query_arg($params, 'https://player.vimeo.com/video/' . $parsed['id']);
+}
+
+/**
  * Build work parallax card data from the homepage ACF repeater.
  *
  * @return array<int, array{

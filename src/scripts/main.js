@@ -8,11 +8,13 @@ import marquee from './part/marquee'
 import heroVideo from './part/heroVideo'
 import navMenu from './part/navMenu'
 import navAccordion from './part/navAccordion'
+import headerScroll from './part/headerScroll'
 
 document.addEventListener('DOMContentLoaded', () => {
 	smoothscroll.polyfill()
 	gsapMotion.init()
 	hamburger()
+	headerScroll()
 	navMenu()
 	navAccordion()
 	marquee()

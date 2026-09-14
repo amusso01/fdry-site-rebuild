@@ -181,6 +181,7 @@ $container = get_theme_mod( 'understrap_container_type' );
 
 
 <script type="text/javascript">
+jQuery(function ($) {
 	$( ".btnaccordion" ).click(function() {
 		if( $( this ).hasClass( "active" ) ){
 			var dataId = $(this).attr("data-id");
@@ -197,6 +198,7 @@ $container = get_theme_mod( 'understrap_container_type' );
 		}
 	  
 	});
+});
 </script>
 
 <?php get_footer(); ?>

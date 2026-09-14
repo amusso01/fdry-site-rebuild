@@ -139,7 +139,8 @@ $nav-main-arrow-size: 2.75rem;
 		text-decoration: none;
 		transition:
 			color 0.25s ease,
-			border-color 0.25s ease;
+			border-color 0.25s ease,
+			background-color 0.25s ease;
 
 		&:link,
 		&:visited {
@@ -149,8 +150,9 @@ $nav-main-arrow-size: 2.75rem;
 
 		&:hover,
 		&:focus-visible {
-			border-color: rgba($color__white, 1);
-			color: rgba($color__white, 1);
+			border-color: $color__white;
+			background-color: $color__white;
+			color: $color__text;
 			text-decoration: none;
 		}
 	}

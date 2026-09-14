@@ -10,7 +10,7 @@
  * @param array $args {
  *     Optional. Pass to override ACF values on any page.
  *
- *     @type string $autoplay_video URL for the muted background autoplay video.
+ *     @type string $autoplay_video Vimeo URL or direct media URL for muted background autoplay.
  *     @type string $full_video     URL for the full showreel (modal hook only).
  *     @type string $showreel_label Showreel button label.
  *     @type array  $showreel_thumb ACF image array for the showreel thumbnail.
@@ -31,19 +31,19 @@ if (! isset($args) || ! is_array($args)) {
 $post_id = isset($args['post_id']) ? (int) $args['post_id'] : (int) get_queried_object_id();
 
 /**
- * @param array|string|false|null $file ACF file field value.
+ * @param array|string|false|null $value ACF url/file field value.
  */
-$normalize_file_url = static function ($file): string {
-	if (! $file) {
+$normalize_media_url = static function ($value): string {
+	if (! $value) {
 		return '';
 	}
 
-	if (is_string($file)) {
-		return trim($file);
+	if (is_string($value)) {
+		return trim($value);
 	}
 
-	if (is_array($file) && ! empty($file['url']) && is_string($file['url'])) {
-		return trim($file['url']);
+	if (is_array($value) && ! empty($value['url']) && is_string($value['url'])) {
+		return trim($value['url']);
 	}
 
 	return '';
@@ -92,11 +92,16 @@ if ($autoplay_video === null && $post_id) {
 	$autoplay_video = get_field('hero_autoplay_video', $post_id);
 }
 
-$autoplay_video = $normalize_file_url($autoplay_video);
+$autoplay_video = $normalize_media_url($autoplay_video);
 
 if ($autoplay_video === '') {
 	return;
 }
+
+$vimeo_embed_url = function_exists('fdry_vimeo_background_embed_url')
+	? fdry_vimeo_background_embed_url($autoplay_video)
+	: '';
+$is_vimeo        = $vimeo_embed_url !== '';
 
 $full_video = $args['full_video'] ?? null;
 
@@ -104,7 +109,7 @@ if ($full_video === null && $post_id) {
 	$full_video = get_field('hero_full_video', $post_id);
 }
 
-$full_video = $normalize_file_url($full_video);
+$full_video = $normalize_media_url($full_video);
 
 $showreel_label = $args['showreel_label'] ?? null;
 
@@ -139,15 +144,22 @@ if ($variant === 'inline') {
 ?>
 
 <section class="<?= esc_attr(implode(' ', $section_classes)); ?>" aria-label="<?= esc_attr($aria_label); ?>">
-	<video
-		class="hero-video__media"
-		src="<?php echo esc_url($autoplay_video); ?>"
-		muted
-		autoplay
-		loop
-		playsinline
-		preload="auto"
-		aria-hidden="true"></video>
+	<?php if ($is_vimeo) : ?>
+		<div
+			class="hero-video__vimeo-mount"
+			data-vimeo-src="<?php echo esc_url($vimeo_embed_url); ?>"
+			aria-hidden="true"></div>
+	<?php else : ?>
+		<video
+			class="hero-video__media"
+			src="<?php echo esc_url($autoplay_video); ?>"
+			muted
+			autoplay
+			loop
+			playsinline
+			preload="auto"
+			aria-hidden="true"></video>
+	<?php endif; ?>
 
 	<?php if ($showreel_label !== '') : ?>
 		<button

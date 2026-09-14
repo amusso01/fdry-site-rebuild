@@ -30,6 +30,12 @@ $nav-media-size: 280px;
 	inset-inline: 0;
 	z-index: 100;
 	background-color: transparent;
+	transition: transform 0.35s ease;
+
+	&.is-hidden {
+		transform: translate3d(0, -100%, 0);
+		pointer-events: none;
+	}
 
 	&__inner {
 		display: flex;
@@ -297,9 +303,9 @@ $nav-media-size: 280px;
 
 		&:hover,
 		&:focus-visible {
-			border-color: $color__link;
-			background-color: rgba($color__white, 0.08);
-			color: $color__link;
+			border-color: $color__white;
+			background-color: $color__white;
+			color: $color__text;
 		}
 	}
 
@@ -341,6 +347,14 @@ $nav-media-size: 280px;
 		font-weight: 600;
 		letter-spacing: 0.08em;
 		text-transform: uppercase;
+	}
+}
+
+html.menu-open,
+html.menu-closing {
+	.site-header {
+		transform: none;
+		pointer-events: auto;
 	}
 }
 

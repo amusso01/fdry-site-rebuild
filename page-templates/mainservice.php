@@ -304,6 +304,7 @@ $pageID = $post->ID;
 
 
 <script type="text/javascript">
+jQuery(function ($) {
 	$( ".btnaccordion" ).click(function() {
 		if( $( this ).hasClass( "active" ) ){
 			var dataId = $(this).attr("data-id");
@@ -318,5 +319,6 @@ $pageID = $post->ID;
 		}
 	  
 	});
+});
 </script>
 <?php get_footer(); ?>

@@ -6494,6 +6494,7 @@
 	}
 })();
 
+jQuery(function ($) {
   $(document).ready(function () {
     var mainBanner = $('.jumbo-video');
     var logo = $("#main-logo .cls-1");
@@ -6524,7 +6525,6 @@
     observer.observe();
 });
 
-jQuery(function($) {
   // Menu magic
   if($(window).width() < 767) {
         $(".dropdown-toggle").attr('data-toggle', 'dropdown');
@@ -6532,8 +6532,7 @@ jQuery(function($) {
         $(this).siblings('.open').removeClass('open').find('a.dropdown-toggle').attr('data-toggle', 'dropdown');
         $(this).find('a.dropdown-toggle').removeAttr('data-toggle');
      });
-  } 
-});
+  }
 
 // Scrolling Effect
 
@@ -6708,6 +6707,8 @@ $('#mega-promote').mouseenter(function(){
     $('#dynamic').removeClass();
   }
   $('#dynamic').html('PROMOTE').addClass('promote-menu');
+});
+
 });
 
 
