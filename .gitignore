@@ -17,3 +17,8 @@ node_modules/
 .agents/
 .cursor/
 .claude/
+# Hero video masters and encode outputs — these live on the server, not in git
+/build/
+*.mov
+/as\ *.mp4
+/as\ *.webm

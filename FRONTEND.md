@@ -155,3 +155,39 @@ Commit `pnpm-lock.yaml` so installs stay reproducible.
 [Vite](https://vite.dev/) with the `sass` package. Config: [`vite.config.js`](vite.config.js).
 
 Build output is hashed `fdry.[hash].js`, `fdry.[hash].css`, and `dist/.vite/manifest.json`. WordPress reads the manifest to enqueue the current filenames — no query-string cache busting, so CDN and WP Rocket pick up new assets automatically.
+
+## Hero / showreel video
+
+The hero and service showreel play a **self-hosted, muted, looping MP4** behind a poster image. There is no Vimeo and no third-party player.
+
+### How it loads
+
+1. The poster is preloaded in `wp_head` (`fdry_preload_hero_poster()`, homepage only) and paints as the LCP element.
+2. The `<video>` ships with `preload="none"`, **no `src`** and **no `autoplay`** — only `data-src-mp4` / `data-src-webm`.
+3. [`heroVideo.js`](src/scripts/part/heroVideo.js) decides whether to fetch at all, then attaches `<source>` elements and calls `play()`.
+
+It **never** downloads the video when the viewport is ≤768px, `prefers-reduced-motion` is set, or `saveData` is on — the poster stands in. The `--inline` variant (service pages) also waits until it approaches the viewport.
+
+Omitting `autoplay` is deliberate: it overrides `preload="none"` and the browser fetches anyway, defeating all of the above.
+
+### Encoding a new video
+
+```bash
+pnpm encode <input> <output-basename>          # → build/video/<name>.mp4, .webm, -poster.webp
+```
+
+Uses `ffmpeg-static` (no system install). Note `pnpm.onlyBuiltDependencies` in `package.json` — without it pnpm blocks the postinstall that downloads the ffmpeg binary.
+
+Settings are **visually transparent** (x264 CRF 18), not size-optimised: the source grading is the desired quality. `-movflags +faststart` is essential — it lets playback begin on the first bytes instead of after a full download.
+
+Measured on the launch showreel (1920×1080, 15.77s): master 29.2 MB @ 14.8 Mbps → **7.8 MB @ 4.2 Mbps, SSIM 0.9965**.
+
+**WebM is intentionally not shipped.** VP9 plateaued at SSIM ~0.97 for this footage at every bitrate tested (6.2 MB → 13.9 MB moved it 0.0014), so it was larger *and* measurably worse than the MP4. Since `<source>` order gives WebM to most browsers, shipping it would have served the majority the worse file. The field and plumbing remain if a future clip tests differently.
+
+### Upload guard
+
+Content editors have no access to the encoder, so `fdry_validate_background_video()` blocks uploads that would undo the above and returns a copy-pasteable ffmpeg brief (`fdry_video_encode_instructions()`) to forward to a developer. It rejects files over 30 MB, MP4s without faststart, and anything above 10 Mbps.
+
+`fdry_inspect_mp4()` parses the MP4 container in plain PHP — the host has no ffmpeg — and **fails open**: anything it cannot parse is allowed through rather than blocking a valid upload.
+
+`fdry_validate_poster_present()` requires a poster wherever a video is set, since the poster is what makes the whole approach work.

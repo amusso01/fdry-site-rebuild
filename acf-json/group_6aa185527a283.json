@@ -164,8 +164,8 @@
             "label": "Small autoplay video",
             "name": "showreel_autoplay_video",
             "aria-label": "",
-            "type": "url",
-            "instructions": "Paste a Vimeo link (e.g. https://vimeo.com/1225631324). Plays muted, looping in the background.",
+            "type": "file",
+            "instructions": "Choose the uploaded MP4. Plays muted and looping in the background. It must be a web encode with faststart — master exports straight from an editing suite are rejected, and the error will give you a note to send to your developer.",
             "required": 0,
             "conditional_logic": 0,
             "wrapper": {
@@ -173,8 +173,54 @@
                 "class": "",
                 "id": ""
             },
-            "default_value": "",
-            "placeholder": "https://vimeo.com/1225631324"
+            "return_format": "url",
+            "mime_types": "mp4",
+            "library": "all",
+            "min_size": "",
+            "max_size": ""
+        },
+        {
+            "key": "field_6aa185527a015",
+            "label": "Poster frame",
+            "name": "showreel_poster",
+            "type": "image",
+            "instructions": "Sharp still shown instantly while the video loads. Use the generated -poster.webp, around 1920 wide.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "return_format": "array",
+            "preview_size": "medium",
+            "library": "all",
+            "min_width": "",
+            "min_height": "",
+            "min_size": "",
+            "max_width": "",
+            "max_height": "",
+            "max_size": "",
+            "mime_types": ""
+        },
+        {
+            "key": "field_6aa185527a016",
+            "label": "Autoplay video (WebM, optional)",
+            "name": "showreel_autoplay_video_webm",
+            "type": "file",
+            "instructions": "Optional WebM version, offered before the MP4. Leave empty to serve the MP4 to everyone — for this footage the MP4 tested better, so empty is the right default.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "return_format": "url",
+            "library": "all",
+            "min_size": "",
+            "max_size": "",
+            "mime_types": "webm"
         },
         {
             "key": "field_6aa185527a012",
@@ -538,5 +584,5 @@
     "display_title": "",
     "allow_ai_access": false,
     "ai_description": "",
-    "modified": 1789052201
+    "modified": 1789572925
 }

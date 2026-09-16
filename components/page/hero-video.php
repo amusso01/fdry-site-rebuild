@@ -3,6 +3,11 @@
 /**
  * Hero video
  *
+ * Renders a muted, looping background video behind an optional showreel
+ * button. The video carries a poster and no src: sources are attached by
+ * heroVideo.js so small screens, reduced-motion and data-saver users never
+ * download it. See src/scripts/part/heroVideo.js.
+ *
  * @author Andrea Musso
  *
  * @package foundry
@@ -10,13 +15,16 @@
  * @param array $args {
  *     Optional. Pass to override ACF values on any page.
  *
- *     @type string $autoplay_video Vimeo URL or direct media URL for muted background autoplay.
- *     @type string $full_video     URL for the full showreel (modal hook only).
- *     @type string $showreel_label Showreel button label.
- *     @type array  $showreel_thumb ACF image array for the showreel thumbnail.
- *     @type string $variant        Layout variant: hero (default) or inline.
- *     @type string $aria_label     Accessible section label. Default Hero.
- *     @type int    $post_id        Post ID for ACF fallback. Default queried object.
+ *     @type string $mp4        MP4 URL for muted background autoplay.
+ *     @type string $webm       WebM URL, offered before the MP4.
+ *     @type array  $poster     ACF image array for the poster frame.
+ *     @type string $full_video URL for the full showreel (modal hook only).
+ *     @type string $label      Showreel button label.
+ *     @type array  $thumb      ACF image array for the showreel thumbnail.
+ *     @type string $prefix     ACF field set to read: hero or showreel.
+ *     @type string $variant    Layout variant: hero (default) or inline.
+ *     @type string $aria_label Accessible section label. Default Hero.
+ *     @type int    $post_id    Post ID for ACF fallback. Default queried object.
  * }
  */
 
@@ -29,102 +37,13 @@ if (! isset($args) || ! is_array($args)) {
 }
 
 $post_id = isset($args['post_id']) ? (int) $args['post_id'] : (int) get_queried_object_id();
+$prefix  = isset($args['prefix']) && $args['prefix'] === 'showreel' ? 'showreel' : 'hero';
 
-/**
- * @param array|string|false|null $value ACF url/file field value.
- */
-$normalize_media_url = static function ($value): string {
-	if (! $value) {
-		return '';
-	}
+$media = fdry_hero_media($post_id, $prefix, $args);
 
-	if (is_string($value)) {
-		return trim($value);
-	}
-
-	if (is_array($value) && ! empty($value['url']) && is_string($value['url'])) {
-		return trim($value['url']);
-	}
-
-	return '';
-};
-
-/**
- * @param array|string|false|null $image ACF image field value.
- * @return array{url: string, alt: string, width: int, height: int}
- */
-$normalize_image = static function ($image): array {
-	$empty = array(
-		'url'    => '',
-		'alt'    => '',
-		'width'  => 0,
-		'height' => 0,
-	);
-
-	if (! $image) {
-		return $empty;
-	}
-
-	if (is_string($image) && $image !== '') {
-		return array(
-			'url'    => $image,
-			'alt'    => '',
-			'width'  => 0,
-			'height' => 0,
-		);
-	}
-
-	if (! is_array($image) || empty($image['url'])) {
-		return $empty;
-	}
-
-	return array(
-		'url'    => is_string($image['url']) ? $image['url'] : '',
-		'alt'    => is_string($image['alt'] ?? null) ? $image['alt'] : '',
-		'width'  => isset($image['width']) ? (int) $image['width'] : 0,
-		'height' => isset($image['height']) ? (int) $image['height'] : 0,
-	);
-};
-
-$autoplay_video = $args['autoplay_video'] ?? null;
-
-if ($autoplay_video === null && $post_id) {
-	$autoplay_video = get_field('hero_autoplay_video', $post_id);
-}
-
-$autoplay_video = $normalize_media_url($autoplay_video);
-
-if ($autoplay_video === '') {
+if ($media['mp4'] === '' && $media['webm'] === '') {
 	return;
 }
-
-$vimeo_embed_url = function_exists('fdry_vimeo_background_embed_url')
-	? fdry_vimeo_background_embed_url($autoplay_video)
-	: '';
-$is_vimeo        = $vimeo_embed_url !== '';
-
-$full_video = $args['full_video'] ?? null;
-
-if ($full_video === null && $post_id) {
-	$full_video = get_field('hero_full_video', $post_id);
-}
-
-$full_video = $normalize_media_url($full_video);
-
-$showreel_label = $args['showreel_label'] ?? null;
-
-if (! is_string($showreel_label) || $showreel_label === '') {
-	$acf_label      = $post_id ? get_field('hero_showreel_label', $post_id) : '';
-	$showreel_label = is_string($acf_label) && $acf_label !== '' ? $acf_label : 'SEE FULL SHOWREEL';
-}
-
-$showreel_thumb = $args['showreel_thumb'] ?? null;
-
-if ($showreel_thumb === null && $post_id) {
-	$showreel_thumb = get_field('hero_showreel_thumb', $post_id);
-}
-
-$showreel_thumb = $normalize_image($showreel_thumb);
 
 $allowed_variants = array('hero', 'inline');
 $variant          = $args['variant'] ?? 'hero';
@@ -144,47 +63,47 @@ if ($variant === 'inline') {
 ?>
 
 <section class="<?= esc_attr(implode(' ', $section_classes)); ?>" aria-label="<?= esc_attr($aria_label); ?>">
-	<?php if ($is_vimeo) : ?>
-		<div
-			class="hero-video__vimeo-mount"
-			data-vimeo-src="<?php echo esc_url($vimeo_embed_url); ?>"
-			aria-hidden="true"></div>
-	<?php else : ?>
-		<video
-			class="hero-video__media"
-			src="<?php echo esc_url($autoplay_video); ?>"
-			muted
-			autoplay
-			loop
-			playsinline
-			preload="auto"
-			aria-hidden="true"></video>
-	<?php endif; ?>
+	<video
+		class="hero-video__media"
+		<?php if ($media['poster']['url'] !== '') : ?>
+			poster="<?php echo esc_url($media['poster']['url']); ?>"
+		<?php endif; ?>
+		<?php if ($media['mp4'] !== '') : ?>
+			data-src-mp4="<?php echo esc_url($media['mp4']); ?>"
+		<?php endif; ?>
+		<?php if ($media['webm'] !== '') : ?>
+			data-src-webm="<?php echo esc_url($media['webm']); ?>"
+		<?php endif; ?>
+		muted
+		loop
+		playsinline
+		preload="none"
+		aria-hidden="true"></video>
 
-	<?php if ($showreel_label !== '') : ?>
+	<?php if ($media['label'] !== '') : ?>
 		<button
 			type="button"
 			class="hero-video__showreel"
 			data-hero-showreel
-			<?php if ($full_video !== '') : ?>
-				data-hero-full-video="<?php echo esc_url($full_video); ?>"
+			<?php if ($media['full_video'] !== '') : ?>
+				data-hero-full-video="<?php echo esc_url($media['full_video']); ?>"
 			<?php endif; ?>>
-			<?php if ($showreel_thumb['url'] !== '') : ?>
+			<?php if ($media['thumb']['url'] !== '') : ?>
 				<span class="hero-video__showreel-thumb">
 					<img
-						src="<?php echo esc_url($showreel_thumb['url']); ?>"
+						src="<?php echo esc_url($media['thumb']['url']); ?>"
 						alt=""
 						loading="lazy"
 						decoding="async"
-						<?php if ($showreel_thumb['width'] > 0) : ?>
-							width="<?php echo esc_attr((string) $showreel_thumb['width']); ?>"
+						<?php if ($media['thumb']['width'] > 0) : ?>
+							width="<?php echo esc_attr((string) $media['thumb']['width']); ?>"
 						<?php endif; ?>
-						<?php if ($showreel_thumb['height'] > 0) : ?>
-							height="<?php echo esc_attr((string) $showreel_thumb['height']); ?>"
+						<?php if ($media['thumb']['height'] > 0) : ?>
+							height="<?php echo esc_attr((string) $media['thumb']['height']); ?>"
 						<?php endif; ?>>
 				</span>
 			<?php endif; ?>
-			<span class="hero-video__showreel-label"><?php echo esc_html($showreel_label); ?></span>
+			<span class="hero-video__showreel-label"><?php echo esc_html($media['label']); ?></span>
 			<span class="hero-video__showreel-arrow" aria-hidden="true">
 				<?php get_template_part('svg-template/svg-arrow'); ?>
 			</span>

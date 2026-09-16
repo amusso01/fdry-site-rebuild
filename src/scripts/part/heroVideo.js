@@ -1,7 +1,16 @@
-const VIMEO_ORIGIN = 'https://player.vimeo.com'
+const MOBILE_QUERY = '(max-width: 768px)'
+const NEAR_VIEWPORT_MARGIN = '200px'
 
 function prefersReducedMotion() {
 	return window.matchMedia('(prefers-reduced-motion: reduce)').matches
+}
+
+function isSmallScreen() {
+	return window.matchMedia(MOBILE_QUERY).matches
+}
+
+function prefersReducedData() {
+	return Boolean(navigator.connection && navigator.connection.saveData)
 }
 
 function playHtml5Video(video) {
@@ -16,55 +25,47 @@ function pauseHtml5Video(video) {
 	video.pause()
 }
 
-function vimeoPostMessage(iframe, method) {
-	if (!(iframe instanceof HTMLIFrameElement) || !iframe.contentWindow) {
+/**
+ * Attach sources and begin loading.
+ *
+ * The markup ships no src and preload="none" so the browser fetches nothing
+ * until this runs. WebM is offered first; the browser picks the first type
+ * it supports.
+ */
+function attachSources(video) {
+	if (video.dataset.sourcesAttached === 'true') {
 		return
 	}
 
-	iframe.contentWindow.postMessage(JSON.stringify({ method }), VIMEO_ORIGIN)
-}
+	const candidates = [
+		{ src: video.dataset.srcWebm, type: 'video/webm' },
+		{ src: video.dataset.srcMp4, type: 'video/mp4' },
+	]
 
-function playVimeo(iframe) {
-	vimeoPostMessage(iframe, 'play')
-}
+	let attached = false
 
-function pauseVimeo(iframe) {
-	vimeoPostMessage(iframe, 'pause')
-}
+	candidates.forEach(({ src, type }) => {
+		if (!src) {
+			return
+		}
 
-function mountVimeoIframe(mount) {
-	const src = mount.dataset.vimeoSrc
+		const source = document.createElement('source')
 
-	if (!src) {
-		return null
+		source.src = src
+		source.type = type
+		video.appendChild(source)
+		attached = true
+	})
+
+	if (!attached) {
+		return
 	}
 
-	const existing = mount.querySelector('.hero-video__media--vimeo')
-
-	if (existing instanceof HTMLIFrameElement) {
-		return existing
-	}
-
-	const iframe = document.createElement('iframe')
-
-	iframe.className = 'hero-video__media hero-video__media--vimeo'
-	iframe.src = src
-	iframe.title = ''
-	iframe.tabIndex = -1
-	iframe.setAttribute('allow', 'autoplay; fullscreen; picture-in-picture')
-	iframe.setAttribute('aria-hidden', 'true')
-
-	mount.appendChild(iframe)
-
-	return iframe
+	video.dataset.sourcesAttached = 'true'
+	video.load()
 }
 
 function initMediaObserver(root, media, play, pause) {
-	if (prefersReducedMotion()) {
-		pause(media)
-		return
-	}
-
 	if (!('IntersectionObserver' in window)) {
 		play(media)
 		return
@@ -93,33 +94,63 @@ function initMediaObserver(root, media, play, pause) {
 	}
 }
 
-function initAutoplayMedia(root) {
-	const vimeoMount = root.querySelector('[data-vimeo-src]')
+/** Load now for the above-the-fold hero, or on approach for the inline variant. */
+function startWhenReady(root, video) {
+	const begin = () => {
+		attachSources(video)
 
-	if (vimeoMount) {
-		const iframe = mountVimeoIframe(vimeoMount)
+		video.addEventListener(
+			'loadeddata',
+			() => {
+				video.classList.add('is-playing')
+			},
+			{ once: true }
+		)
 
-		if (iframe) {
-			initMediaObserver(root, iframe, playVimeo, pauseVimeo)
+		initMediaObserver(root, video, playHtml5Video, pauseHtml5Video)
+	}
+
+	const isInline = root.classList.contains('hero-video--inline')
+
+	if (!isInline || !('IntersectionObserver' in window)) {
+		begin()
+		return
+	}
+
+	const loader = new IntersectionObserver(
+		(entries, observer) => {
+			entries.forEach((entry) => {
+				if (!entry.isIntersecting) {
+					return
+				}
+
+				observer.disconnect()
+				begin()
+			})
+		},
+		{
+			root: null,
+			rootMargin: NEAR_VIEWPORT_MARGIN,
 		}
+	)
 
+	loader.observe(root)
+}
+
+function initAutoplayMedia(root) {
+	const video = root.querySelector('.hero-video__media')
+
+	if (!(video instanceof HTMLVideoElement)) {
 		return
 	}
 
-	const media = root.querySelector('.hero-video__media')
-
-	if (!media) {
+	// The poster is already painted from markup. Leaving the video unloaded
+	// here is the whole mobile/reduced-motion saving: zero video bytes.
+	if (isSmallScreen() || prefersReducedMotion() || prefersReducedData()) {
 		return
 	}
 
-	if (media.classList.contains('hero-video__media--vimeo')) {
-		initMediaObserver(root, media, playVimeo, pauseVimeo)
-		return
-	}
-
-	if (media instanceof HTMLVideoElement) {
-		initMediaObserver(root, media, playHtml5Video, pauseHtml5Video)
-	}
+	startWhenReady(root, video)
 }
 
 export default function heroVideo() {
