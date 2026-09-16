@@ -10,6 +10,7 @@ import navMenu from './part/navMenu'
 import navAccordion from './part/navAccordion'
 import headerScroll from './part/headerScroll'
 import workArchive from './part/workArchive'
+import workRowSlider from './part/workRowSlider'
 
 document.addEventListener('DOMContentLoaded', () => {
 	smoothscroll.polyfill()
@@ -21,4 +22,5 @@ document.addEventListener('DOMContentLoaded', () => {
 	marquee()
 	heroVideo()
 	workArchive()
+	workRowSlider()
 })

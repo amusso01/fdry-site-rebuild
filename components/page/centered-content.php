@@ -159,19 +159,19 @@ if ($tagline === '' && $title === '' && $content === '' && ! $has_button_1 && ! 
 						<?php endif; ?>
 					</div>
 				<?php endif; ?>
-
-				<?php
-				get_template_part(
-					'components/page/work-row',
-					null,
-					array(
-						'field'   => $work_row_field,
-						'post_id' => $post_id,
-						'variant' => 'inner',
-					)
-				);
-				?>
 			</div>
+
+			<?php
+			get_template_part(
+				'components/page/work-row',
+				null,
+				array(
+					'field'   => $work_row_field,
+					'post_id' => $post_id,
+					'variant' => 'inner',
+				)
+			);
+			?>
 		</div>
 	</div>
 </section>

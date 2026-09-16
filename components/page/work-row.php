@@ -13,6 +13,7 @@
  *     @type string $field          ACF repeater field name. Default work_row.
  *     @type bool   $show_more_work When true, show a More work CTA below the grid. Default false.
  *     @type string $variant        Visual variant: default or inner. Default default.
+ *     @type bool   $slider         When false, stack cards on mobile instead of Swiper. Default true.
  *     @type int    $post_id        Post ID for ACF fallback. Default queried object.
  * }
  */
@@ -36,6 +37,7 @@ $allowed_variants = array('default', 'inner');
 $variant          = $args['variant'] ?? 'default';
 $variant          = is_string($variant) && in_array($variant, $allowed_variants, true) ? $variant : 'default';
 $is_inner         = $variant === 'inner';
+$enable_slider    = ! array_key_exists('slider', $args) || (bool) $args['slider'];
 
 if (! $post_id || ! have_rows($field, $post_id)) {
 	return;
@@ -107,10 +109,13 @@ if ($cards === array()) {
 }
 ?>
 
-<section class="work-row<?= $is_inner ? ' work-row--inner' : ''; ?>" aria-label="<?php esc_attr_e('Featured work', 'foundry'); ?>">
-	<div class="work-row__grid">
-			<?php foreach ($cards as $index => $card) : ?>
-				<article class="work-row__card">
+<section class="work-row<?= $is_inner ? ' work-row--inner' : ''; ?><?= $enable_slider ? '' : ' work-row--stack'; ?>" aria-label="<?php esc_attr_e('Featured work', 'foundry'); ?>">
+	<?php if ($enable_slider) : ?>
+		<div class="swiper work-row__slider">
+	<?php endif; ?>
+		<div class="work-row__grid<?= $enable_slider ? ' swiper-wrapper' : ''; ?>">
+			<?php foreach ($cards as $card) : ?>
+				<article class="work-row__card<?= $enable_slider ? ' swiper-slide' : ''; ?>">
 					<a
 						class="work-row__link"
 						href="<?= esc_url($card['permalink']); ?>"
@@ -120,7 +125,7 @@ if ($cards === array()) {
 								class="work-row__image"
 								src="<?= esc_url($card['image_url']); ?>"
 								alt="<?= esc_attr($card['image_alt'] !== '' ? $card['image_alt'] : $card['title']); ?>"
-								loading="<?= $index === 0 ? 'eager' : 'lazy'; ?>"
+								loading="eager"
 								decoding="async"
 								<?php if ($card['image_width'] > 0) : ?>
 									width="<?= esc_attr((string) $card['image_width']); ?>"
@@ -159,6 +164,11 @@ if ($cards === array()) {
 				</article>
 			<?php endforeach; ?>
 		</div>
+
+	<?php if ($enable_slider) : ?>
+		<div class="swiper-pagination work-row__pagination"></div>
+		</div>
+	<?php endif; ?>
 
 	<?php if ($show_more_work) : ?>
 		<div class="work-row__more">
