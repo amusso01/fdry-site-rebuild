@@ -1,0 +1,162 @@
+@use '../common/variables' as *;
+@use '../common/media' as *;
+
+.two-column-list {
+	padding-block: 72px;
+	background-color: $color__white;
+
+	&--gray {
+		background-color: #f7f7f7;
+	}
+
+	&__grid {
+		display: grid;
+		grid-template-columns: minmax(0, 1.25fr) minmax(0, 2fr);
+		row-gap: 20px;
+		align-items: start;
+
+		@include media('<tablet') {
+			grid-template-columns: 1fr;
+		}
+	}
+
+	&__left {
+		display: flex;
+		flex-direction: column;
+	}
+
+	&__tagline {
+		margin: 0;
+		font-size: 11px;
+		font-weight: 600;
+		line-height: 16px;
+		letter-spacing: 1px;
+		text-transform: uppercase;
+	}
+
+	&__tagline + * {
+		margin-top: 1.5rem;
+	}
+
+	&__title {
+		margin: 0;
+		font-size: 32px;
+		font-weight: 400;
+		line-height: 36px;
+	}
+
+	&__title + * {
+		margin-top: 1.5rem;
+	}
+
+	&__media {
+		width: 100%;
+	}
+
+	&__image {
+		display: block;
+		width: 100%;
+		height: auto;
+	}
+
+	&__right {
+		display: flex;
+		flex-direction: column;
+	}
+
+	&__list {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		column-gap: 48px;
+
+		@include media('<phone') {
+			grid-template-columns: 1fr;
+		}
+	}
+
+	&__list-column {
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	&__list-item {
+		display: flex;
+		align-items: flex-start;
+		gap: 12px;
+		padding-block: 16px;
+		border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+		font-size: 16px;
+		font-weight: 300;
+		line-height: 20px;
+	}
+
+	&__list-number {
+		flex-shrink: 0;
+		min-width: 20px;
+		font-size: 14px;
+		font-weight: 400;
+		line-height: 20px;
+	}
+
+	&__list-icon {
+		display: flex;
+		flex-shrink: 0;
+		align-items: center;
+		justify-content: center;
+		width: 20px;
+		height: 20px;
+
+		svg {
+			display: block;
+			width: 20px;
+			height: 20px;
+		}
+	}
+
+	&__list-label {
+		flex: 1;
+		min-width: 0;
+	}
+
+	&__body {
+		> :first-child {
+			margin-top: 0;
+		}
+
+		> :last-child {
+			margin-bottom: 0;
+		}
+
+		p + p {
+			margin-top: 1.25rem;
+		}
+
+		&--bigger-font {
+			max-width: 54ch;
+			font-size: 20px;
+			font-weight: 400;
+			line-height: 1.4;
+		}
+	}
+
+	&__list + &__body {
+		margin-top: 32px;
+	}
+}
+
+.service-inner-main .two-column-list {
+	.two-column-list__body {
+		max-width: 54ch;
+	}
+
+	@include media('>=tablet') {
+		.two-column-list__grid {
+			column-gap: 64px;
+		}
+
+		.two-column-list__right {
+			align-self: center;
+		}
+	}
+}

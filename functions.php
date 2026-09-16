@@ -379,3 +379,4 @@ function my_load_more_posts_handler() {
 
 // NEW DEV SITE 2026/27 logic
 require_once get_template_directory() . '/library/function-dev.php';
+require_once get_template_directory() . '/library/function-work.php';

@@ -1,0 +1,85 @@
+@use '../common/variables' as *;
+@use '../common/media' as *;
+
+.four-column-grid {
+	padding-top: clamp(3rem, 6vw, 5rem);
+	padding-bottom: 0;
+	background-color: $color__white;
+
+	&__cards {
+		display: grid;
+		grid-template-columns: repeat(4, 1fr);
+		margin: 0;
+		padding: 0;
+		list-style: none;
+
+		@include media('<tablet') {
+			grid-template-columns: repeat(2, 1fr);
+		}
+
+		@include media('<phone') {
+			grid-template-columns: 1fr;
+		}
+	}
+
+	&__card {
+		display: flex;
+		flex-direction: column;
+		gap: 8px;
+		padding: 32px 24px;
+		border-top: 1px solid rgba(0, 0, 0, 0.1);
+		border-right: 1px solid rgba(0, 0, 0, 0.1);
+
+		&:last-child {
+			border-right: 0;
+		}
+
+		@include media('<tablet') {
+			&:nth-child(2n) {
+				border-right: 0;
+			}
+		}
+
+		@include media('<phone') {
+			border-right: 0;
+		}
+	}
+
+	&__card-icon {
+		width: 24px;
+		height: 24px;
+		flex-shrink: 0;
+
+		svg {
+			display: block;
+			width: 24px;
+			height: 24px;
+		}
+	}
+
+	&__card-title {
+		margin: 0;
+		font-size: 16px;
+		font-weight: 700;
+		line-height: 20px;
+		color: $color__text;
+	}
+
+	&__card-content {
+		font-size: 16px;
+		font-weight: 300;
+		line-height: 20px;
+
+		> :first-child {
+			margin-top: 0;
+		}
+
+		> :last-child {
+			margin-bottom: 0;
+		}
+
+		p + p {
+			margin-top: 1rem;
+		}
+	}
+}

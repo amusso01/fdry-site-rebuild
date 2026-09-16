@@ -9,6 +9,7 @@ import heroVideo from './part/heroVideo'
 import navMenu from './part/navMenu'
 import navAccordion from './part/navAccordion'
 import headerScroll from './part/headerScroll'
+import workArchive from './part/workArchive'
 
 document.addEventListener('DOMContentLoaded', () => {
 	smoothscroll.polyfill()
@@ -19,4 +20,5 @@ document.addEventListener('DOMContentLoaded', () => {
 	navAccordion()
 	marquee()
 	heroVideo()
+	workArchive()
 })
