@@ -12,6 +12,7 @@
  *
  *     @type string $field          ACF repeater field name. Default work_row.
  *     @type bool   $show_more_work When true, show a More work CTA below the grid. Default false.
+ *     @type string $variant        Visual variant: default or inner. Default default.
  *     @type int    $post_id        Post ID for ACF fallback. Default queried object.
  * }
  */
@@ -30,6 +31,11 @@ $field = $args['field'] ?? 'work_row';
 $field = is_string($field) && $field !== '' ? $field : 'work_row';
 
 $show_more_work = ! empty($args['show_more_work']);
+
+$allowed_variants = array('default', 'inner');
+$variant          = $args['variant'] ?? 'default';
+$variant          = is_string($variant) && in_array($variant, $allowed_variants, true) ? $variant : 'default';
+$is_inner         = $variant === 'inner';
 
 if (! $post_id || ! have_rows($field, $post_id)) {
 	return;
@@ -59,24 +65,27 @@ while (have_rows($field, $post_id)) {
 		continue;
 	}
 
-	$description = get_field('description', $work_id);
-	$description = is_string($description) ? trim($description) : '';
+	$description = '';
+	$categories  = array();
 
-	$categories = array();
+	if (! $is_inner) {
+		$description = get_field('description', $work_id);
+		$description = is_string($description) ? trim($description) : '';
 
-	foreach (get_the_category($work_id) as $category) {
-		if (! $category instanceof WP_Term) {
-			continue;
-		}
+		foreach (get_the_category($work_id) as $category) {
+			if (! $category instanceof WP_Term) {
+				continue;
+			}
 
-		if ($category->slug === 'uncategorized') {
-			continue;
-		}
+			if ($category->slug === 'uncategorized') {
+				continue;
+			}
 
-		$categories[] = $category->name;
+			$categories[] = $category->name;
 
-		if (count($categories) >= 2) {
-			break;
+			if (count($categories) >= 2) {
+				break;
+			}
 		}
 	}
 
@@ -98,7 +107,7 @@ if ($cards === array()) {
 }
 ?>
 
-<section class="work-row" aria-label="<?php esc_attr_e('Featured work', 'foundry'); ?>">
+<section class="work-row<?= $is_inner ? ' work-row--inner' : ''; ?>" aria-label="<?php esc_attr_e('Featured work', 'foundry'); ?>">
 	<div class="work-row__grid">
 			<?php foreach ($cards as $index => $card) : ?>
 				<article class="work-row__card">
@@ -127,16 +136,22 @@ if ($cards === array()) {
 									<p class="work-row__title"><?= esc_html($card['title']); ?></p>
 								<?php endif; ?>
 
-								<?php if ($card['description'] !== '') : ?>
-									<p class="work-row__description"><?= esc_html($card['description']); ?></p>
-								<?php endif; ?>
+								<?php if ($is_inner) : ?>
+									<span class="work-row__arrow" aria-hidden="true">
+										<?php get_template_part('svg-template/svg-arrow'); ?>
+									</span>
+								<?php else : ?>
+									<?php if ($card['description'] !== '') : ?>
+										<p class="work-row__description"><?= esc_html($card['description']); ?></p>
+									<?php endif; ?>
 
-								<?php if ($card['categories'] !== array()) : ?>
-									<ul class="work-row__categories" aria-label="<?php esc_attr_e('Categories', 'foundry'); ?>">
-										<?php foreach ($card['categories'] as $category_name) : ?>
-											<li class="work-row__category"><?= esc_html($category_name); ?></li>
-										<?php endforeach; ?>
-									</ul>
+									<?php if ($card['categories'] !== array()) : ?>
+										<ul class="work-row__categories" aria-label="<?php esc_attr_e('Categories', 'foundry'); ?>">
+											<?php foreach ($card['categories'] as $category_name) : ?>
+												<li class="work-row__category"><?= esc_html($category_name); ?></li>
+											<?php endforeach; ?>
+										</ul>
+									<?php endif; ?>
 								<?php endif; ?>
 							</div>
 						</div>

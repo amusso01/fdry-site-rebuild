@@ -63,14 +63,6 @@
 	}
 }
 
-html.menu-open .site-header__hamburger {
-	--hamburger-width: 48px;
-
-	@include media('<tablet') {
-		--hamburger-width: 45px;
-	}
-}
-
 @media (prefers-reduced-motion: reduce) {
 	.hamburger__line {
 		transition: none;

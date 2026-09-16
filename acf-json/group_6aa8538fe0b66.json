@@ -117,6 +117,57 @@
             "allow_in_bindings": 0
         },
         {
+            "key": "field_6aaa9a623af8f",
+            "label": "Work Row",
+            "name": "centered_work_row",
+            "aria-label": "",
+            "type": "repeater",
+            "instructions": "Pick up to three featured works. Shown below the buttons, inside the centered column.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "layout": "block",
+            "pagination": 0,
+            "min": 0,
+            "max": 3,
+            "collapsed": "field_6aaa9a623b08d",
+            "button_label": "Add work",
+            "rows_per_page": 20,
+            "sub_fields": [
+                {
+                    "key": "field_6aaa9a623b08d",
+                    "label": "Work",
+                    "name": "work",
+                    "aria-label": "",
+                    "type": "post_object",
+                    "instructions": "",
+                    "required": 1,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "post_type": [
+                        "works_post"
+                    ],
+                    "post_status": "",
+                    "taxonomy": "",
+                    "return_format": "object",
+                    "multiple": 0,
+                    "allow_null": 0,
+                    "allow_in_bindings": 0,
+                    "ui": 1,
+                    "bidirectional_target": [],
+                    "parent_repeater": "field_6aaa9a623af8f"
+                }
+            ]
+        },
+        {
             "key": "field_6aa8538fe0c53",
             "label": "4 Column Grid",
             "name": "",
@@ -1325,5 +1376,5 @@
     "display_title": "",
     "allow_ai_access": false,
     "ai_description": "",
-    "modified": 1789419697
+    "modified": 1789565538
 }

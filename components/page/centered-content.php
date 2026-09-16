@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Centered content — tagline, title, WYSIWYG body, and optional buttons
+ * Centered content — tagline, title, WYSIWYG body, optional buttons, and optional work row
  *
  * @author Andrea Musso
  *
@@ -97,9 +97,13 @@ $button_2_label = is_array($button_2) && ! empty($button_2['title']) ? $button_2
 $has_button_1 = $button_1_label !== '' && $button_1_parts['url'] !== '#';
 $has_button_2 = $button_2_label !== '' && $button_2_parts['url'] !== '#';
 
+$work_row_field = $prefix . '_work_row';
+$work_row       = $post_id ? get_field($work_row_field, $post_id) : null;
+$has_work_row   = is_array($work_row) && $work_row !== array();
+
 $button_1_variant = $appearance === 'dark' ? 'yellow' : 'primary';
 
-if ($tagline === '' && $title === '' && $content === '' && ! $has_button_1 && ! $has_button_2) {
+if ($tagline === '' && $title === '' && $content === '' && ! $has_button_1 && ! $has_button_2 && ! $has_work_row) {
 	return;
 }
 ?>
@@ -155,6 +159,18 @@ if ($tagline === '' && $title === '' && $content === '' && ! $has_button_1 && ! 
 						<?php endif; ?>
 					</div>
 				<?php endif; ?>
+
+				<?php
+				get_template_part(
+					'components/page/work-row',
+					null,
+					array(
+						'field'   => $work_row_field,
+						'post_id' => $post_id,
+						'variant' => 'inner',
+					)
+				);
+				?>
 			</div>
 		</div>
 	</div>
