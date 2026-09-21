@@ -247,33 +247,12 @@
 			"mime_types": "webm"
 		},
 		{
-			"key": "field_6aa185527a012",
-			"label": "Full video",
-			"name": "showreel_full_video",
-			"aria-label": "",
-			"type": "file",
-			"instructions": "Full showreel video. Used by the showreel button (modal to be added later).",
-			"required": 0,
-			"conditional_logic": 0,
-			"wrapper": {
-				"width": "",
-				"class": "",
-				"id": ""
-			},
-			"return_format": "url",
-			"library": "all",
-			"min_size": "",
-			"max_size": "",
-			"mime_types": "mp4,webm,mov",
-			"allow_in_bindings": 0
-		},
-		{
 			"key": "field_6aa185527a013",
 			"label": "Showreel label",
 			"name": "showreel_label",
 			"aria-label": "",
 			"type": "text",
-			"instructions": "",
+			"instructions": "Text on the button that opens the full showreel. The button only appears once the showreel video has been deployed to the theme's media folder (see video-encode.md).",
 			"required": 0,
 			"conditional_logic": 0,
 			"wrapper": {
@@ -606,5 +585,5 @@
 	"display_title": "",
 	"allow_ai_access": false,
 	"ai_description": "",
-	"modified": 1789641617
+	"modified": 1789983447
 }

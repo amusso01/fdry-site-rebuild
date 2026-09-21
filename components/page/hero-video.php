@@ -10,6 +10,11 @@
  * heroVideo.js so small screens, reduced-motion and data-saver users never
  * download it. See src/scripts/part/heroVideo.js.
  *
+ * The showreel button opens a <dialog> with the full reel. It renders only
+ * when the reel file is deployed, and its <video> also ships without a src:
+ * showreelModal.js attaches one on hover/focus or click, so the page itself
+ * downloads none of it. See src/scripts/part/showreelModal.js.
+ *
  * @author Andrea Musso
  *
  * @package foundry
@@ -21,7 +26,8 @@
  *     @type string $webm       WebM URL, offered before the MP4.
  *     @type array  $poster     ACF image array for the poster frame.
  *     @type array  $poster_mobile ACF image array shown at or below FDRY_HERO_MOBILE_MAX_PX.
- *     @type string $full_video URL for the full showreel (modal hook only).
+ *     @type string $full_video    Full showreel MP4 URL. Default the theme file (fdry_showreel_sources()).
+ *     @type string $full_video_sd 720p showreel MP4 URL for small screens and slow connections.
  *     @type string $label      Showreel button label.
  *     @type array  $thumb      ACF image array for the showreel thumbnail.
  *     @type string $prefix     ACF field set to read: hero or showreel.
@@ -63,6 +69,9 @@ $section_classes = array('hero-video');
 if ($variant === 'inline') {
 	$section_classes[] = 'hero-video--inline';
 }
+
+$has_showreel = $media['full_video'] !== '' && $media['label'] !== '';
+$modal_id     = $has_showreel ? wp_unique_id('showreel-modal-') : '';
 ?>
 
 <section
@@ -109,14 +118,13 @@ if ($variant === 'inline') {
 		preload="none"
 		aria-hidden="true"></video>
 
-	<?php if ($media['label'] !== '') : ?>
+	<?php if ($has_showreel) : ?>
 		<button
 			type="button"
 			class="hero-video__showreel"
 			data-hero-showreel
-			<?php if ($media['full_video'] !== '') : ?>
-				data-hero-full-video="<?php echo esc_url($media['full_video']); ?>"
-			<?php endif; ?>>
+			aria-haspopup="dialog"
+			aria-controls="<?php echo esc_attr($modal_id); ?>">
 			<?php if ($media['thumb']['url'] !== '') : ?>
 				<span class="hero-video__showreel-thumb">
 					<img
@@ -137,5 +145,35 @@ if ($variant === 'inline') {
 				<?php get_template_part('svg-template/svg-arrow'); ?>
 			</span>
 		</button>
+
+		<dialog
+			class="showreel-modal"
+			id="<?php echo esc_attr($modal_id); ?>"
+			aria-label="<?php echo esc_attr($media['label']); ?>">
+			<div class="showreel-modal__inner">
+				<button
+					type="button"
+					class="showreel-modal__close"
+					data-showreel-close
+					aria-label="<?php esc_attr_e('Close showreel', 'foundry'); ?>">
+					<svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true" focusable="false">
+						<path d="M3 3l14 14M17 3L3 17" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" />
+					</svg>
+				</button>
+				<video
+					class="showreel-modal__video"
+					data-src="<?php echo esc_url($media['full_video']); ?>"
+					data-src-sd="<?php echo esc_url($media['full_video_sd']); ?>"
+					<?php if ($media['poster']['url'] !== '') : ?>
+						poster="<?php echo esc_url($media['poster']['url']); ?>"
+					<?php endif; ?>
+					controls
+					playsinline
+					preload="none"></video>
+				<p class="showreel-modal__error" hidden>
+					<?php esc_html_e('The showreel could not be loaded. Please try again later.', 'foundry'); ?>
+				</p>
+			</div>
+		</dialog>
 	<?php endif; ?>
 </section>

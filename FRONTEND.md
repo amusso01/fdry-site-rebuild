@@ -38,6 +38,8 @@ dist/
     manifest.json    # Maps entry to current hashed filenames (read by PHP)
 components/          # PHP partials for header-new templates
 header-new.php       # New header (legacy <head>, new body markup)
+media/
+  showreel-*.mp4     # Full showreel for the modal (gitignored, deployed by hand)
 ```
 
 Add SCSS partials under `src/styles/` and import them from `main.scss`.
@@ -77,6 +79,8 @@ Add new helpers, CPTs, ACF hooks, and enqueue rules to this file as the new site
 - `fdry.[hash].css`
 - `fdry.[hash].js`
 - `.vite/manifest.json`
+
+The full showreel files in `media/` are gitignored, so they are uploaded separately and only when the reel changes (see **Showreel modal** below).
 
 If the manifest is missing (no build yet), assets are not enqueued and the site still loads.
 
@@ -147,6 +151,8 @@ pnpm build     # one-off production build
 - `.vite/` — Vite cache
 - `*.log`, `.pnpm-debug.log*`
 - `.DS_Store`, `.idea/`, `*.swp`
+- `build/` — video masters and encoder output
+- `media/*.mp4` — the full showreel, deployed to the server by hand
 
 Commit `pnpm-lock.yaml` so installs stay reproducible.
 
@@ -180,17 +186,7 @@ Omitting `autoplay` is deliberate: it overrides `preload="none"` and the browser
 
 ### Encoding a new video
 
-```bash
-pnpm encode <input> <output-basename>          # → build/video/<name>.mp4, .webm, -poster.webp
-```
-
-Uses `ffmpeg-static` (no system install). Note `pnpm.onlyBuiltDependencies` in `package.json` — without it pnpm blocks the postinstall that downloads the ffmpeg binary.
-
-Settings are **visually transparent** (x264 CRF 18), not size-optimised: the source grading is the desired quality. `-movflags +faststart` is essential — it lets playback begin on the first bytes instead of after a full download.
-
-Measured on the launch showreel (1920×1080, 15.77s): master 29.2 MB @ 14.8 Mbps → **7.8 MB @ 4.2 Mbps, SSIM 0.9965**.
-
-**WebM is intentionally not shipped.** VP9 plateaued at SSIM ~0.97 for this footage at every bitrate tested (6.2 MB → 13.9 MB moved it 0.0014), so it was larger *and* measurably worse than the MP4. Since `<source>` order gives WebM to most browsers, shipping it would have served the majority the worse file. The field and plumbing remain if a future clip tests differently.
+See [`video-encode.md`](video-encode.md). It covers running `pnpm encode`, where masters and output go, which file goes in which ACF field, and why the site serves MP4 only.
 
 ### Upload guard
 
@@ -199,3 +195,22 @@ Content editors have no access to the encoder, so `fdry_validate_background_vide
 `fdry_inspect_mp4()` parses the MP4 container in plain PHP — the host has no ffmpeg — and **fails open**: anything it cannot parse is allowed through rather than blocking a valid upload.
 
 `fdry_validate_poster_present()` requires a poster wherever a video is set, since the poster is what makes the whole approach work.
+
+### Showreel modal
+
+The showreel button opens the full reel (with sound) in a native `<dialog>`. It is the same on the homepage hero and the service page showreel, because both render [`hero-video.php`](components/page/hero-video.php).
+
+There is **one site-wide reel and no ACF field**. `FDRY_SHOWREEL_BASENAME` in [`function-dev.php`](library/function-dev.php) points at `media/showreel-2026` in the theme root. `fdry_showreel_sources()` resolves `{name}.mp4` (1080p) and `{name}-720.mp4`, returning only files that exist on disk. **If the 1080p file is missing, the button does not render**, so a missed upload never shows a button that opens a broken player.
+
+It is a single faststart MP4, not HLS. For a 1–3 minute reel, HLS's only real gain is dropping quality mid-play on a weak connection. It would cost hls.js, a switch of the whole bundle to `type="module"`, two playback paths (native in Safari, hls.js elsewhere), CDN and MIME config, and hundreds of files per reel. It would also risk the soft start that got Vimeo removed. Revisit HLS if the reel goes past about 5 minutes or 4K, or if analytics show many viewers on weak connections.
+
+How [`showreelModal.js`](src/scripts/part/showreelModal.js) loads it:
+
+1. The modal's `<video>` ships with `preload="none"` and **no `src`**. Page load downloads nothing.
+2. On `pointerenter` or `focus` of the button, it sets `src` with `preload="metadata"`. Chrome fetches about 0.3 MB (the index and a fraction of a second of video), then stops.
+3. On click it opens the dialog, pauses the hero loop, and calls `play()` **inside the click handler**, because iOS only allows sound from within the user gesture. Measured in headless Chrome, playback starts about 30 ms after the click when primed, and about 290 ms when not (20 Mbps link, 40 ms latency).
+4. On close (button, Esc or backdrop) it saves the position, removes `src` and calls `load()`, which aborts the download. A paused video would keep buffering otherwise. Reopening resumes from the saved position, and the hero loop resumes.
+
+The 720p file is served at or below `data-mobile-max` (the same `FDRY_HERO_MOBILE_MAX_PX` cutoff as the hero), with save-data on, or when `navigator.connection.effectiveType` is 3g or slower. That API only exists in Chromium, so other browsers decide on screen size alone. Unlike the background loop, phones **do** play the full reel, since the visitor asked for it.
+
+To replace the reel, see "Full showreel" in [`video-encode.md`](video-encode.md).

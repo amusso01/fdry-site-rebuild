@@ -400,11 +400,56 @@ function fdry_image_parts($image): array
 const FDRY_HERO_MOBILE_MAX_PX = 768;
 
 /**
+ * Full showreel played in the modal, relative to the theme root, without
+ * extension. `pnpm encode ... --full` writes {name}.mp4 and {name}-720.mp4;
+ * both are deployed to media/ by hand (they are gitignored).
+ *
+ * Give a new reel a new name rather than overwriting the files, so no
+ * browser or CDN cache can serve the old one.
+ */
+const FDRY_SHOWREEL_BASENAME = 'media/showreel-2026';
+
+/**
+ * Resolve the full showreel files to URLs.
+ *
+ * Only files that exist on disk are returned, so a missing deploy hides the
+ * showreel button instead of rendering one that opens a broken player.
+ * The 720p file is optional and falls back to the full-size one.
+ *
+ * @return array{hd: string, sd: string}
+ */
+function fdry_showreel_sources(): array
+{
+	$url = static function (string $file): string {
+		return file_exists(get_stylesheet_directory() . '/' . $file)
+			? get_stylesheet_directory_uri() . '/' . $file
+			: '';
+	};
+
+	$hd = $url(FDRY_SHOWREEL_BASENAME . '.mp4');
+
+	if ($hd === '') {
+		return array(
+			'hd' => '',
+			'sd' => '',
+		);
+	}
+
+	$sd = $url(FDRY_SHOWREEL_BASENAME . '-720.mp4');
+
+	return array(
+		'hd' => $hd,
+		'sd' => $sd !== '' ? $sd : $hd,
+	);
+}
+
+/**
  * Resolve hero / showreel media fields into one normalised array.
  *
  * The homepage hero and the service page showreel share markup but use
  * different ACF field names, so the names are mapped per prefix rather than
- * built by concatenation.
+ * built by concatenation. The full showreel is not an ACF field: it is one
+ * site-wide reel served from the theme (see fdry_showreel_sources()).
  *
  * @param int                  $post_id Post to read ACF fields from.
  * @param string               $prefix  Field set to read: hero or showreel.
@@ -415,6 +460,7 @@ const FDRY_HERO_MOBILE_MAX_PX = 768;
  *     poster: array{url: string, alt: string, width: int, height: int},
  *     poster_mobile: array{url: string, alt: string, width: int, height: int},
  *     full_video: string,
+ *     full_video_sd: string,
  *     label: string,
  *     thumb: array{url: string, alt: string, width: int, height: int}
  * }
@@ -427,7 +473,6 @@ function fdry_hero_media(int $post_id, string $prefix = 'hero', array $args = ar
 			'webm'          => 'showreel_autoplay_video_webm',
 			'poster'        => 'showreel_poster',
 			'poster_mobile' => 'showreel_poster_mobile',
-			'full_video'    => 'showreel_full_video',
 			'label'         => 'showreel_label',
 			'thumb'         => 'showreel_thumb',
 		)
@@ -436,7 +481,6 @@ function fdry_hero_media(int $post_id, string $prefix = 'hero', array $args = ar
 			'webm'          => 'hero_autoplay_video_webm',
 			'poster'        => 'hero_poster',
 			'poster_mobile' => 'hero_poster_mobile',
-			'full_video'    => 'hero_full_video',
 			'label'         => 'hero_showreel_label',
 			'thumb'         => 'hero_showreel_thumb',
 		);
@@ -456,12 +500,17 @@ function fdry_hero_media(int $post_id, string $prefix = 'hero', array $args = ar
 	$label = $get('label');
 	$label = is_string($label) && $label !== '' ? $label : 'SEE FULL SHOWREEL';
 
+	$showreel   = fdry_showreel_sources();
+	$full_video = fdry_media_url($args['full_video'] ?? $showreel['hd']);
+	$full_sd    = fdry_media_url($args['full_video_sd'] ?? $showreel['sd']);
+
 	return array(
 		'mp4'           => fdry_media_url($get('mp4')),
 		'webm'          => fdry_media_url($get('webm')),
 		'poster'        => fdry_image_parts($get('poster')),
 		'poster_mobile' => fdry_image_parts($get('poster_mobile')),
-		'full_video'    => fdry_media_url($get('full_video')),
+		'full_video'    => $full_video,
+		'full_video_sd' => $full_sd !== '' ? $full_sd : $full_video,
 		'label'         => $label,
 		'thumb'         => fdry_image_parts($get('thumb')),
 	);

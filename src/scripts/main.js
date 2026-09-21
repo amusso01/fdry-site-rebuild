@@ -6,6 +6,7 @@ import gsapMotion from './part/gsap'
 import hamburger from './part/hamburger'
 import marquee from './part/marquee'
 import heroVideo from './part/heroVideo'
+import showreelModal from './part/showreelModal'
 import navMenu from './part/navMenu'
 import navAccordion from './part/navAccordion'
 import headerScroll from './part/headerScroll'
@@ -21,6 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	navAccordion()
 	marquee()
 	heroVideo()
+	showreelModal()
 	workArchive()
 	workRowSlider()
 })

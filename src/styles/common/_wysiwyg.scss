@@ -33,7 +33,23 @@
 	}
 
 	a {
+		color: $color__text;
 		text-decoration: underline;
+		transition: color 0.2s ease;
+
+		&:hover,
+		&:focus-visible {
+			color: rgba($color__text, 0.65);
+		}
+	}
+
+	.centered-content--dark & a {
+		color: $color__white;
+
+		&:hover,
+		&:focus-visible {
+			color: rgba($color__white, 0.72);
+		}
 	}
 
 	ul + p,
@@ -69,6 +85,15 @@
 	h6 {
 		margin: 0;
 		font-family: $header__fontname;
+	}
+
+	p + h1,
+	p + h2,
+	p + h3,
+	p + h4,
+	p + h5,
+	p + h6 {
+		margin-top: 1.25rem;
 	}
 
 	h1,

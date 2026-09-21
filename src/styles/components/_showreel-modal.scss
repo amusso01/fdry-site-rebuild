@@ -1,0 +1,112 @@
+@use '../common/variables' as *;
+
+// No page scroll behind the open modal.
+html:has(.showreel-modal[open]) {
+	overflow: hidden;
+}
+
+// Full showreel. A modal <dialog> renders in the top layer, so the hero's
+// overflow: hidden and stacking context do not clip or bury it.
+.showreel-modal {
+	--showreel-gutter: clamp(1rem, 4vw, 3.5rem);
+
+	width: 100%;
+	max-width: none;
+	height: 100%;
+	max-height: none;
+	margin: 0;
+	padding: var(--showreel-gutter);
+	border: 0;
+	overflow: hidden;
+	background: transparent;
+	color: $color__white;
+
+	&[open] {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+	}
+
+	&::backdrop {
+		background-color: rgba($color__black, 0.92);
+	}
+
+	// Largest 16:9 box that fits both the width and the height inside the
+	// gutter. dvh keeps it clear of mobile browser chrome; vh is the fallback.
+	&__inner {
+		width: min(100%, (100vh - 2 * var(--showreel-gutter)) * 16 / 9);
+		width: min(100%, (100dvh - 2 * var(--showreel-gutter)) * 16 / 9);
+	}
+
+	&__video {
+		display: block;
+		width: 100%;
+		aspect-ratio: 16 / 9;
+		object-fit: contain;
+		background-color: $color__black;
+	}
+
+	&__close {
+		position: absolute;
+		top: 1rem;
+		right: 1rem;
+		z-index: 1;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 2.75rem;
+		height: 2.75rem;
+		padding: 0;
+		border: 0;
+		border-radius: 50%;
+		background-color: rgba($color__white, 0.12);
+		color: $color__white;
+		cursor: pointer;
+		appearance: none;
+		transition: background-color 0.25s ease;
+
+		&:hover,
+		&:focus-visible {
+			background-color: rgba($color__white, 0.24);
+		}
+
+		&:focus-visible {
+			outline: 2px solid $color__white;
+			outline-offset: 2px;
+		}
+
+		svg {
+			display: block;
+		}
+	}
+
+	&__error {
+		margin: 1rem 0 0;
+		font-size: 0.875rem;
+		text-align: center;
+	}
+
+	@media (prefers-reduced-motion: no-preference) {
+		&[open] {
+			animation: showreel-modal-in 0.3s ease;
+		}
+
+		&[open]::backdrop {
+			animation: showreel-modal-fade 0.3s ease;
+		}
+	}
+}
+
+@keyframes showreel-modal-in {
+	from {
+		opacity: 0;
+		transform: scale(0.98);
+	}
+}
+
+@keyframes showreel-modal-fade {
+	from {
+		opacity: 0;
+	}
+}

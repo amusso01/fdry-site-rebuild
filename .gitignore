@@ -17,8 +17,8 @@ node_modules/
 .agents/
 .cursor/
 .claude/
-# Hero video masters and encode outputs — these live on the server, not in git
+# Hero video masters (build/masters/) and encode outputs (build/video/) — these live on the server, not in git
 /build/
+# Full showreel (FDRY_SHOWREEL_BASENAME) — deployed to the server by hand, see video-encode.md
+/media/*.mp4
 *.mov
-/as\ *.mp4
-/as\ *.webm

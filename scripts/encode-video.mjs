@@ -12,8 +12,12 @@
  *   --skip-webm       Do not encode VP9
  *   --skip-mp4        Do not encode H.264
  *   --poster-only     Only extract the poster
+ *   --full            Full showreel for the modal instead of a background loop
  *
  * Produces <name>.mp4, <name>.webm and <name>-poster.webp.
+ *
+ * With --full it produces <name>.mp4 (1080p) and <name>-720.mp4 instead, with
+ * audio kept and bitrate capped, and no WebM or poster. CRF defaults to 19.
  *
  * Settings are deliberately high quality: the source grading is the desired
  * quality, so these are transparency thresholds rather than efficiency
@@ -29,7 +33,13 @@ import sharp from 'sharp'
 
 const run = promisify(execFile)
 
-const argv = process.argv.slice(2)
+// A bare "--" (as in `pnpm encode -- file name`) is an end-of-options marker,
+// not an option, so drop it before parsing.
+const argv = process.argv.slice(2).filter((a) => a !== '--')
+
+// Only these options take a value; every other --flag is a boolean.
+const VALUE_OPTIONS = ['outdir', 'crf', 'vp9-crf']
+
 const flag = (name) => argv.includes(`--${name}`)
 const opt = (name, fallback) => {
 	const i = argv.indexOf(`--${name}`)
@@ -38,18 +48,22 @@ const opt = (name, fallback) => {
 const positional = argv.filter((a, i) => {
 	if (a.startsWith('--')) return false
 	const prev = argv[i - 1]
-	return !(prev && prev.startsWith('--') && !['skip-webm', 'skip-mp4', 'poster-only'].includes(prev.slice(2)))
+	return !(prev && VALUE_OPTIONS.includes(prev.replace(/^--/, '')))
 })
 
 const [input, basename] = positional
 
 if (!input || !basename) {
-	console.error('usage: pnpm encode <input> <output-basename> [--outdir dir] [--crf 18] [--vp9-crf 24]')
+	console.error(
+		'usage: pnpm encode <input> <output-basename> [--skip-webm] [--skip-mp4] [--poster-only] [--full] [--outdir dir] [--crf 18] [--vp9-crf 24]\n' +
+			'see video-encode.md'
+	)
 	process.exit(1)
 }
 
 const outDir = opt('outdir', 'build/video')
-const crf = opt('crf', '18')
+const isFull = flag('full')
+const crf = opt('crf', isFull ? '19' : '18')
 const vp9Crf = opt('vp9-crf', '24')
 
 const mb = (bytes) => (bytes / 1e6).toFixed(2)
@@ -105,6 +119,66 @@ const posterPng = path.join(outDir, `${basename}-poster.png`)
 const posterWebp = path.join(outDir, `${basename}-poster.webp`)
 
 console.log('\noutputs:')
+
+// Full showreel for the modal. Unlike the loop it keeps its audio, and the
+// bitrate is capped (maxrate/bufsize) so peaks never outrun an ordinary
+// connection mid-play. Keyframes at least every 2s make seeking land quickly;
+// faststart lets playback begin long before the download ends. Never
+// upscaled; a source above 1080p is brought down to 1080p.
+if (isFull) {
+	const renditions = [
+		{
+			file: `${basename}.mp4`,
+			label: `full c${crf}`,
+			height: src.height && src.height > 1080 ? 1080 : null,
+			crf,
+			maxrate: '5.5M',
+			bufsize: '11M',
+			audio: '160k',
+		},
+	]
+
+	if (!src.height || src.height > 720) {
+		renditions.push({
+			file: `${basename}-720.mp4`,
+			label: `720 c${Number(crf) + 1}`,
+			height: 720,
+			crf: String(Number(crf) + 1),
+			maxrate: '2.8M',
+			bufsize: '5.6M',
+			audio: '128k',
+		})
+	}
+
+	for (const r of renditions) {
+		const out = path.join(outDir, r.file)
+
+		console.log(`  encoding ${r.file}…`)
+
+		await ffmpeg([
+			'-i', input,
+			...(r.height ? ['-vf', `scale=-2:${r.height}`] : []),
+			'-c:v', 'libx264',
+			'-profile:v', 'high',
+			'-level', '4.2',
+			'-preset', 'slow',
+			'-crf', r.crf,
+			'-maxrate', r.maxrate,
+			'-bufsize', r.bufsize,
+			'-pix_fmt', 'yuv420p',
+			'-force_key_frames', 'expr:gte(t,n_forced*2)',
+			'-c:a', 'aac',
+			'-b:a', r.audio,
+			'-ac', '2',
+			'-movflags', '+faststart',
+			out,
+		])
+		report(r.label, out, await size(out), src.duration)
+	}
+
+	console.log('')
+	process.exit(0)
+}
 
 if (!flag('poster-only') && !flag('skip-mp4')) {
 	// No scale filter: source is already at target resolution, so scaling

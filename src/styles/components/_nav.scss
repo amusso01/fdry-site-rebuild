@@ -43,6 +43,7 @@ $nav-media-size: 280px;
 		justify-content: space-between;
 		min-height: $site-header-height;
 		flex-shrink: 0;
+		background-color: $nav-bg;
 	}
 
 	&__brand {
@@ -148,6 +149,13 @@ $nav-media-size: 280px;
 				opacity: 1;
 			}
 		}
+	}
+}
+
+body.home,
+body.page-template-template-home-php {
+	.site-header__inner {
+		background-color: transparent;
 	}
 }
 

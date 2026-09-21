@@ -1,5 +1,5 @@
 <?php
-if ( ! defined( 'ABSPATH' ) ) {
+if (! defined('ABSPATH')) {
 	exit; // Exit if accessed directly.
 }
 
@@ -18,12 +18,13 @@ get_header();
 
 				<main class="site-main career-main" id="main" role="main">
 
-					<?php while ( have_posts() ) : the_post(); ?>
+					<?php while (have_posts()) : the_post(); ?>
 
-						<?php get_template_part( 'loop-templates/content', 'page' ); ?>
+						<?php get_template_part('loop-templates/content', 'page'); ?>
 
 
-					<?php endwhile; // end of the loop. ?>
+					<?php endwhile; // end of the loop. 
+					?>
 
 				</main><!-- #main -->
 

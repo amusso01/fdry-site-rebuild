@@ -17,7 +17,8 @@
  *     @type string $webm       WebM URL, offered before the MP4.
  *     @type array  $poster     ACF image array for the poster frame.
  *     @type array  $poster_mobile ACF image array shown at or below FDRY_HERO_MOBILE_MAX_PX.
- *     @type string $full_video URL for the full showreel (modal hook only).
+ *     @type string $full_video    Full showreel MP4 URL. Default the theme file (fdry_showreel_sources()).
+ *     @type string $full_video_sd 720p showreel MP4 URL for small screens and slow connections.
  *     @type string $label      Showreel button label.
  *     @type array  $thumb      ACF image array for the showreel thumbnail.
  *     @type int    $post_id    Post ID for ACF fallback. Default queried object.
