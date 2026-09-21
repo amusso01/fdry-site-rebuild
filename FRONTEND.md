@@ -162,9 +162,17 @@ The hero and service showreel play a **self-hosted, muted, looping MP4** behind 
 
 ### How it loads
 
-1. The poster is preloaded in `wp_head` (`fdry_preload_hero_poster()`, homepage only) and paints as the LCP element.
+1. The still renders as a separate `<picture class="hero-video__poster">` and is preloaded in `wp_head` (`fdry_preload_hero_poster()`, homepage only), so it paints as the LCP element.
 2. The `<video>` ships with `preload="none"`, **no `src`** and **no `autoplay`** — only `data-src-mp4` / `data-src-webm`.
-3. [`heroVideo.js`](src/scripts/part/heroVideo.js) decides whether to fetch at all, then attaches `<source>` elements and calls `play()`.
+3. [`heroVideo.js`](src/scripts/part/heroVideo.js) decides whether to fetch at all, then attaches `<source>` elements and calls `play()`. On `loadeddata` the video fades in **over** the still.
+
+**The still must never be the video's `poster` attribute.** It was, once, and because `.hero-video__media` is `opacity: 0` until `.is-playing`, the poster was hidden along with the element containing it — black hero on mobile, and no early paint anywhere. A single element cannot cross-fade against its own poster.
+
+### Mobile still
+
+`{prefix}_poster_mobile` is optional and falls back to `{prefix}_poster`. When set it is served below the breakpoint via `<source media>`, following the `banner_mobile_image` pattern in [`image-banner.php`](components/page/image-banner.php). Worth supplying: a 16:9 still loses most of its composition cropped into a `100vh` phone viewport.
+
+`FDRY_HERO_MOBILE_MAX_PX` (768) in [`function-dev.php`](library/function-dev.php) is the single source of truth. It feeds the `<source media>`, both preload `media` queries, and `data-mobile-max` on the section, which `heroVideo.js` reads instead of hardcoding a value — so the art-direction switch and the download gate cannot drift apart. The theme has other breakpoints (639px in image-banner, 700px in legacy `front-page.php`); those are unrelated and deliberately untouched.
 
 It **never** downloads the video when the viewport is ≤768px, `prefers-reduced-motion` is set, or `saveData` is on — the poster stands in. The `--inline` variant (service pages) also waits until it approaches the viewport.
 

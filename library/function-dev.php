@@ -391,6 +391,15 @@ function fdry_image_parts($image): array
 }
 
 /**
+ * Viewport width at or below which the hero shows a still instead of video.
+ *
+ * Single source of truth: feeds the <picture> art-direction switch, the
+ * poster preload media queries, and (via data-mobile-max) the JS download
+ * gate, so the CSS and JS cutoffs cannot drift apart.
+ */
+const FDRY_HERO_MOBILE_MAX_PX = 768;
+
+/**
  * Resolve hero / showreel media fields into one normalised array.
  *
  * The homepage hero and the service page showreel share markup but use
@@ -404,6 +413,7 @@ function fdry_image_parts($image): array
  *     mp4: string,
  *     webm: string,
  *     poster: array{url: string, alt: string, width: int, height: int},
+ *     poster_mobile: array{url: string, alt: string, width: int, height: int},
  *     full_video: string,
  *     label: string,
  *     thumb: array{url: string, alt: string, width: int, height: int}
@@ -413,20 +423,22 @@ function fdry_hero_media(int $post_id, string $prefix = 'hero', array $args = ar
 {
 	$names = $prefix === 'showreel'
 		? array(
-			'mp4'        => 'showreel_autoplay_video',
-			'webm'       => 'showreel_autoplay_video_webm',
-			'poster'     => 'showreel_poster',
-			'full_video' => 'showreel_full_video',
-			'label'      => 'showreel_label',
-			'thumb'      => 'showreel_thumb',
+			'mp4'           => 'showreel_autoplay_video',
+			'webm'          => 'showreel_autoplay_video_webm',
+			'poster'        => 'showreel_poster',
+			'poster_mobile' => 'showreel_poster_mobile',
+			'full_video'    => 'showreel_full_video',
+			'label'         => 'showreel_label',
+			'thumb'         => 'showreel_thumb',
 		)
 		: array(
-			'mp4'        => 'hero_autoplay_video',
-			'webm'       => 'hero_autoplay_video_webm',
-			'poster'     => 'hero_poster',
-			'full_video' => 'hero_full_video',
-			'label'      => 'hero_showreel_label',
-			'thumb'      => 'hero_showreel_thumb',
+			'mp4'           => 'hero_autoplay_video',
+			'webm'          => 'hero_autoplay_video_webm',
+			'poster'        => 'hero_poster',
+			'poster_mobile' => 'hero_poster_mobile',
+			'full_video'    => 'hero_full_video',
+			'label'         => 'hero_showreel_label',
+			'thumb'         => 'hero_showreel_thumb',
 		);
 
 	$get = static function (string $key) use ($names, $post_id, $args) {
@@ -445,12 +457,13 @@ function fdry_hero_media(int $post_id, string $prefix = 'hero', array $args = ar
 	$label = is_string($label) && $label !== '' ? $label : 'SEE FULL SHOWREEL';
 
 	return array(
-		'mp4'        => fdry_media_url($get('mp4')),
-		'webm'       => fdry_media_url($get('webm')),
-		'poster'     => fdry_image_parts($get('poster')),
-		'full_video' => fdry_media_url($get('full_video')),
-		'label'      => $label,
-		'thumb'      => fdry_image_parts($get('thumb')),
+		'mp4'           => fdry_media_url($get('mp4')),
+		'webm'          => fdry_media_url($get('webm')),
+		'poster'        => fdry_image_parts($get('poster')),
+		'poster_mobile' => fdry_image_parts($get('poster_mobile')),
+		'full_video'    => fdry_media_url($get('full_video')),
+		'label'         => $label,
+		'thumb'         => fdry_image_parts($get('thumb')),
 	);
 }
 
@@ -469,6 +482,24 @@ function fdry_preload_hero_poster(): void
 	$media = fdry_hero_media((int) get_queried_object_id(), 'hero');
 
 	if ($media['poster']['url'] === '' || $media['mp4'] === '') {
+		return;
+	}
+
+	// With two candidate posters each link must be media-scoped, or the
+	// browser preloads both and the mobile saving is lost.
+	if ($media['poster_mobile']['url'] !== '') {
+		printf(
+			'<link rel="preload" as="image" href="%1$s" media="(max-width: %2$dpx)" fetchpriority="high" />' . "\n",
+			esc_url($media['poster_mobile']['url']),
+			FDRY_HERO_MOBILE_MAX_PX
+		);
+
+		printf(
+			'<link rel="preload" as="image" href="%1$s" media="(min-width: %2$spx)" fetchpriority="high" />' . "\n",
+			esc_url($media['poster']['url']),
+			esc_attr(FDRY_HERO_MOBILE_MAX_PX + 0.02)
+		);
+
 		return;
 	}
 

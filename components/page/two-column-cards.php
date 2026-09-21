@@ -150,7 +150,7 @@ if ($tagline === '' && $title === '' && ! $has_button && $content === '' && $car
 				<?php if ($content !== '' || $cards !== array()) : ?>
 					<div class="two-column-cards__right">
 						<?php if ($content !== '') : ?>
-							<div class="two-column-cards__body<?= $use_bigger_font ? ' two-column-cards__body--bigger-font' : ''; ?>">
+							<div class="two-column-cards__body wysiwyg<?= $use_bigger_font ? ' two-column-cards__body--bigger-font' : ''; ?>">
 								<?= wp_kses_post($content); ?>
 							</div>
 						<?php endif; ?>
@@ -170,7 +170,7 @@ if ($tagline === '' && $title === '' && ! $has_button && $content === '' && $car
 										<?php endif; ?>
 
 										<?php if ($card['content'] !== '') : ?>
-											<div class="two-column-cards__card-content">
+											<div class="two-column-cards__card-content wysiwyg">
 												<?= wp_kses_post($card['content']); ?>
 											</div>
 										<?php endif; ?>

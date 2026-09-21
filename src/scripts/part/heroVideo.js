@@ -1,12 +1,20 @@
-const MOBILE_QUERY = '(max-width: 768px)'
+const DEFAULT_MOBILE_MAX = 768
 const NEAR_VIEWPORT_MARGIN = '200px'
 
 function prefersReducedMotion() {
 	return window.matchMedia('(prefers-reduced-motion: reduce)').matches
 }
 
-function isSmallScreen() {
-	return window.matchMedia(MOBILE_QUERY).matches
+/**
+ * Read the cutoff from the markup so it always matches the <picture>
+ * art-direction switch and the poster preload, which are both driven by
+ * FDRY_HERO_MOBILE_MAX_PX in PHP.
+ */
+function isSmallScreen(root) {
+	const declared = Number.parseInt(root.dataset.mobileMax, 10)
+	const max = Number.isFinite(declared) ? declared : DEFAULT_MOBILE_MAX
+
+	return window.matchMedia(`(max-width: ${max}px)`).matches
 }
 
 function prefersReducedData() {
@@ -146,7 +154,7 @@ function initAutoplayMedia(root) {
 
 	// The poster is already painted from markup. Leaving the video unloaded
 	// here is the whole mobile/reduced-motion saving: zero video bytes.
-	if (isSmallScreen() || prefersReducedMotion() || prefersReducedData()) {
+	if (isSmallScreen(root) || prefersReducedMotion() || prefersReducedData()) {
 		return
 	}
 

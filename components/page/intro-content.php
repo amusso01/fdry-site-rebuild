@@ -162,7 +162,7 @@ if ($tagline === '' && $title === '' && $content === '' && $logos === array() &&
 					<?php endif; ?>
 
 					<?php if ($content !== '') : ?>
-						<div class="intro-content__body">
+						<div class="intro-content__body wysiwyg">
 							<?= wp_kses_post($content); ?>
 						</div>
 					<?php endif; ?>

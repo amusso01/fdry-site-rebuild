@@ -1,588 +1,610 @@
 {
-    "key": "group_6aa185527a283",
-    "title": "New Service",
-    "fields": [
-        {
-            "key": "field_6aa185527a001",
-            "label": "Centered Content",
-            "name": "",
-            "aria-label": "",
-            "type": "tab",
-            "instructions": "",
-            "required": 0,
-            "conditional_logic": 0,
-            "wrapper": {
-                "width": "",
-                "class": "",
-                "id": ""
-            },
-            "placement": "top",
-            "endpoint": 0,
-            "selected": 0
-        },
-        {
-            "key": "field_6aa185527a002",
-            "label": "Tagline",
-            "name": "centered_tagline",
-            "aria-label": "",
-            "type": "text",
-            "instructions": "",
-            "required": 0,
-            "conditional_logic": 0,
-            "wrapper": {
-                "width": "70",
-                "class": "",
-                "id": ""
-            },
-            "default_value": "",
-            "maxlength": "",
-            "allow_in_bindings": 0,
-            "placeholder": "",
-            "prepend": "",
-            "append": ""
-        },
-        {
-            "key": "field_6aa185527a003",
-            "label": "Tagline tag",
-            "name": "centered_tagline_tag",
-            "aria-label": "",
-            "type": "button_group",
-            "instructions": "Semantic heading level for the tagline. Styled the same regardless of choice.",
-            "required": 0,
-            "conditional_logic": 0,
-            "wrapper": {
-                "width": "30",
-                "class": "",
-                "id": ""
-            },
-            "choices": {
-                "h1": "H1",
-                "h2": "H2",
-                "h3": "H3",
-                "h4": "H4"
-            },
-            "default_value": "h2",
-            "return_format": "value",
-            "allow_null": 0,
-            "layout": "horizontal"
-        },
-        {
-            "key": "field_6aa185527a004",
-            "label": "Section title",
-            "name": "centered_title",
-            "aria-label": "",
-            "type": "text",
-            "instructions": "",
-            "required": 0,
-            "conditional_logic": 0,
-            "wrapper": {
-                "width": "",
-                "class": "",
-                "id": ""
-            },
-            "default_value": "",
-            "maxlength": "",
-            "allow_in_bindings": 0,
-            "placeholder": "",
-            "prepend": "",
-            "append": ""
-        },
-        {
-            "key": "field_6aa185527a005",
-            "label": "Content",
-            "name": "centered_content",
-            "aria-label": "",
-            "type": "wysiwyg",
-            "instructions": "",
-            "required": 0,
-            "conditional_logic": 0,
-            "wrapper": {
-                "width": "",
-                "class": "",
-                "id": ""
-            },
-            "default_value": "",
-            "tabs": "visual",
-            "toolbar": "basic",
-            "media_upload": 0,
-            "delay": 0
-        },
-        {
-            "key": "field_6aa185527a006",
-            "label": "Button 1",
-            "name": "centered_button_1",
-            "aria-label": "",
-            "type": "link",
-            "instructions": "Primary button (label and URL from link field).",
-            "required": 0,
-            "conditional_logic": 0,
-            "wrapper": {
-                "width": "50",
-                "class": "",
-                "id": ""
-            },
-            "return_format": "array",
-            "allow_in_bindings": 0
-        },
-        {
-            "key": "field_6aa185527a007",
-            "label": "Button 2",
-            "name": "centered_button_2",
-            "aria-label": "",
-            "type": "link",
-            "instructions": "White button (label and URL from link field).",
-            "required": 0,
-            "conditional_logic": 0,
-            "wrapper": {
-                "width": "50",
-                "class": "",
-                "id": ""
-            },
-            "return_format": "array",
-            "allow_in_bindings": 0
-        },
-        {
-            "key": "field_6aa185527a010",
-            "label": "Showreel",
-            "name": "",
-            "aria-label": "",
-            "type": "tab",
-            "instructions": "",
-            "required": 0,
-            "conditional_logic": 0,
-            "wrapper": {
-                "width": "",
-                "class": "",
-                "id": ""
-            },
-            "placement": "top",
-            "endpoint": 0,
-            "selected": 0
-        },
-        {
-            "key": "field_6aa185527a011",
-            "label": "Small autoplay video",
-            "name": "showreel_autoplay_video",
-            "aria-label": "",
-            "type": "file",
-            "instructions": "Choose the uploaded MP4. Plays muted and looping in the background. It must be a web encode with faststart — master exports straight from an editing suite are rejected, and the error will give you a note to send to your developer.",
-            "required": 0,
-            "conditional_logic": 0,
-            "wrapper": {
-                "width": "",
-                "class": "",
-                "id": ""
-            },
-            "return_format": "url",
-            "mime_types": "mp4",
-            "library": "all",
-            "min_size": "",
-            "max_size": ""
-        },
-        {
-            "key": "field_6aa185527a015",
-            "label": "Poster frame",
-            "name": "showreel_poster",
-            "type": "image",
-            "instructions": "Sharp still shown instantly while the video loads. Use the generated -poster.webp, around 1920 wide.",
-            "required": 0,
-            "conditional_logic": 0,
-            "wrapper": {
-                "width": "",
-                "class": "",
-                "id": ""
-            },
-            "return_format": "array",
-            "preview_size": "medium",
-            "library": "all",
-            "min_width": "",
-            "min_height": "",
-            "min_size": "",
-            "max_width": "",
-            "max_height": "",
-            "max_size": "",
-            "mime_types": ""
-        },
-        {
-            "key": "field_6aa185527a016",
-            "label": "Autoplay video (WebM, optional)",
-            "name": "showreel_autoplay_video_webm",
-            "type": "file",
-            "instructions": "Optional WebM version, offered before the MP4. Leave empty to serve the MP4 to everyone — for this footage the MP4 tested better, so empty is the right default.",
-            "required": 0,
-            "conditional_logic": 0,
-            "wrapper": {
-                "width": "",
-                "class": "",
-                "id": ""
-            },
-            "return_format": "url",
-            "library": "all",
-            "min_size": "",
-            "max_size": "",
-            "mime_types": "webm"
-        },
-        {
-            "key": "field_6aa185527a012",
-            "label": "Full video",
-            "name": "showreel_full_video",
-            "aria-label": "",
-            "type": "file",
-            "instructions": "Full showreel video. Used by the showreel button (modal to be added later).",
-            "required": 0,
-            "conditional_logic": 0,
-            "wrapper": {
-                "width": "",
-                "class": "",
-                "id": ""
-            },
-            "return_format": "url",
-            "library": "all",
-            "min_size": "",
-            "max_size": "",
-            "mime_types": "mp4,webm,mov",
-            "allow_in_bindings": 0
-        },
-        {
-            "key": "field_6aa185527a013",
-            "label": "Showreel label",
-            "name": "showreel_label",
-            "aria-label": "",
-            "type": "text",
-            "instructions": "",
-            "required": 0,
-            "conditional_logic": 0,
-            "wrapper": {
-                "width": "50",
-                "class": "",
-                "id": ""
-            },
-            "default_value": "SEE FULL SHOWREEL",
-            "maxlength": "",
-            "allow_in_bindings": 0,
-            "placeholder": "",
-            "prepend": "",
-            "append": ""
-        },
-        {
-            "key": "field_6aa185527a014",
-            "label": "Showreel thumbnail",
-            "name": "showreel_thumb",
-            "aria-label": "",
-            "type": "image",
-            "instructions": "Circular thumbnail shown inside the showreel button.",
-            "required": 0,
-            "conditional_logic": 0,
-            "wrapper": {
-                "width": "50",
-                "class": "",
-                "id": ""
-            },
-            "return_format": "array",
-            "library": "all",
-            "min_width": "",
-            "min_height": "",
-            "min_size": "",
-            "max_width": "",
-            "max_height": "",
-            "max_size": "",
-            "mime_types": "",
-            "allow_in_bindings": 0,
-            "preview_size": "thumbnail"
-        },
-        {
-            "key": "field_6aa185527a020",
-            "label": "Navigation Content",
-            "name": "",
-            "aria-label": "",
-            "type": "tab",
-            "instructions": "",
-            "required": 0,
-            "conditional_logic": 0,
-            "wrapper": {
-                "width": "",
-                "class": "",
-                "id": ""
-            },
-            "placement": "top",
-            "endpoint": 0,
-            "selected": 0
-        },
-        {
-            "key": "field_6aa185527a021",
-            "label": "Navigation Content",
-            "name": "navigation_content",
-            "aria-label": "",
-            "type": "repeater",
-            "instructions": "Add up to three rows. Each row has a main link and a list of sublink pills.",
-            "required": 0,
-            "conditional_logic": 0,
-            "wrapper": {
-                "width": "",
-                "class": "",
-                "id": ""
-            },
-            "layout": "block",
-            "pagination": 0,
-            "min": 0,
-            "max": 3,
-            "collapsed": "field_6aa185527a022",
-            "button_label": "Add row",
-            "rows_per_page": 20,
-            "sub_fields": [
-                {
-                    "key": "field_6aa185527a022",
-                    "label": "Main link",
-                    "name": "main_link",
-                    "aria-label": "",
-                    "type": "link",
-                    "instructions": "",
-                    "required": 0,
-                    "conditional_logic": 0,
-                    "wrapper": {
-                        "width": "",
-                        "class": "",
-                        "id": ""
-                    },
-                    "return_format": "array",
-                    "allow_in_bindings": 0,
-                    "parent_repeater": "field_6aa185527a021"
-                },
-                {
-                    "key": "field_6aa185527a023",
-                    "label": "Sublinks",
-                    "name": "sublinks",
-                    "aria-label": "",
-                    "type": "repeater",
-                    "instructions": "",
-                    "required": 0,
-                    "conditional_logic": 0,
-                    "wrapper": {
-                        "width": "",
-                        "class": "",
-                        "id": ""
-                    },
-                    "layout": "table",
-                    "pagination": 0,
-                    "min": 0,
-                    "max": 0,
-                    "collapsed": "",
-                    "button_label": "Add sublink",
-                    "rows_per_page": 20,
-                    "sub_fields": [
-                        {
-                            "key": "field_6aa185527a024",
-                            "label": "Sublink",
-                            "name": "sublink",
-                            "aria-label": "",
-                            "type": "link",
-                            "instructions": "",
-                            "required": 0,
-                            "conditional_logic": 0,
-                            "wrapper": {
-                                "width": "",
-                                "class": "",
-                                "id": ""
-                            },
-                            "return_format": "array",
-                            "allow_in_bindings": 0,
-                            "parent_repeater": "field_6aa185527a023"
-                        }
-                    ],
-                    "parent_repeater": "field_6aa185527a021"
-                }
-            ]
-        },
-        {
-            "key": "field_6aa185527a030",
-            "label": "Work Row",
-            "name": "",
-            "aria-label": "",
-            "type": "tab",
-            "instructions": "",
-            "required": 0,
-            "conditional_logic": 0,
-            "wrapper": {
-                "width": "",
-                "class": "",
-                "id": ""
-            },
-            "placement": "top",
-            "endpoint": 0,
-            "selected": 0
-        },
-        {
-            "key": "field_6aa185527a031",
-            "label": "Work Row",
-            "name": "work_row",
-            "aria-label": "",
-            "type": "repeater",
-            "instructions": "Pick up to three featured works for the full-width hover row.",
-            "required": 0,
-            "conditional_logic": 0,
-            "wrapper": {
-                "width": "",
-                "class": "",
-                "id": ""
-            },
-            "layout": "block",
-            "pagination": 0,
-            "min": 0,
-            "max": 3,
-            "collapsed": "field_6aa185527a032",
-            "button_label": "Add work",
-            "rows_per_page": 20,
-            "sub_fields": [
-                {
-                    "key": "field_6aa185527a032",
-                    "label": "Work",
-                    "name": "work",
-                    "aria-label": "",
-                    "type": "post_object",
-                    "instructions": "",
-                    "required": 1,
-                    "conditional_logic": 0,
-                    "wrapper": {
-                        "width": "",
-                        "class": "",
-                        "id": ""
-                    },
-                    "post_type": [
-                        "works_post"
-                    ],
-                    "post_status": "",
-                    "taxonomy": "",
-                    "return_format": "object",
-                    "multiple": 0,
-                    "allow_null": 0,
-                    "ui": 1,
-                    "bidirectional_target": [],
-                    "parent_repeater": "field_6aa185527a031"
-                }
-            ]
-        },
-        {
-            "key": "field_6aa185527a040",
-            "label": "Centered Content Dark",
-            "name": "",
-            "aria-label": "",
-            "type": "tab",
-            "instructions": "",
-            "required": 0,
-            "conditional_logic": 0,
-            "wrapper": {
-                "width": "",
-                "class": "",
-                "id": ""
-            },
-            "placement": "top",
-            "endpoint": 0,
-            "selected": 0
-        },
-        {
-            "key": "field_6aa185527a041",
-            "label": "Tagline",
-            "name": "centered_dark_tagline",
-            "aria-label": "",
-            "type": "text",
-            "instructions": "",
-            "required": 0,
-            "conditional_logic": 0,
-            "wrapper": {
-                "width": "70",
-                "class": "",
-                "id": ""
-            },
-            "default_value": "",
-            "maxlength": "",
-            "allow_in_bindings": 0,
-            "placeholder": "",
-            "prepend": "",
-            "append": ""
-        },
-        {
-            "key": "field_6aa185527a042",
-            "label": "Tagline tag",
-            "name": "centered_dark_tagline_tag",
-            "aria-label": "",
-            "type": "button_group",
-            "instructions": "Semantic heading level for the tagline. Styled the same regardless of choice.",
-            "required": 0,
-            "conditional_logic": 0,
-            "wrapper": {
-                "width": "30",
-                "class": "",
-                "id": ""
-            },
-            "choices": {
-                "h1": "H1",
-                "h2": "H2",
-                "h3": "H3",
-                "h4": "H4"
-            },
-            "default_value": "h4",
-            "return_format": "value",
-            "allow_null": 0,
-            "layout": "horizontal"
-        },
-        {
-            "key": "field_6aa185527a043",
-            "label": "Content",
-            "name": "centered_dark_content",
-            "aria-label": "",
-            "type": "wysiwyg",
-            "instructions": "",
-            "required": 0,
-            "conditional_logic": 0,
-            "wrapper": {
-                "width": "",
-                "class": "",
-                "id": ""
-            },
-            "default_value": "",
-            "tabs": "visual",
-            "toolbar": "basic",
-            "media_upload": 0,
-            "delay": 0
-        },
-        {
-            "key": "field_6aa185527a044",
-            "label": "Button",
-            "name": "centered_dark_button",
-            "aria-label": "",
-            "type": "link",
-            "instructions": "",
-            "required": 0,
-            "conditional_logic": 0,
-            "wrapper": {
-                "width": "",
-                "class": "",
-                "id": ""
-            },
-            "return_format": "array",
-            "allow_in_bindings": 0
-        }
-    ],
-    "location": [
-        [
-            {
-                "param": "page_template",
-                "operator": "==",
-                "value": "template-service.php"
-            }
-        ]
-    ],
-    "menu_order": 0,
-    "position": "normal",
-    "style": "default",
-    "label_placement": "top",
-    "instruction_placement": "label",
-    "hide_on_screen": "",
-    "active": true,
-    "description": "",
-    "show_in_rest": 0,
-    "display_title": "",
-    "allow_ai_access": false,
-    "ai_description": "",
-    "modified": 1789572925
+	"key": "group_6aa185527a283",
+	"title": "New Service",
+	"fields": [
+		{
+			"key": "field_6aa185527a001",
+			"label": "Centered Content",
+			"name": "",
+			"aria-label": "",
+			"type": "tab",
+			"instructions": "",
+			"required": 0,
+			"conditional_logic": 0,
+			"wrapper": {
+				"width": "",
+				"class": "",
+				"id": ""
+			},
+			"placement": "top",
+			"endpoint": 0,
+			"selected": 0
+		},
+		{
+			"key": "field_6aa185527a002",
+			"label": "Tagline",
+			"name": "centered_tagline",
+			"aria-label": "",
+			"type": "text",
+			"instructions": "",
+			"required": 0,
+			"conditional_logic": 0,
+			"wrapper": {
+				"width": "70",
+				"class": "",
+				"id": ""
+			},
+			"default_value": "",
+			"maxlength": "",
+			"allow_in_bindings": 0,
+			"placeholder": "",
+			"prepend": "",
+			"append": ""
+		},
+		{
+			"key": "field_6aa185527a003",
+			"label": "Tagline tag",
+			"name": "centered_tagline_tag",
+			"aria-label": "",
+			"type": "button_group",
+			"instructions": "Semantic heading level for the tagline. Styled the same regardless of choice.",
+			"required": 0,
+			"conditional_logic": 0,
+			"wrapper": {
+				"width": "30",
+				"class": "",
+				"id": ""
+			},
+			"choices": {
+				"h1": "H1",
+				"h2": "H2",
+				"h3": "H3",
+				"h4": "H4"
+			},
+			"default_value": "h2",
+			"return_format": "value",
+			"allow_null": 0,
+			"layout": "horizontal"
+		},
+		{
+			"key": "field_6aa185527a004",
+			"label": "Section title",
+			"name": "centered_title",
+			"aria-label": "",
+			"type": "text",
+			"instructions": "",
+			"required": 0,
+			"conditional_logic": 0,
+			"wrapper": {
+				"width": "",
+				"class": "",
+				"id": ""
+			},
+			"default_value": "",
+			"maxlength": "",
+			"allow_in_bindings": 0,
+			"placeholder": "",
+			"prepend": "",
+			"append": ""
+		},
+		{
+			"key": "field_6aa185527a005",
+			"label": "Content",
+			"name": "centered_content",
+			"aria-label": "",
+			"type": "wysiwyg",
+			"instructions": "",
+			"required": 0,
+			"conditional_logic": 0,
+			"wrapper": {
+				"width": "",
+				"class": "",
+				"id": ""
+			},
+			"default_value": "",
+			"tabs": "all",
+			"toolbar": "full",
+			"media_upload": 1,
+			"delay": 0
+		},
+		{
+			"key": "field_6aa185527a006",
+			"label": "Button 1",
+			"name": "centered_button_1",
+			"aria-label": "",
+			"type": "link",
+			"instructions": "Primary button (label and URL from link field).",
+			"required": 0,
+			"conditional_logic": 0,
+			"wrapper": {
+				"width": "50",
+				"class": "",
+				"id": ""
+			},
+			"return_format": "array",
+			"allow_in_bindings": 0
+		},
+		{
+			"key": "field_6aa185527a007",
+			"label": "Button 2",
+			"name": "centered_button_2",
+			"aria-label": "",
+			"type": "link",
+			"instructions": "White button (label and URL from link field).",
+			"required": 0,
+			"conditional_logic": 0,
+			"wrapper": {
+				"width": "50",
+				"class": "",
+				"id": ""
+			},
+			"return_format": "array",
+			"allow_in_bindings": 0
+		},
+		{
+			"key": "field_6aa185527a010",
+			"label": "Showreel",
+			"name": "",
+			"aria-label": "",
+			"type": "tab",
+			"instructions": "",
+			"required": 0,
+			"conditional_logic": 0,
+			"wrapper": {
+				"width": "",
+				"class": "",
+				"id": ""
+			},
+			"placement": "top",
+			"endpoint": 0,
+			"selected": 0
+		},
+		{
+			"key": "field_6aa185527a011",
+			"label": "Small autoplay video",
+			"name": "showreel_autoplay_video",
+			"aria-label": "",
+			"type": "file",
+			"instructions": "Choose the uploaded MP4. Plays muted and looping in the background. It must be a web encode with faststart — master exports straight from an editing suite are rejected, and the error will give you a note to send to your developer.",
+			"required": 0,
+			"conditional_logic": 0,
+			"wrapper": {
+				"width": "",
+				"class": "",
+				"id": ""
+			},
+			"return_format": "url",
+			"mime_types": "mp4",
+			"library": "all",
+			"min_size": "",
+			"max_size": ""
+		},
+		{
+			"key": "field_6aa185527a015",
+			"label": "Poster frame",
+			"name": "showreel_poster",
+			"type": "image",
+			"instructions": "Sharp still shown instantly while the video loads. Use the generated -poster.webp, around 1920 wide.",
+			"required": 0,
+			"conditional_logic": 0,
+			"wrapper": {
+				"width": "",
+				"class": "",
+				"id": ""
+			},
+			"return_format": "array",
+			"preview_size": "medium",
+			"library": "all",
+			"min_width": "",
+			"min_height": "",
+			"min_size": "",
+			"max_width": "",
+			"max_height": "",
+			"max_size": "",
+			"mime_types": ""
+		},
+		{
+			"key": "field_6aa185527a017",
+			"label": "Poster frame (mobile, optional)",
+			"name": "showreel_poster_mobile",
+			"type": "image",
+			"instructions": "Optional. Shown instead of the video on screens 768px and under, where no video is downloaded at all. Use a portrait-friendly crop, a 16:9 still loses most of its composition on a tall phone screen. Leave empty to reuse the main poster.",
+			"required": 0,
+			"conditional_logic": 0,
+			"wrapper": {
+				"width": "",
+				"class": "",
+				"id": ""
+			},
+			"return_format": "array",
+			"preview_size": "medium",
+			"library": "all",
+			"min_width": "",
+			"min_height": "",
+			"min_size": "",
+			"max_width": "",
+			"max_height": "",
+			"max_size": "",
+			"mime_types": ""
+		},
+		{
+			"key": "field_6aa185527a016",
+			"label": "Autoplay video (WebM, optional)",
+			"name": "showreel_autoplay_video_webm",
+			"type": "file",
+			"instructions": "Optional WebM version, offered before the MP4. Leave empty to serve the MP4 to everyone — for this footage the MP4 tested better, so empty is the right default.",
+			"required": 0,
+			"conditional_logic": 0,
+			"wrapper": {
+				"width": "",
+				"class": "",
+				"id": ""
+			},
+			"return_format": "url",
+			"library": "all",
+			"min_size": "",
+			"max_size": "",
+			"mime_types": "webm"
+		},
+		{
+			"key": "field_6aa185527a012",
+			"label": "Full video",
+			"name": "showreel_full_video",
+			"aria-label": "",
+			"type": "file",
+			"instructions": "Full showreel video. Used by the showreel button (modal to be added later).",
+			"required": 0,
+			"conditional_logic": 0,
+			"wrapper": {
+				"width": "",
+				"class": "",
+				"id": ""
+			},
+			"return_format": "url",
+			"library": "all",
+			"min_size": "",
+			"max_size": "",
+			"mime_types": "mp4,webm,mov",
+			"allow_in_bindings": 0
+		},
+		{
+			"key": "field_6aa185527a013",
+			"label": "Showreel label",
+			"name": "showreel_label",
+			"aria-label": "",
+			"type": "text",
+			"instructions": "",
+			"required": 0,
+			"conditional_logic": 0,
+			"wrapper": {
+				"width": "50",
+				"class": "",
+				"id": ""
+			},
+			"default_value": "SEE FULL SHOWREEL",
+			"maxlength": "",
+			"allow_in_bindings": 0,
+			"placeholder": "",
+			"prepend": "",
+			"append": ""
+		},
+		{
+			"key": "field_6aa185527a014",
+			"label": "Showreel thumbnail",
+			"name": "showreel_thumb",
+			"aria-label": "",
+			"type": "image",
+			"instructions": "Circular thumbnail shown inside the showreel button.",
+			"required": 0,
+			"conditional_logic": 0,
+			"wrapper": {
+				"width": "50",
+				"class": "",
+				"id": ""
+			},
+			"return_format": "array",
+			"library": "all",
+			"min_width": "",
+			"min_height": "",
+			"min_size": "",
+			"max_width": "",
+			"max_height": "",
+			"max_size": "",
+			"mime_types": "",
+			"allow_in_bindings": 0,
+			"preview_size": "thumbnail"
+		},
+		{
+			"key": "field_6aa185527a020",
+			"label": "Navigation Content",
+			"name": "",
+			"aria-label": "",
+			"type": "tab",
+			"instructions": "",
+			"required": 0,
+			"conditional_logic": 0,
+			"wrapper": {
+				"width": "",
+				"class": "",
+				"id": ""
+			},
+			"placement": "top",
+			"endpoint": 0,
+			"selected": 0
+		},
+		{
+			"key": "field_6aa185527a021",
+			"label": "Navigation Content",
+			"name": "navigation_content",
+			"aria-label": "",
+			"type": "repeater",
+			"instructions": "Add up to three rows. Each row has a main link and a list of sublink pills.",
+			"required": 0,
+			"conditional_logic": 0,
+			"wrapper": {
+				"width": "",
+				"class": "",
+				"id": ""
+			},
+			"layout": "block",
+			"pagination": 0,
+			"min": 0,
+			"max": 3,
+			"collapsed": "field_6aa185527a022",
+			"button_label": "Add row",
+			"rows_per_page": 20,
+			"sub_fields": [
+				{
+					"key": "field_6aa185527a022",
+					"label": "Main link",
+					"name": "main_link",
+					"aria-label": "",
+					"type": "link",
+					"instructions": "",
+					"required": 0,
+					"conditional_logic": 0,
+					"wrapper": {
+						"width": "",
+						"class": "",
+						"id": ""
+					},
+					"return_format": "array",
+					"allow_in_bindings": 0,
+					"parent_repeater": "field_6aa185527a021"
+				},
+				{
+					"key": "field_6aa185527a023",
+					"label": "Sublinks",
+					"name": "sublinks",
+					"aria-label": "",
+					"type": "repeater",
+					"instructions": "",
+					"required": 0,
+					"conditional_logic": 0,
+					"wrapper": {
+						"width": "",
+						"class": "",
+						"id": ""
+					},
+					"layout": "table",
+					"pagination": 0,
+					"min": 0,
+					"max": 0,
+					"collapsed": "",
+					"button_label": "Add sublink",
+					"rows_per_page": 20,
+					"sub_fields": [
+						{
+							"key": "field_6aa185527a024",
+							"label": "Sublink",
+							"name": "sublink",
+							"aria-label": "",
+							"type": "link",
+							"instructions": "",
+							"required": 0,
+							"conditional_logic": 0,
+							"wrapper": {
+								"width": "",
+								"class": "",
+								"id": ""
+							},
+							"return_format": "array",
+							"allow_in_bindings": 0,
+							"parent_repeater": "field_6aa185527a023"
+						}
+					],
+					"parent_repeater": "field_6aa185527a021"
+				}
+			]
+		},
+		{
+			"key": "field_6aa185527a030",
+			"label": "Work Row",
+			"name": "",
+			"aria-label": "",
+			"type": "tab",
+			"instructions": "",
+			"required": 0,
+			"conditional_logic": 0,
+			"wrapper": {
+				"width": "",
+				"class": "",
+				"id": ""
+			},
+			"placement": "top",
+			"endpoint": 0,
+			"selected": 0
+		},
+		{
+			"key": "field_6aa185527a031",
+			"label": "Work Row",
+			"name": "work_row",
+			"aria-label": "",
+			"type": "repeater",
+			"instructions": "Pick up to three featured works for the full-width hover row.",
+			"required": 0,
+			"conditional_logic": 0,
+			"wrapper": {
+				"width": "",
+				"class": "",
+				"id": ""
+			},
+			"layout": "block",
+			"pagination": 0,
+			"min": 0,
+			"max": 3,
+			"collapsed": "field_6aa185527a032",
+			"button_label": "Add work",
+			"rows_per_page": 20,
+			"sub_fields": [
+				{
+					"key": "field_6aa185527a032",
+					"label": "Work",
+					"name": "work",
+					"aria-label": "",
+					"type": "post_object",
+					"instructions": "",
+					"required": 1,
+					"conditional_logic": 0,
+					"wrapper": {
+						"width": "",
+						"class": "",
+						"id": ""
+					},
+					"post_type": ["works_post"],
+					"post_status": "",
+					"taxonomy": "",
+					"return_format": "object",
+					"multiple": 0,
+					"allow_null": 0,
+					"ui": 1,
+					"bidirectional_target": [],
+					"parent_repeater": "field_6aa185527a031"
+				}
+			]
+		},
+		{
+			"key": "field_6aa185527a040",
+			"label": "Centered Content Dark",
+			"name": "",
+			"aria-label": "",
+			"type": "tab",
+			"instructions": "",
+			"required": 0,
+			"conditional_logic": 0,
+			"wrapper": {
+				"width": "",
+				"class": "",
+				"id": ""
+			},
+			"placement": "top",
+			"endpoint": 0,
+			"selected": 0
+		},
+		{
+			"key": "field_6aa185527a041",
+			"label": "Tagline",
+			"name": "centered_dark_tagline",
+			"aria-label": "",
+			"type": "text",
+			"instructions": "",
+			"required": 0,
+			"conditional_logic": 0,
+			"wrapper": {
+				"width": "70",
+				"class": "",
+				"id": ""
+			},
+			"default_value": "",
+			"maxlength": "",
+			"allow_in_bindings": 0,
+			"placeholder": "",
+			"prepend": "",
+			"append": ""
+		},
+		{
+			"key": "field_6aa185527a042",
+			"label": "Tagline tag",
+			"name": "centered_dark_tagline_tag",
+			"aria-label": "",
+			"type": "button_group",
+			"instructions": "Semantic heading level for the tagline. Styled the same regardless of choice.",
+			"required": 0,
+			"conditional_logic": 0,
+			"wrapper": {
+				"width": "30",
+				"class": "",
+				"id": ""
+			},
+			"choices": {
+				"h1": "H1",
+				"h2": "H2",
+				"h3": "H3",
+				"h4": "H4"
+			},
+			"default_value": "h4",
+			"return_format": "value",
+			"allow_null": 0,
+			"layout": "horizontal"
+		},
+		{
+			"key": "field_6aa185527a043",
+			"label": "Content",
+			"name": "centered_dark_content",
+			"aria-label": "",
+			"type": "wysiwyg",
+			"instructions": "",
+			"required": 0,
+			"conditional_logic": 0,
+			"wrapper": {
+				"width": "",
+				"class": "",
+				"id": ""
+			},
+			"default_value": "",
+			"tabs": "all",
+			"toolbar": "full",
+			"media_upload": 1,
+			"delay": 0
+		},
+		{
+			"key": "field_6aa185527a044",
+			"label": "Button",
+			"name": "centered_dark_button",
+			"aria-label": "",
+			"type": "link",
+			"instructions": "",
+			"required": 0,
+			"conditional_logic": 0,
+			"wrapper": {
+				"width": "",
+				"class": "",
+				"id": ""
+			},
+			"return_format": "array",
+			"allow_in_bindings": 0
+		}
+	],
+	"location": [
+		[
+			{
+				"param": "page_template",
+				"operator": "==",
+				"value": "template-service.php"
+			}
+		]
+	],
+	"menu_order": 0,
+	"position": "normal",
+	"style": "default",
+	"label_placement": "top",
+	"instruction_placement": "label",
+	"hide_on_screen": "",
+	"active": true,
+	"description": "",
+	"show_in_rest": 0,
+	"display_title": "",
+	"allow_ai_access": false,
+	"ai_description": "",
+	"modified": 1789641617
 }

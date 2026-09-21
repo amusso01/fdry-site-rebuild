@@ -77,9 +77,9 @@
                 "id": ""
             },
             "default_value": "",
-            "tabs": "visual",
-            "toolbar": "basic",
-            "media_upload": 0,
+            "tabs": "all",
+            "toolbar": "full",
+            "media_upload": 1,
             "delay": 0
         },
         {
@@ -266,9 +266,9 @@
                         "id": ""
                     },
                     "default_value": "",
-                    "tabs": "visual",
-                    "toolbar": "basic",
-                    "media_upload": 0,
+                    "tabs": "all",
+                    "toolbar": "full",
+                    "media_upload": 1,
                     "delay": 0,
                     "parent_repeater": "field_6aa8538fe0c54"
                 }
@@ -537,9 +537,9 @@
                 "id": ""
             },
             "default_value": "",
-            "tabs": "visual",
-            "toolbar": "basic",
-            "media_upload": 0,
+            "tabs": "all",
+            "toolbar": "full",
+            "media_upload": 1,
             "delay": 0
         },
         {
@@ -662,9 +662,9 @@
                         "id": ""
                     },
                     "default_value": "",
-                    "tabs": "visual",
-                    "toolbar": "basic",
-                    "media_upload": 0,
+                    "tabs": "all",
+                    "toolbar": "full",
+                    "media_upload": 1,
                     "delay": 0,
                     "parent_repeater": "field_6aa8538fe0c66"
                 },
@@ -890,9 +890,9 @@
                 "id": ""
             },
             "default_value": "",
-            "tabs": "visual",
-            "toolbar": "basic",
-            "media_upload": 0,
+            "tabs": "all",
+            "toolbar": "full",
+            "media_upload": 1,
             "delay": 0
         },
         {
@@ -1109,9 +1109,9 @@
                 "id": ""
             },
             "default_value": "",
-            "tabs": "visual",
-            "toolbar": "basic",
-            "media_upload": 0,
+            "tabs": "all",
+            "toolbar": "full",
+            "media_upload": 1,
             "delay": 0
         },
         {
@@ -1328,9 +1328,9 @@
                 "id": ""
             },
             "default_value": "",
-            "tabs": "visual",
-            "toolbar": "basic",
-            "media_upload": 0,
+            "tabs": "all",
+            "toolbar": "full",
+            "media_upload": 1,
             "delay": 0
         },
         {
@@ -1376,5 +1376,5 @@
     "display_title": "",
     "allow_ai_access": false,
     "ai_description": "",
-    "modified": 1789565538
+    "modified": 1789641617
 }

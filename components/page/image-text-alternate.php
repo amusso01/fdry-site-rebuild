@@ -116,7 +116,7 @@ foreach ($rows as $index => $row) {
 							<?php endif; ?>
 
 							<?php if ($row['row_content'] !== '') : ?>
-								<div class="image-text-alternate__body">
+								<div class="image-text-alternate__body wysiwyg">
 									<?= wp_kses_post($row['row_content']); ?>
 								</div>
 							<?php endif; ?>

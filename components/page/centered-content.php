@@ -121,7 +121,7 @@ if ($tagline === '' && $title === '' && $content === '' && ! $has_button_1 && ! 
 				<?php endif; ?>
 
 				<?php if ($content !== '') : ?>
-					<div class="centered-content__body">
+					<div class="centered-content__body wysiwyg">
 						<?= wp_kses_post($content); ?>
 					</div>
 				<?php endif; ?>

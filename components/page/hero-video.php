@@ -4,7 +4,9 @@
  * Hero video
  *
  * Renders a muted, looping background video behind an optional showreel
- * button. The video carries a poster and no src: sources are attached by
+ * button. The still is a separate <picture>, not the video's poster
+ * attribute, so it stays visible when the video is never loaded at all.
+ * The video carries no src: sources are attached by
  * heroVideo.js so small screens, reduced-motion and data-saver users never
  * download it. See src/scripts/part/heroVideo.js.
  *
@@ -18,6 +20,7 @@
  *     @type string $mp4        MP4 URL for muted background autoplay.
  *     @type string $webm       WebM URL, offered before the MP4.
  *     @type array  $poster     ACF image array for the poster frame.
+ *     @type array  $poster_mobile ACF image array shown at or below FDRY_HERO_MOBILE_MAX_PX.
  *     @type string $full_video URL for the full showreel (modal hook only).
  *     @type string $label      Showreel button label.
  *     @type array  $thumb      ACF image array for the showreel thumbnail.
@@ -62,12 +65,38 @@ if ($variant === 'inline') {
 }
 ?>
 
-<section class="<?= esc_attr(implode(' ', $section_classes)); ?>" aria-label="<?= esc_attr($aria_label); ?>">
+<section
+	class="<?= esc_attr(implode(' ', $section_classes)); ?>"
+	data-mobile-max="<?= esc_attr((string) FDRY_HERO_MOBILE_MAX_PX); ?>"
+	aria-label="<?= esc_attr($aria_label); ?>">
+	<?php if ($media['poster']['url'] !== '') : ?>
+		<picture class="hero-video__poster">
+			<?php if ($media['poster_mobile']['url'] !== '') : ?>
+				<source
+					media="(max-width: <?php echo esc_attr((string) FDRY_HERO_MOBILE_MAX_PX); ?>px)"
+					srcset="<?php echo esc_url($media['poster_mobile']['url']); ?>">
+			<?php endif; ?>
+			<img
+				src="<?php echo esc_url($media['poster']['url']); ?>"
+				alt=""
+				decoding="async"
+				<?php if ($variant === 'inline') : ?>
+					loading="lazy"
+				<?php else : ?>
+					loading="eager"
+					fetchpriority="high"
+				<?php endif; ?>
+				<?php if ($media['poster']['width'] > 0) : ?>
+					width="<?php echo esc_attr((string) $media['poster']['width']); ?>"
+				<?php endif; ?>
+				<?php if ($media['poster']['height'] > 0) : ?>
+					height="<?php echo esc_attr((string) $media['poster']['height']); ?>"
+				<?php endif; ?>>
+		</picture>
+	<?php endif; ?>
+
 	<video
 		class="hero-video__media"
-		<?php if ($media['poster']['url'] !== '') : ?>
-			poster="<?php echo esc_url($media['poster']['url']); ?>"
-		<?php endif; ?>
 		<?php if ($media['mp4'] !== '') : ?>
 			data-src-mp4="<?php echo esc_url($media['mp4']); ?>"
 		<?php endif; ?>

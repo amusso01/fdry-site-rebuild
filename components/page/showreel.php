@@ -16,6 +16,7 @@
  *     @type string $mp4        MP4 URL for muted background autoplay.
  *     @type string $webm       WebM URL, offered before the MP4.
  *     @type array  $poster     ACF image array for the poster frame.
+ *     @type array  $poster_mobile ACF image array shown at or below FDRY_HERO_MOBILE_MAX_PX.
  *     @type string $full_video URL for the full showreel (modal hook only).
  *     @type string $label      Showreel button label.
  *     @type array  $thumb      ACF image array for the showreel thumbnail.

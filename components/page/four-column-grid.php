@@ -78,7 +78,7 @@ if ($cards === array()) {
 						<?php endif; ?>
 
 						<?php if ($card['content'] !== '') : ?>
-							<div class="four-column-grid__card-content">
+							<div class="four-column-grid__card-content wysiwyg">
 								<?= wp_kses_post($card['content']); ?>
 							</div>
 						<?php endif; ?>

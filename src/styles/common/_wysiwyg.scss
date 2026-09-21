@@ -1,0 +1,150 @@
+@use 'variables' as *;
+@use 'media' as *;
+
+/* WYSIWYG output from ACF editor fields */
+.wysiwyg {
+	--text-h1: 32px;
+	--text-h2: 24px;
+	--text-h3: 20px;
+	--text-h4: 18px;
+	--text-h5: 16px;
+	--text-h6: 14px;
+
+	ul {
+		list-style: disc outside;
+		padding-left: 1.25em;
+	}
+
+	ol {
+		list-style: decimal outside;
+		padding-left: 1.25em;
+	}
+
+	ul ul,
+	ol ol,
+	ul ol,
+	ol ul {
+		margin-top: 0.5em;
+		padding-left: 1.5em;
+	}
+
+	li + li {
+		margin-top: 0.35em;
+	}
+
+	a {
+		text-decoration: underline;
+	}
+
+	ul + p,
+	ol + p,
+	p + ul,
+	p + ol,
+	h1 + *,
+	h2 + *,
+	h3 + *,
+	h4 + *,
+	h5 + *,
+	h6 + *,
+	* + h1,
+	* + h2,
+	* + h3,
+	* + h4,
+	* + h5,
+	* + h6 {
+		margin-top: 1rem;
+	}
+
+	.h1,
+	.h2,
+	.h3,
+	.h4,
+	.h5,
+	.h6,
+	h1,
+	h2,
+	h3,
+	h4,
+	h5,
+	h6 {
+		margin: 0;
+		font-family: $header__fontname;
+	}
+
+	h1,
+	.h1 {
+		font-size: var(--text-h1);
+	}
+
+	h2,
+	.h2,
+	h3,
+	.h3,
+	h4,
+	.h4,
+	h5,
+	.h5,
+	h6,
+	.h6 {
+		font-weight: 600;
+	}
+
+	h2,
+	.h2 {
+		font-size: var(--text-h2);
+	}
+
+	h3,
+	.h3 {
+		font-size: var(--text-h3);
+	}
+
+	h4,
+	.h4 {
+		font-size: var(--text-h4);
+	}
+
+	h5,
+	.h5 {
+		font-size: var(--text-h5);
+	}
+
+	h6,
+	.h6 {
+		font-size: var(--text-h6);
+	}
+
+	@include media('<desktop') {
+		h1,
+		.h1 {
+			font-size: calc(var(--text-h1) * 0.9);
+		}
+
+		h2,
+		.h2 {
+			font-size: calc(var(--text-h2) * 0.9);
+		}
+
+		h3,
+		.h3 {
+			font-size: calc(var(--text-h3) * 0.9);
+		}
+	}
+
+	@include media('<phone-land') {
+		h1,
+		.h1 {
+			font-size: calc(var(--text-h1) * 0.75);
+		}
+
+		h2,
+		.h2 {
+			font-size: calc(var(--text-h2) * 0.75);
+		}
+
+		h3,
+		.h3 {
+			font-size: calc(var(--text-h3) * 0.75);
+		}
+	}
+}

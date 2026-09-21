@@ -134,23 +134,22 @@ $container = get_theme_mod( 'understrap_container_type' );
 			while ($works-> have_posts() ) {
 				$works->the_post(); 
 
-				$cat = get_the_category(); // array of object of WP_Term
-				$postCat = []; // object WP_Term for the current post
+				$categories = get_the_category();
+				$category_classes = array_map(
+					static fn( WP_Term $category ): string => $category->slug,
+					$categories
+				);
 
-				foreach($cat as $category){
-					$postCat[] = $category->cat_name;
-				}
-				// var_dump($postCat);
-
-				$thumbnail_id  = get_post_thumbnail_id($works->ID);
-				$thumbnail_alt = get_post_meta( $thumbnail_id, '_wp_attachment_image_alt', true );
-				$image = wp_get_attachment_image_src( $thumbnail_id,'large' ); 
+				$thumbnail_id = get_post_thumbnail_id();
+				$image        = wp_get_attachment_image_src( $thumbnail_id, 'large' );
+				$image_url    = ( is_array( $image ) && ! empty( $image[0] ) ) ? $image[0] : '';
 		?>
-				<a href="<?php echo get_permalink(); ?>" class="ajax-call  <?php foreach($postCat as $name){ echo $name.' '; }   ?>"><article class="work-box " <?php echo $postCat->slug; ?>"  >
+				<a href="<?= esc_url( get_permalink() ); ?>" class="ajax-call <?= esc_attr( implode( ' ', $category_classes ) ); ?>">
+				<article class="work-box">
 
 					<div class="hovereffect">
-						<img src="<?php echo get_template_directory_uri()?>/img/Spinner.gif" data-src="<?php echo $image[0]; ?>"  class="img-fluid lozad" />
-						<noscript><img src="<?php echo $image[0]; ?>"  class="img-fluid lozad" /></noscript>
+						<img src="<?= esc_url( get_template_directory_uri() . '/img/Spinner.gif' ); ?>" data-src="<?= esc_url( $image_url ); ?>" class="img-fluid lozad" alt="<?= esc_attr( get_the_title() ); ?>" />
+						<noscript><img src="<?= esc_url( $image_url ); ?>" class="img-fluid lozad" alt="<?= esc_attr( get_the_title() ); ?>" /></noscript>
 						<div class="overlay">
 							
 							<h2 class="work-title" ><?php the_title(); ?></h2>

@@ -102,9 +102,9 @@
                 "id": ""
             },
             "default_value": "",
-            "tabs": "visual",
-            "toolbar": "basic",
-            "media_upload": 0,
+            "tabs": "all",
+            "toolbar": "full",
+            "media_upload": 1,
             "delay": 0
         },
         {
@@ -473,9 +473,9 @@
                 "id": ""
             },
             "default_value": "",
-            "tabs": "visual",
-            "toolbar": "basic",
-            "media_upload": 0,
+            "tabs": "all",
+            "toolbar": "full",
+            "media_upload": 1,
             "delay": 0
         },
         {
@@ -580,9 +580,9 @@
                         "id": ""
                     },
                     "default_value": "",
-                    "tabs": "visual",
-                    "toolbar": "basic",
-                    "media_upload": 0,
+                    "tabs": "all",
+                    "toolbar": "full",
+                    "media_upload": 1,
                     "delay": 0,
                     "parent_repeater": "field_6aa2aa6f62246"
                 }
@@ -773,9 +773,9 @@
                 "id": ""
             },
             "default_value": "",
-            "tabs": "visual",
-            "toolbar": "basic",
-            "media_upload": 0,
+            "tabs": "all",
+            "toolbar": "full",
+            "media_upload": 1,
             "delay": 0
         },
         {
@@ -880,9 +880,9 @@
                         "id": ""
                     },
                     "default_value": "",
-                    "tabs": "visual",
-                    "toolbar": "basic",
-                    "media_upload": 0,
+                    "tabs": "all",
+                    "toolbar": "full",
+                    "media_upload": 1,
                     "delay": 0,
                     "parent_repeater": "field_6aa2aa6f62266"
                 }
@@ -910,5 +910,5 @@
     "display_title": "",
     "allow_ai_access": false,
     "ai_description": "",
-    "modified": 1789049578
+    "modified": 1789641617
 }

@@ -172,33 +172,35 @@ if ($tagline === '' && $title === '' && ! $has_image && ! $has_list && $content 
 <section class="two-column-list<?= $appearance === 'gray' ? ' two-column-list--gray' : ''; ?>">
 	<div class="content-block">
 		<div class="content-max">
+			<?php if ($tagline !== '' || $title !== '') : ?>
+				<div class="two-column-list__header">
+					<?php if ($tagline !== '') : ?>
+						<<?= esc_attr($tagline_tag); ?> class="two-column-list__tagline"><?= esc_html($tagline); ?></<?= esc_attr($tagline_tag); ?>>
+					<?php endif; ?>
+
+					<?php if ($title !== '') : ?>
+						<p class="two-column-list__title"><?= esc_html($title); ?></p>
+					<?php endif; ?>
+				</div>
+			<?php endif; ?>
+
 			<div class="two-column-list__grid">
-				<?php if ($tagline !== '' || $title !== '' || $has_image) : ?>
+				<?php if ($has_image) : ?>
 					<div class="two-column-list__left">
-						<?php if ($tagline !== '') : ?>
-							<<?= esc_attr($tagline_tag); ?> class="two-column-list__tagline"><?= esc_html($tagline); ?></<?= esc_attr($tagline_tag); ?>>
-						<?php endif; ?>
-
-						<?php if ($title !== '') : ?>
-							<p class="two-column-list__title"><?= esc_html($title); ?></p>
-						<?php endif; ?>
-
-						<?php if ($has_image) : ?>
-							<div class="two-column-list__media">
-								<img
-									class="two-column-list__image"
-									src="<?= esc_url($image['url']); ?>"
-									alt="<?= esc_attr($image['alt']); ?>"
-									loading="lazy"
-									decoding="async"
-									<?php if ($image['width'] > 0) : ?>
-										width="<?= esc_attr((string) $image['width']); ?>"
-									<?php endif; ?>
-									<?php if ($image['height'] > 0) : ?>
-										height="<?= esc_attr((string) $image['height']); ?>"
-									<?php endif; ?>>
-							</div>
-						<?php endif; ?>
+						<div class="two-column-list__media">
+							<img
+								class="two-column-list__image"
+								src="<?= esc_url($image['url']); ?>"
+								alt="<?= esc_attr($image['alt']); ?>"
+								loading="lazy"
+								decoding="async"
+								<?php if ($image['width'] > 0) : ?>
+									width="<?= esc_attr((string) $image['width']); ?>"
+								<?php endif; ?>
+								<?php if ($image['height'] > 0) : ?>
+									height="<?= esc_attr((string) $image['height']); ?>"
+								<?php endif; ?>>
+						</div>
 					</div>
 				<?php endif; ?>
 
@@ -233,7 +235,7 @@ if ($tagline === '' && $title === '' && ! $has_image && ! $has_list && $content 
 						<?php endif; ?>
 
 						<?php if ($content !== '') : ?>
-							<div class="two-column-list__body<?= $use_bigger_font ? ' two-column-list__body--bigger-font' : ''; ?>">
+							<div class="two-column-list__body wysiwyg<?= $use_bigger_font ? ' two-column-list__body--bigger-font' : ''; ?>">
 								<?= wp_kses_post($content); ?>
 							</div>
 						<?php endif; ?>

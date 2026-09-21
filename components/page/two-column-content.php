@@ -159,7 +159,7 @@ if ($tagline === '' && $title === '' && $links === array() && $content === '') {
 				<?php endif; ?>
 
 				<?php if ($content !== '') : ?>
-					<div class="two-column-content__body">
+					<div class="two-column-content__body wysiwyg">
 						<?= wp_kses_post($content); ?>
 					</div>
 				<?php endif; ?>
