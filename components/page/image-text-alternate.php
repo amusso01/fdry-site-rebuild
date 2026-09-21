@@ -24,43 +24,6 @@ if (! isset($args) || ! is_array($args)) {
 
 $post_id = isset($args['post_id']) ? (int) $args['post_id'] : (int) get_queried_object_id();
 
-/**
- * @param array|string|false|null $image ACF image field value.
- * @return array{url: string, alt: string, width: int, height: int}
- */
-$normalize_image = static function ($image): array {
-	$empty = array(
-		'url'    => '',
-		'alt'    => '',
-		'width'  => 0,
-		'height' => 0,
-	);
-
-	if (! $image) {
-		return $empty;
-	}
-
-	if (is_string($image) && $image !== '') {
-		return array(
-			'url'    => $image,
-			'alt'    => '',
-			'width'  => 0,
-			'height' => 0,
-		);
-	}
-
-	if (! is_array($image) || empty($image['url'])) {
-		return $empty;
-	}
-
-	return array(
-		'url'    => is_string($image['url']) ? $image['url'] : '',
-		'alt'    => is_string($image['alt'] ?? null) ? $image['alt'] : '',
-		'width'  => isset($image['width']) ? (int) $image['width'] : 0,
-		'height' => isset($image['height']) ? (int) $image['height'] : 0,
-	);
-};
-
 $rows = array();
 
 if ($post_id && have_rows('image_text_alternate', $post_id)) {
@@ -76,7 +39,7 @@ if ($post_id && have_rows('image_text_alternate', $post_id)) {
 		$row_content = get_sub_field('row_content');
 		$row_content = is_string($row_content) ? trim($row_content) : '';
 
-		$image = $normalize_image(get_sub_field('image'));
+		$image = fdry_image_parts(get_sub_field('image'));
 
 		if ($tagline === '' && $row_title === '' && $row_content === '' && $image['url'] === '') {
 			continue;
@@ -108,7 +71,7 @@ foreach ($rows as $index => $row) {
 					<?php if ($row['tagline'] !== '' || $row['row_title'] !== '' || $row['row_content'] !== '') : ?>
 						<div class="image-text-alternate__content">
 							<?php if ($row['tagline'] !== '') : ?>
-								<h3 class="image-text-alternate__tagline"><?= esc_html($row['tagline']); ?></h3>
+								<h2 class="image-text-alternate__tagline"><?= esc_html($row['tagline']); ?></h2>
 							<?php endif; ?>
 
 							<?php if ($row['row_title'] !== '') : ?>
@@ -128,6 +91,10 @@ foreach ($rows as $index => $row) {
 							<img
 								class="image-text-alternate__image"
 								src="<?= esc_url($row['image']['url']); ?>"
+								<?php if ($row['image']['srcset'] !== '') : ?>
+									srcset="<?= esc_attr($row['image']['srcset']); ?>"
+									sizes="(min-width: 1140px) 419px, 100vw"
+								<?php endif; ?>
 								alt="<?= esc_attr($row['image']['alt']); ?>"
 								loading="lazy"
 								decoding="async"

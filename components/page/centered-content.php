@@ -58,6 +58,11 @@ if (! is_string($tagline_tag) || ! in_array($tagline_tag, $allowed_tags, true)) 
 	$tagline_tag = is_string($acf_tag) && in_array($acf_tag, $allowed_tags, true) ? $acf_tag : 'h2';
 }
 
+// A page H1 must never be empty; fall back to the page title.
+if ($tagline === '' && $tagline_tag === 'h1' && $post_id) {
+	$tagline = get_the_title($post_id);
+}
+
 $title = $args['title'] ?? null;
 
 if (! is_string($title) || $title === '') {

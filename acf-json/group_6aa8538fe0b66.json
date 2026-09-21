@@ -26,7 +26,7 @@
             "name": "centered_tagline",
             "aria-label": "",
             "type": "text",
-            "instructions": "Rendered as H1 on the front end.",
+            "instructions": "Rendered as the page H1. Leave empty to use the page title.",
             "required": 0,
             "conditional_logic": 0,
             "wrapper": {
@@ -402,7 +402,7 @@
                 "h3": "H3",
                 "h4": "H4"
             },
-            "default_value": "h3",
+            "default_value": "h2",
             "return_format": "value",
             "allow_null": 0,
             "layout": "horizontal"
@@ -755,7 +755,7 @@
                 "h3": "H3",
                 "h4": "H4"
             },
-            "default_value": "h3",
+            "default_value": "h2",
             "return_format": "value",
             "allow_null": 0,
             "layout": "horizontal"
@@ -974,7 +974,7 @@
                 "h3": "H3",
                 "h4": "H4"
             },
-            "default_value": "h3",
+            "default_value": "h2",
             "return_format": "value",
             "allow_null": 0,
             "layout": "horizontal"
@@ -1193,7 +1193,7 @@
                 "h3": "H3",
                 "h4": "H4"
             },
-            "default_value": "h3",
+            "default_value": "h2",
             "return_format": "value",
             "allow_null": 0,
             "layout": "horizontal"
@@ -1376,5 +1376,5 @@
     "display_title": "",
     "allow_ai_access": false,
     "ai_description": "",
-    "modified": 1789641617
+    "modified": 1789996544
 }

@@ -74,7 +74,7 @@ if ($cards === array()) {
 						<?php endif; ?>
 
 						<?php if ($card['title'] !== '') : ?>
-							<p class="four-column-grid__card-title"><?= esc_html($card['title']); ?></p>
+							<h2 class="four-column-grid__card-title"><?= esc_html($card['title']); ?></h2>
 						<?php endif; ?>
 
 						<?php if ($card['content'] !== '') : ?>

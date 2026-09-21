@@ -354,7 +354,7 @@ function fdry_media_url($value): string
  * Normalise an ACF image field value.
  *
  * @param array|string|false|null $image ACF image field value.
- * @return array{url: string, alt: string, width: int, height: int}
+ * @return array{url: string, alt: string, width: int, height: int, srcset: string}
  */
 function fdry_image_parts($image): array
 {
@@ -363,6 +363,7 @@ function fdry_image_parts($image): array
 		'alt'    => '',
 		'width'  => 0,
 		'height' => 0,
+		'srcset' => '',
 	);
 
 	if (! $image) {
@@ -375,6 +376,7 @@ function fdry_image_parts($image): array
 			'alt'    => '',
 			'width'  => 0,
 			'height' => 0,
+			'srcset' => '',
 		);
 	}
 
@@ -382,11 +384,14 @@ function fdry_image_parts($image): array
 		return $empty;
 	}
 
+	$attachment_id = isset($image['ID']) ? (int) $image['ID'] : 0;
+
 	return array(
 		'url'    => is_string($image['url']) ? $image['url'] : '',
 		'alt'    => is_string($image['alt'] ?? null) ? $image['alt'] : '',
 		'width'  => isset($image['width']) ? (int) $image['width'] : 0,
 		'height' => isset($image['height']) ? (int) $image['height'] : 0,
+		'srcset' => $attachment_id ? (string) wp_get_attachment_image_srcset($attachment_id, 'full') : '',
 	);
 }
 

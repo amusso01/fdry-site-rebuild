@@ -90,9 +90,9 @@ if (! defined('FDRY_USING_NEW_HEADER')) {
 
   <!-- Start cookieyes banner -->
   <script id="cookieyes" type="text/javascript" src="https://cdn-cookieyes.com/client_data/025fa60311aef15b7fe2e817/script.js"></script>
-  <!-- End cookieyes banner
+  <!-- End cookieyes banner -->
 
-  <script type="text/javascript" src="https://secure.office-insightdetails.com/js/788650.js"></script>
+  <!-- <script type="text/javascript" src="https://secure.office-insightdetails.com/js/788650.js"></script> -->
 
   <!-- Hotjar Tracking Code for FDRY Wholesite -->
   <script>
@@ -157,9 +157,6 @@ if (! defined('FDRY_USING_NEW_HEADER')) {
   <noscript><img height="1" width="1" style="display:none"
       src="https://www.facebook.com/tr?id=1558785528625318&ev=PageView&noscript=1" /></noscript>
   <!-- End Meta Pixel Code -->
-
-
-  <link rel="stylesheet" href="https://jason5-dev.agis.ai/admin/styles.css">
 
 
 </head>

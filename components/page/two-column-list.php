@@ -12,7 +12,7 @@
  *
  *     @type string $prefix          ACF field name prefix. Default two_column.
  *     @type string $tagline         Tagline text.
- *     @type string $tagline_tag     Semantic heading tag: h2–h4. Default h3.
+ *     @type string $tagline_tag     Semantic heading tag: h2–h4. Default h2.
  *     @type string $title           Section title.
  *     @type array  $image           ACF image array.
  *     @type string $content         WYSIWYG body content.
@@ -52,7 +52,7 @@ $tagline_tag = $args['tagline_tag'] ?? null;
 
 if (! is_string($tagline_tag) || ! in_array($tagline_tag, $allowed_tags, true)) {
 	$acf_tag = $post_id ? get_field($prefix . '_tagline_tag', $post_id) : '';
-	$tagline_tag = is_string($acf_tag) && in_array($acf_tag, $allowed_tags, true) ? $acf_tag : 'h3';
+	$tagline_tag = is_string($acf_tag) && in_array($acf_tag, $allowed_tags, true) ? $acf_tag : 'h2';
 }
 
 $title = $args['title'] ?? null;
@@ -77,50 +77,13 @@ if ($use_bigger_font === null && $post_id) {
 	$use_bigger_font = (bool) $use_bigger_font;
 }
 
-/**
- * @param array|string|false|null $image ACF image field value.
- * @return array{url: string, alt: string, width: int, height: int}
- */
-$normalize_image = static function ($image): array {
-	$empty = array(
-		'url'    => '',
-		'alt'    => '',
-		'width'  => 0,
-		'height' => 0,
-	);
-
-	if (! $image) {
-		return $empty;
-	}
-
-	if (is_string($image) && $image !== '') {
-		return array(
-			'url'    => $image,
-			'alt'    => '',
-			'width'  => 0,
-			'height' => 0,
-		);
-	}
-
-	if (! is_array($image) || empty($image['url'])) {
-		return $empty;
-	}
-
-	return array(
-		'url'    => is_string($image['url']) ? $image['url'] : '',
-		'alt'    => is_string($image['alt'] ?? null) ? $image['alt'] : '',
-		'width'  => isset($image['width']) ? (int) $image['width'] : 0,
-		'height' => isset($image['height']) ? (int) $image['height'] : 0,
-	);
-};
-
 $image = $args['image'] ?? null;
 
 if ($image === null && $post_id) {
 	$image = get_field($prefix . '_image', $post_id);
 }
 
-$image = $normalize_image($image);
+$image = fdry_image_parts($image);
 
 $list_items = array();
 
@@ -191,6 +154,10 @@ if ($tagline === '' && $title === '' && ! $has_image && ! $has_list && $content 
 							<img
 								class="two-column-list__image"
 								src="<?= esc_url($image['url']); ?>"
+								<?php if ($image['srcset'] !== '') : ?>
+									srcset="<?= esc_attr($image['srcset']); ?>"
+									sizes="(min-width: 1140px) 40vw, 100vw"
+								<?php endif; ?>
 								alt="<?= esc_attr($image['alt']); ?>"
 								loading="lazy"
 								decoding="async"
