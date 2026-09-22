@@ -49,7 +49,6 @@
 	&__content {
 		display: flex;
 		flex-direction: column;
-		row-gap: 12px;
 	}
 
 	&__tagline {
@@ -61,12 +60,20 @@
 		text-transform: uppercase;
 	}
 
+	&__tagline + * {
+		margin-top: 1.5rem;
+	}
+
 	&__title {
 		margin: 0;
 		font-size: 32px;
 		font-weight: 500;
 		line-height: 36px;
 		letter-spacing: 0;
+	}
+
+	&__title + * {
+		margin-top: 1.5rem;
 	}
 
 	&__body {
