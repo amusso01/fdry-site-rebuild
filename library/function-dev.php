@@ -48,6 +48,7 @@ add_action('after_setup_theme', 'ea_setup');
 function fdry_acf_only_page_templates(): array
 {
 	return array(
+		'template-about.php',
 		'template-home.php',
 		'template-service.php',
 		'template-service-child.php',

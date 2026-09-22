@@ -151,12 +151,14 @@
 		}
 	}
 
-	&__list + &__body {
+	&__list + &__body,
+	&__body + &__list {
 		margin-top: 32px;
 	}
 }
 
-.service-inner-main .two-column-list {
+.service-inner-main .two-column-list,
+.about-main .two-column-list {
 	--two-column-list-gap: 64px;
 
 	.two-column-list__body {

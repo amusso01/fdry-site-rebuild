@@ -22,6 +22,14 @@
 		}
 	}
 
+	&--3 &__cards {
+		grid-template-columns: repeat(3, 1fr);
+
+		@include media('<tablet') {
+			grid-template-columns: 1fr;
+		}
+	}
+
 	&__card {
 		display: flex;
 		flex-direction: column;
@@ -42,6 +50,16 @@
 
 		@include media('<phone') {
 			border-right: 0;
+		}
+	}
+
+	&--3 &__card {
+		@include media('<tablet') {
+			border-right: 0;
+
+			&:nth-child(2n) {
+				border-right: 0;
+			}
 		}
 	}
 

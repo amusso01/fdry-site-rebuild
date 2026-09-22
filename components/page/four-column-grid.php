@@ -11,6 +11,7 @@
  *     Optional. Pass to override ACF values on any page.
  *
  *     @type string $prefix  ACF field name prefix. Default four_column.
+ *     @type int    $columns Number of grid columns (3 or 4). Default 4.
  *     @type int    $post_id Post ID for ACF fallback. Default queried object.
  * }
  */
@@ -27,6 +28,9 @@ $post_id = isset($args['post_id']) ? (int) $args['post_id'] : (int) get_queried_
 
 $prefix = $args['prefix'] ?? 'four_column';
 $prefix = is_string($prefix) && $prefix !== '' ? $prefix : 'four_column';
+
+$columns = isset($args['columns']) ? (int) $args['columns'] : 4;
+$columns = in_array($columns, array(3, 4), true) ? $columns : 4;
 
 $field_name = $prefix . '_grid';
 $cards      = array();
@@ -61,7 +65,7 @@ if ($cards === array()) {
 }
 ?>
 
-<section class="four-column-grid">
+<section class="four-column-grid<?= $columns === 3 ? ' four-column-grid--3' : ''; ?>">
 	<div class="content-block">
 		<div class="content-max">
 			<ul class="four-column-grid__cards">

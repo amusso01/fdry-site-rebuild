@@ -1,0 +1,29 @@
+@use '../common/media' as *;
+
+.three-grid-images {
+	padding-block: 32px;
+	background-color: #212121;
+
+	&__grid {
+		display: grid;
+		grid-template-columns: repeat(3, 1fr);
+		gap: 32px;
+		margin: 0;
+		padding: 0;
+		list-style: none;
+
+		@include media('<tablet') {
+			grid-template-columns: 1fr;
+		}
+	}
+
+	&__item {
+		margin: 0;
+	}
+
+	&__image {
+		display: block;
+		width: 100%;
+		height: auto;
+	}
+}

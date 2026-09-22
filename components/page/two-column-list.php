@@ -16,9 +16,10 @@
  *     @type string $title           Section title.
  *     @type array  $image           ACF image array.
  *     @type string $content         WYSIWYG body content.
- *     @type bool   $use_bigger_font When true, applies larger body typography.
- *     @type string $appearance      Visual variant: white or gray. Default white.
- *     @type int    $post_id         Post ID for ACF fallback. Default queried object.
+ *     @type bool   $use_bigger_font     When true, applies larger body typography.
+ *     @type bool   $content_before_list When true, renders WYSIWYG body before the list.
+ *     @type string $appearance          Visual variant: white or gray. Default white.
+ *     @type int    $post_id             Post ID for ACF fallback. Default queried object.
  * }
  */
 
@@ -76,6 +77,8 @@ if ($use_bigger_font === null && $post_id) {
 } else {
 	$use_bigger_font = (bool) $use_bigger_font;
 }
+
+$content_before_list = ! empty($args['content_before_list']);
 
 $image = $args['image'] ?? null;
 
@@ -173,6 +176,12 @@ if ($tagline === '' && $title === '' && ! $has_image && ! $has_list && $content 
 
 				<?php if ($has_list || $content !== '') : ?>
 					<div class="two-column-list__right">
+						<?php if ($content_before_list && $content !== '') : ?>
+							<div class="two-column-list__body wysiwyg<?= $use_bigger_font ? ' two-column-list__body--bigger-font' : ''; ?>">
+								<?= wp_kses_post($content); ?>
+							</div>
+						<?php endif; ?>
+
 						<?php if ($has_list) : ?>
 							<div class="two-column-list__list">
 								<?php foreach ($list_columns as $column_items) : ?>
@@ -201,7 +210,7 @@ if ($tagline === '' && $title === '' && ! $has_image && ! $has_list && $content 
 							</div>
 						<?php endif; ?>
 
-						<?php if ($content !== '') : ?>
+						<?php if (! $content_before_list && $content !== '') : ?>
 							<div class="two-column-list__body wysiwyg<?= $use_bigger_font ? ' two-column-list__body--bigger-font' : ''; ?>">
 								<?= wp_kses_post($content); ?>
 							</div>

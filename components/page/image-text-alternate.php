@@ -93,7 +93,7 @@ foreach ($rows as $index => $row) {
 								src="<?= esc_url($row['image']['url']); ?>"
 								<?php if ($row['image']['srcset'] !== '') : ?>
 									srcset="<?= esc_attr($row['image']['srcset']); ?>"
-									sizes="(min-width: 1140px) 419px, 100vw"
+									sizes="(min-width: 1140px) 608px, 100vw"
 								<?php endif; ?>
 								alt="<?= esc_attr($row['image']['alt']); ?>"
 								loading="lazy"
