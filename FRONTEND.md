@@ -104,11 +104,13 @@ Vite has a **single entry**: [`src/scripts/main.js`](src/scripts/main.js).
 ```js
 import '../styles/main.scss'
 
+import smoothScroll from './part/smoothScroll'
 import gsapMotion from './part/gsap'
 import hamburger from './part/hamburger'
 import marquee from './part/marquee'
 
 document.addEventListener('DOMContentLoaded', () => {
+	smoothScroll()
 	gsapMotion.init()
 	hamburger()
 	marquee()
@@ -123,6 +125,33 @@ document.addEventListener('DOMContentLoaded', () => {
 - Sub-modules (e.g. `gsapReveal.js`, `gsapParallax.js`) are imported **only** by their parent (`gsap.js`), not by `main.js`.
 
 If `pnpm dev` leaves `dist/` empty, check the terminal — a failed build (often a bad import path) clears `dist/` when `emptyOutDir` is true.
+
+## Smooth scroll
+
+[`smoothScroll.js`](src/scripts/part/smoothScroll.js) runs [Lenis](https://github.com/darkroomengineering/lenis) for wheel and trackpad scrolling. Lenis keeps the native window scroll and only eases the input, so `position: sticky`, the fixed header, `window.scrollY`, AOS and ScrollTrigger all keep working. GSAP ScrollSmoother was ruled out: it moves the page into a transformed wrapper, which breaks `position: sticky` (the `work-parallax` cards) and needs markup changes in the header and footer.
+
+**Where it runs.** `fdry-scripts` loads on every page, legacy `header.php` included, so Lenis only starts when `<body>` has the `fdry-new-header` class. `fdry_new_header_body_class()` in [`function-dev.php`](library/function-dev.php) adds it wherever `FDRY_USING_NEW_HEADER` is set. It never starts with `prefers-reduced-motion`. Touch devices keep native scrolling (`syncTouch` is off).
+
+**GSAP.** Lenis steps on `gsap.ticker` and calls `ScrollTrigger.update` on every scroll, so ScrollTrigger reads the smoothed position in the same frame. `gsap.ticker.lagSmoothing(0)` is set globally, as Lenis recommends.
+
+**Feel.** Each wheel step is a 1.2 s easeOutExpo tween (`SCROLL_DURATION`, `easeOutExpo`), the same config as [lionandmason.com](https://lionandmason.com/). Raise `SCROLL_DURATION` for a longer glide. While a duration is set Lenis ignores `lerp`, and the same curve applies to `lenis.scrollTo()` (anchor links).
+
+**Locking the page.** `overflow: hidden` does not stop Lenis, because it scrolls with `window.scrollTo()`. Overlays send an event with `{ isOpen }` in `detail` instead, and `smoothScroll.js` stops or restarts Lenis:
+
+| Event | Sent by |
+|-------|---------|
+| `fdry:nav-toggle` | `hamburger.js` |
+| `fdry:showreel-toggle` | `showreelModal.js` |
+
+A new overlay that locks the page should send the same kind of event and be added to the listeners in `smoothScroll.js`. Keep its `overflow: hidden` rule as well, since that is what holds the page when Lenis is off.
+
+**Nested scroll.** `allowNestedScroll: true` lets inner scroll areas (the nav overlay list, the CookieYes and Klaviyo pop-ups) scroll natively, including while Lenis is stopped. It checks the DOM on every wheel event. If that ever shows up in profiling, switch it off and add `data-lenis-prevent` to our own scroll containers, plus a `prevent` callback for third-party markup.
+
+**Anchors.** Same-page `#hash` links glide to the target below the header, update the URL and move focus to the target. The skip link, links in a stopped state (e.g. inside the open menu) and links to other pages are left to the browser.
+
+**CSS.** `lenis/dist/lenis.css` is pulled in from [`main.scss`](src/styles/main.scss). It resets the legacy `html, body { height: 100% }` from `typeformstyle.css`. `html.lenis { scroll-behavior: auto }` in `_reset.scss` cancels `theme.css`'s `html { scroll-behavior: smooth }`.
+
+**Scroll-driven effects.** Build them on ScrollTrigger (`scrub` for effects tied to scroll position), not on `lenis.on('scroll')`, so they behave the same where Lenis is off. `getLenis()` returns the instance, or `null` where it is off, for the rare case that needs Lenis itself (e.g. scroll velocity).
 
 ## Commands
 

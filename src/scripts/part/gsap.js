@@ -1,6 +1,6 @@
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import { initReveal } from './gsapReveal'
+import { initFade } from './gsapFade'
 import { initParallax } from './gsapParallax'
 
 gsap.registerPlugin(ScrollTrigger)

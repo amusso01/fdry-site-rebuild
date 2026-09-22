@@ -44,6 +44,11 @@ body {
 	line-height: 1.5;
 }
 
+/* Lenis animates the scroll itself; theme.css's html smooth would fight it */
+html.lenis {
+	scroll-behavior: auto;
+}
+
 /* A elements that don't have a class get default styles */
 a:not([class]) {
 	text-decoration-skip-ink: auto;

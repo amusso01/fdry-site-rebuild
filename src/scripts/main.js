@@ -2,6 +2,7 @@ import '../styles/main.scss'
 
 // JS IMPORT
 import smoothscroll from 'smoothscroll-polyfill'
+import smoothScroll from './part/smoothScroll'
 import gsapMotion from './part/gsap'
 import hamburger from './part/hamburger'
 import marquee from './part/marquee'
@@ -15,6 +16,7 @@ import workRowSlider from './part/workRowSlider'
 
 document.addEventListener('DOMContentLoaded', () => {
 	smoothscroll.polyfill()
+	smoothScroll()
 	gsapMotion.init()
 	hamburger()
 	headerScroll()

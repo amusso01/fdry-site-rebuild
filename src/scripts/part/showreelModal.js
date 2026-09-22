@@ -14,6 +14,16 @@ function prefersReducedMotion() {
 	return window.matchMedia('(prefers-reduced-motion: reduce)').matches
 }
 
+// smoothScroll.js stops Lenis while the reel is open; overflow: hidden alone
+// does not hold the page still.
+function dispatchShowreelToggle(isOpen) {
+	document.dispatchEvent(
+		new CustomEvent('fdry:showreel-toggle', {
+			detail: { isOpen },
+		})
+	)
+}
+
 function playQuietly(video) {
 	const playPromise = video.play()
 
@@ -124,6 +134,7 @@ function initShowreel(button) {
 		}
 
 		dialog.showModal()
+		dispatchShowreelToggle(true)
 		attach('auto')
 
 		// Must run inside the click handler: iOS only allows playback with sound
@@ -222,6 +233,7 @@ function initShowreel(button) {
 		video.load()
 
 		resumeLoopIfPaused()
+		dispatchShowreelToggle(false)
 	})
 
 	video.addEventListener('error', () => {

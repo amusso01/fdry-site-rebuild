@@ -306,6 +306,22 @@ function fdry_enqueue_assets()
 add_action('wp_enqueue_scripts', 'fdry_enqueue_assets', 11);
 
 /**
+ * Mark pages rendered with header-new.php.
+ *
+ * fdry-scripts loads on every page, legacy header.php included; smoothScroll.js
+ * reads this class so Lenis only runs on the new header.
+ */
+function fdry_new_header_body_class(array $classes): array
+{
+	if (defined('FDRY_USING_NEW_HEADER') && FDRY_USING_NEW_HEADER) {
+		$classes[] = 'fdry-new-header';
+	}
+
+	return $classes;
+}
+add_filter('body_class', 'fdry_new_header_body_class');
+
+/**
  * Normalise an ACF link field to url + target parts.
  *
  * @param array|string|false|null $link ACF link field value.
