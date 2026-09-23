@@ -30,17 +30,18 @@
 	overflow: hidden;
 }
 
-[data-reveal]:not([data-reveal='stagger-up']) {
-	opacity: 0;
-}
-
-[data-reveal='stagger-up'] > * {
+// Hidden until gsapFade.js plays them in. Group children are only tagged by
+// the JS, so they are matched here too or they would flash first.
+[data-fade-up],
+[data-fade-down],
+[data-fade-up-group] > :is(p, h1, h2, h3, h4, h5, h6, ul, ol, img, figure, blockquote, hr) {
 	opacity: 0;
 }
 
 @media (prefers-reduced-motion: reduce) {
-	[data-reveal]:not([data-reveal='stagger-up']),
-	[data-reveal='stagger-up'] > * {
+	[data-fade-up],
+	[data-fade-down],
+	[data-fade-up-group] > :is(p, h1, h2, h3, h4, h5, h6, ul, ol, img, figure, blockquote, hr) {
 		opacity: 1;
 	}
 }

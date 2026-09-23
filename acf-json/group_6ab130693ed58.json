@@ -706,12 +706,12 @@
             "append": ""
         },
         {
-            "key": "field_6ab241b6215f1",
-            "label": "Button",
-            "name": "two_column_gray_button",
+            "key": "field_6ab28db675e82",
+            "label": "Image",
+            "name": "two_column_gray_image",
             "aria-label": "",
-            "type": "link",
-            "instructions": "Primary button below the section title.",
+            "type": "image",
+            "instructions": "Shown below the section title in the left column.",
             "required": 0,
             "conditional_logic": 0,
             "wrapper": {
@@ -720,7 +720,16 @@
                 "id": ""
             },
             "return_format": "array",
-            "allow_in_bindings": 0
+            "library": "all",
+            "min_width": "",
+            "min_height": "",
+            "min_size": "",
+            "max_width": "",
+            "max_height": "",
+            "max_size": "",
+            "mime_types": "",
+            "allow_in_bindings": 0,
+            "preview_size": "medium"
         },
         {
             "key": "field_6ab1306cca9e3",
@@ -938,11 +947,11 @@
             "append": ""
         },
         {
-            "key": "field_6ab1306cca9ec",
-            "label": "Image",
-            "name": "team_image",
+            "key": "field_6ab29303e6a72",
+            "label": "Content",
+            "name": "team_content",
             "aria-label": "",
-            "type": "image",
+            "type": "wysiwyg",
             "instructions": "",
             "required": 0,
             "conditional_logic": 0,
@@ -951,17 +960,11 @@
                 "class": "",
                 "id": ""
             },
-            "return_format": "array",
-            "library": "all",
-            "min_width": "",
-            "min_height": "",
-            "min_size": "",
-            "max_width": "",
-            "max_height": "",
-            "max_size": "",
-            "mime_types": "",
-            "allow_in_bindings": 0,
-            "preview_size": "medium"
+            "default_value": "",
+            "tabs": "all",
+            "toolbar": "full",
+            "media_upload": 1,
+            "delay": 0
         },
         {
             "key": "field_6ab1306cca9ed",
@@ -1150,5 +1153,5 @@
     "display_title": "",
     "allow_ai_access": false,
     "ai_description": "",
-    "modified": 1790068646
+    "modified": 1790087939
 }

@@ -15,6 +15,7 @@
  *     @type string $tagline_tag     Semantic heading tag: h2–h4. Default h3.
  *     @type string $title           Section title.
  *     @type array  $button          ACF link array for primary button.
+ *     @type array  $image           ACF image array.
  *     @type string $content         WYSIWYG body content.
  *     @type bool   $use_bigger_font When true, applies larger body typography.
  *     @type string $appearance      Visual variant: white or gray. Default white.
@@ -87,6 +88,15 @@ $button_parts = fdry_acf_link_parts($button);
 $button_label = is_array($button) && ! empty($button['title']) ? $button['title'] : '';
 $has_button   = $button_label !== '' && $button_parts['url'] !== '#';
 
+$image = $args['image'] ?? null;
+
+if ($image === null && $post_id) {
+	$image = get_field($prefix . '_image', $post_id);
+}
+
+$image     = fdry_image_parts($image);
+$has_image = $image['url'] !== '';
+
 $cards = array();
 
 if ($post_id && have_rows($prefix . '_list_items', $post_id)) {
@@ -114,7 +124,7 @@ if ($post_id && have_rows($prefix . '_list_items', $post_id)) {
 	}
 }
 
-if ($tagline === '' && $title === '' && ! $has_button && $content === '' && $cards === array()) {
+if ($tagline === '' && $title === '' && ! $has_button && ! $has_image && $content === '' && $cards === array()) {
 	return;
 }
 ?>
@@ -122,70 +132,172 @@ if ($tagline === '' && $title === '' && ! $has_button && $content === '' && $car
 <section class="two-column-features<?= $appearance === 'gray' ? ' two-column-features--gray' : ''; ?>">
 	<div class="content-block">
 		<div class="content-max">
-			<div class="two-column-features__grid">
-				<?php if ($tagline !== '' || $title !== '' || $has_button) : ?>
-					<div class="two-column-features__left">
+			<?php if ($appearance === 'gray') : ?>
+				<?php if ($tagline !== '' || $title !== '') : ?>
+					<div class="two-column-features__header">
 						<?php if ($tagline !== '') : ?>
-							<<?= esc_attr($tagline_tag); ?> class="two-column-features__tagline"><?= esc_html($tagline); ?></<?= esc_attr($tagline_tag); ?>>
+							<<?= esc_attr($tagline_tag); ?> class="two-column-features__tagline" data-fade-up><?= esc_html($tagline); ?></<?= esc_attr($tagline_tag); ?>>
 						<?php endif; ?>
 
 						<?php if ($title !== '') : ?>
-							<p class="two-column-features__title"><?= esc_html($title); ?></p>
-						<?php endif; ?>
-
-						<?php if ($has_button) : ?>
-							<div class="two-column-features__actions">
-								<?php
-								get_template_part(
-									'components/partials/button',
-									null,
-									array(
-										'variant' => 'primary',
-										'label'   => $button_label,
-										'url'     => $button,
-										'target'  => $button_parts['target'],
-									)
-								);
-								?>
-							</div>
+							<p class="two-column-features__title" data-fade-up data-fade-up-duration=".8"><?= esc_html($title); ?></p>
 						<?php endif; ?>
 					</div>
 				<?php endif; ?>
 
-				<?php if ($content !== '' || $cards !== array()) : ?>
-					<div class="two-column-features__right">
-						<?php if ($content !== '') : ?>
-							<div class="two-column-features__body wysiwyg<?= $use_bigger_font ? ' two-column-features__body--bigger-font' : ''; ?>">
-								<?= wp_kses_post($content); ?>
+				<?php if ($has_image || $content !== '' || $cards !== array()) : ?>
+					<div class="two-column-features__grid">
+						<?php if ($has_image) : ?>
+							<div class="two-column-features__left">
+								<div class="two-column-features__media" data-fade-up>
+									<img
+										class="two-column-features__image"
+										src="<?= esc_url($image['url']); ?>"
+										<?php if ($image['srcset'] !== '') : ?>
+											srcset="<?= esc_attr($image['srcset']); ?>"
+											sizes="(min-width: 1140px) 40vw, 100vw"
+										<?php endif; ?>
+										alt="<?= esc_attr($image['alt']); ?>"
+										loading="lazy"
+										decoding="async"
+										<?php if ($image['width'] > 0) : ?>
+											width="<?= esc_attr((string) $image['width']); ?>"
+										<?php endif; ?>
+										<?php if ($image['height'] > 0) : ?>
+											height="<?= esc_attr((string) $image['height']); ?>"
+										<?php endif; ?>>
+								</div>
 							</div>
 						<?php endif; ?>
 
-						<?php if ($cards !== array()) : ?>
-							<ul class="two-column-features__cards">
-								<?php foreach ($cards as $card) : ?>
-									<li class="two-column-features__card">
-										<?php if ($card['icon'] !== '') : ?>
-											<div class="two-column-features__card-icon" aria-hidden="true">
-												<?= $card['icon']; ?>
-											</div>
-										<?php endif; ?>
+						<?php if ($content !== '' || $cards !== array()) : ?>
+							<div class="two-column-features__right">
+								<?php if ($content !== '') : ?>
+									<div class="two-column-features__body wysiwyg<?= $use_bigger_font ? ' two-column-features__body--bigger-font' : ''; ?>" data-fade-up>
+										<?= wp_kses_post($content); ?>
+									</div>
+								<?php endif; ?>
 
-										<?php if ($card['title'] !== '') : ?>
-											<p class="two-column-features__card-title"><?= esc_html($card['title']); ?></p>
-										<?php endif; ?>
+								<?php if ($cards !== array()) : ?>
+									<ul class="two-column-features__cards">
+										<?php foreach ($cards as $index => $card) : ?>
+											<?php
+											$fade_delay = $index * 0.15;
+											?>
+											<li class="two-column-features__card" data-fade-up<?= $fade_delay > 0 ? ' data-fade-up-delay="' . esc_attr(number_format($fade_delay, 2)) . '"' : ''; ?>>
+												<?php if ($card['icon'] !== '') : ?>
+													<div class="two-column-features__card-icon" aria-hidden="true">
+														<?= $card['icon']; ?>
+													</div>
+												<?php endif; ?>
 
-										<?php if ($card['content'] !== '') : ?>
-											<div class="two-column-features__card-content">
-												<?= wp_kses_post(wpautop(esc_html($card['content']))); ?>
-											</div>
-										<?php endif; ?>
-									</li>
-								<?php endforeach; ?>
-							</ul>
+												<?php if ($card['title'] !== '') : ?>
+													<p class="two-column-features__card-title"><?= esc_html($card['title']); ?></p>
+												<?php endif; ?>
+
+												<?php if ($card['content'] !== '') : ?>
+													<div class="two-column-features__card-content">
+														<?= wp_kses_post(wpautop(esc_html($card['content']))); ?>
+													</div>
+												<?php endif; ?>
+											</li>
+										<?php endforeach; ?>
+									</ul>
+								<?php endif; ?>
+							</div>
 						<?php endif; ?>
 					</div>
 				<?php endif; ?>
-			</div>
+			<?php else : ?>
+				<div class="two-column-features__grid">
+					<?php if ($tagline !== '' || $title !== '' || $has_button || $has_image) : ?>
+						<div class="two-column-features__left">
+							<?php if ($tagline !== '') : ?>
+								<<?= esc_attr($tagline_tag); ?> class="two-column-features__tagline" data-fade-up><?= esc_html($tagline); ?></<?= esc_attr($tagline_tag); ?>>
+							<?php endif; ?>
+
+							<?php if ($title !== '') : ?>
+								<p class="two-column-features__title" data-fade-up data-fade-up-duration=".8"><?= esc_html($title); ?></p>
+							<?php endif; ?>
+
+							<?php if ($has_image) : ?>
+								<div class="two-column-features__media" data-fade-up>
+									<img
+										class="two-column-features__image"
+										src="<?= esc_url($image['url']); ?>"
+										<?php if ($image['srcset'] !== '') : ?>
+											srcset="<?= esc_attr($image['srcset']); ?>"
+											sizes="(min-width: 1140px) 40vw, 100vw"
+										<?php endif; ?>
+										alt="<?= esc_attr($image['alt']); ?>"
+										loading="lazy"
+										decoding="async"
+										<?php if ($image['width'] > 0) : ?>
+											width="<?= esc_attr((string) $image['width']); ?>"
+										<?php endif; ?>
+										<?php if ($image['height'] > 0) : ?>
+											height="<?= esc_attr((string) $image['height']); ?>"
+										<?php endif; ?>>
+								</div>
+							<?php endif; ?>
+
+							<?php if ($has_button) : ?>
+								<div class="two-column-features__actions" data-fade-up>
+									<?php
+									get_template_part(
+										'components/partials/button',
+										null,
+										array(
+											'variant' => 'primary',
+											'label'   => $button_label,
+											'url'     => $button,
+											'target'  => $button_parts['target'],
+										)
+									);
+									?>
+								</div>
+							<?php endif; ?>
+						</div>
+					<?php endif; ?>
+
+					<?php if ($content !== '' || $cards !== array()) : ?>
+						<div class="two-column-features__right">
+							<?php if ($content !== '') : ?>
+								<div class="two-column-features__body wysiwyg<?= $use_bigger_font ? ' two-column-features__body--bigger-font' : ''; ?>" data-fade-up>
+									<?= wp_kses_post($content); ?>
+								</div>
+							<?php endif; ?>
+
+							<?php if ($cards !== array()) : ?>
+								<ul class="two-column-features__cards">
+									<?php foreach ($cards as $index => $card) : ?>
+										<?php
+										$fade_delay = $index * 0.15;
+										?>
+										<li class="two-column-features__card" data-fade-up<?= $fade_delay > 0 ? ' data-fade-up-delay="' . esc_attr(number_format($fade_delay, 2)) . '"' : ''; ?>>
+											<?php if ($card['icon'] !== '') : ?>
+												<div class="two-column-features__card-icon" aria-hidden="true">
+													<?= $card['icon']; ?>
+												</div>
+											<?php endif; ?>
+
+											<?php if ($card['title'] !== '') : ?>
+												<p class="two-column-features__card-title"><?= esc_html($card['title']); ?></p>
+											<?php endif; ?>
+
+											<?php if ($card['content'] !== '') : ?>
+												<div class="two-column-features__card-content">
+													<?= wp_kses_post(wpautop(esc_html($card['content']))); ?>
+												</div>
+											<?php endif; ?>
+										</li>
+									<?php endforeach; ?>
+								</ul>
+							<?php endif; ?>
+						</div>
+					<?php endif; ?>
+				</div>
+			<?php endif; ?>
 		</div>
 	</div>
 </section>

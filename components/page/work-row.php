@@ -109,7 +109,7 @@ if ($cards === array()) {
 }
 ?>
 
-<section class="work-row<?= $is_inner ? ' work-row--inner' : ''; ?><?= $enable_slider ? '' : ' work-row--stack'; ?>" aria-label="<?php esc_attr_e('Featured work', 'foundry'); ?>">
+<section class="work-row<?= $is_inner ? ' work-row--inner' : ''; ?><?= $enable_slider ? '' : ' work-row--stack'; ?>"<?= $is_inner ? ' data-fade-up' : ''; ?> aria-label="<?php esc_attr_e('Featured work', 'foundry'); ?>">
 	<?php if ($enable_slider) : ?>
 		<div class="swiper work-row__slider">
 	<?php endif; ?>

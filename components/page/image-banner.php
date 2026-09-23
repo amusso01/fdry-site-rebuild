@@ -53,7 +53,7 @@ $display_alt      = $desktop_image['alt'] !== '' ? $desktop_image['alt'] : $mobi
 <section class="inner-image-banner">
 	<div class="content-block">
 		<div class="content-max">
-			<picture class="inner-image-banner__picture">
+			<picture class="inner-image-banner__picture" data-fade-up>
 				<?php if ($has_mobile_image) : ?>
 					<?php if ($mobile_image['srcset'] !== '') : ?>
 						<source

@@ -141,11 +141,11 @@ if ($tagline === '' && $title === '' && ! $has_image && ! $has_list && $content 
 			<?php if ($tagline !== '' || $title !== '') : ?>
 				<div class="two-column-list__header">
 					<?php if ($tagline !== '') : ?>
-						<<?= esc_attr($tagline_tag); ?> class="two-column-list__tagline"><?= esc_html($tagline); ?></<?= esc_attr($tagline_tag); ?>>
+						<<?= esc_attr($tagline_tag); ?> class="two-column-list__tagline" data-fade-up><?= esc_html($tagline); ?></<?= esc_attr($tagline_tag); ?>>
 					<?php endif; ?>
 
 					<?php if ($title !== '') : ?>
-						<p class="two-column-list__title"><?= esc_html($title); ?></p>
+						<p class="two-column-list__title" data-fade-up data-fade-up-delay="0.2"><?= esc_html($title); ?></p>
 					<?php endif; ?>
 				</div>
 			<?php endif; ?>
@@ -153,7 +153,7 @@ if ($tagline === '' && $title === '' && ! $has_image && ! $has_list && $content 
 			<div class="two-column-list__grid">
 				<?php if ($has_image) : ?>
 					<div class="two-column-list__left">
-						<div class="two-column-list__media">
+						<div class="two-column-list__media" data-fade-up>
 							<img
 								class="two-column-list__image"
 								src="<?= esc_url($image['url']); ?>"
@@ -177,7 +177,7 @@ if ($tagline === '' && $title === '' && ! $has_image && ! $has_list && $content 
 				<?php if ($has_list || $content !== '') : ?>
 					<div class="two-column-list__right">
 						<?php if ($content_before_list && $content !== '') : ?>
-							<div class="two-column-list__body wysiwyg<?= $use_bigger_font ? ' two-column-list__body--bigger-font' : ''; ?>">
+							<div class="two-column-list__body wysiwyg<?= $use_bigger_font ? ' two-column-list__body--bigger-font' : ''; ?>" data-fade-up>
 								<?= wp_kses_post($content); ?>
 							</div>
 						<?php endif; ?>
@@ -191,7 +191,7 @@ if ($tagline === '' && $title === '' && ! $has_image && ! $has_list && $content 
 
 									<ul class="two-column-list__list-column">
 										<?php foreach ($column_items as $list_item) : ?>
-											<li class="two-column-list__list-item">
+											<li class="two-column-list__list-item" data-fade-up>
 												<?php if ($list_item['icon'] !== '') : ?>
 													<span class="two-column-list__list-icon" aria-hidden="true">
 														<?= $list_item['icon']; ?>
@@ -211,7 +211,7 @@ if ($tagline === '' && $title === '' && ! $has_image && ! $has_list && $content 
 						<?php endif; ?>
 
 						<?php if (! $content_before_list && $content !== '') : ?>
-							<div class="two-column-list__body wysiwyg<?= $use_bigger_font ? ' two-column-list__body--bigger-font' : ''; ?>">
+							<div class="two-column-list__body wysiwyg<?= $use_bigger_font ? ' two-column-list__body--bigger-font' : ''; ?>" data-fade-up>
 								<?= wp_kses_post($content); ?>
 							</div>
 						<?php endif; ?>

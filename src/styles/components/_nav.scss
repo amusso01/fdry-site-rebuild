@@ -98,6 +98,10 @@ $nav-media-size: 280px;
 
 	&__cta {
 		flex-shrink: 0;
+
+		.btn a {
+			text-transform: none;
+		}
 	}
 
 	&__menu {

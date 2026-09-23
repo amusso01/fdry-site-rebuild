@@ -1,0 +1,186 @@
+@use '../common/variables' as *;
+@use '../common/media' as *;
+
+.team {
+	padding-block: 72px;
+	background-color: $color__white;
+
+	&__layout {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) minmax(0, 1.6fr);
+		column-gap: 50px;
+		align-items: start;
+
+		@include media('<tablet') {
+			grid-template-columns: 1fr;
+			row-gap: 40px;
+		}
+	}
+
+	&__copy {
+		display: flex;
+		flex-direction: column;
+	}
+
+	&__tagline {
+		margin: 0;
+		font-size: 11px;
+		font-weight: 600;
+		line-height: 16px;
+		letter-spacing: 1px;
+		text-transform: uppercase;
+	}
+
+	&__tagline + * {
+		margin-top: 1.5rem;
+	}
+
+	&__title {
+		margin: 0;
+		font-size: 32px;
+		font-weight: 400;
+		line-height: 36px;
+		letter-spacing: -1.6px;
+	}
+
+	&__title + * {
+		margin-top: 1.5rem;
+	}
+
+	&__body {
+		> :first-child {
+			margin-top: 0;
+		}
+
+		> :last-child {
+			margin-bottom: 0;
+		}
+
+		p + p {
+			margin-top: 1.25rem;
+		}
+	}
+
+	&__slider-wrap {
+		min-width: 0;
+		overflow: hidden;
+	}
+
+	&__slider {
+		position: relative;
+		overflow: hidden;
+		cursor: grab;
+
+		&.swiper-grabbing {
+			cursor: grabbing;
+		}
+	}
+
+	&__slide {
+		height: auto;
+	}
+
+	&__card {
+		position: relative;
+		overflow: hidden;
+		border-radius: 8px;
+		aspect-ratio: 3 / 4;
+		background-color: rgba($color__text, 0.08);
+	}
+
+	&__photo {
+		display: block;
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+
+	&__meta {
+		position: absolute;
+		right: 0;
+		bottom: 0;
+		left: 0;
+		z-index: 1;
+		padding: 12px;
+		color: $color__white;
+		background: linear-gradient(
+			180deg,
+			rgba($color__black, 0) 0%,
+			rgba($color__black, 0.55) 100%
+		);
+		pointer-events: none;
+	}
+
+	&__name {
+		margin: 0;
+		font-size: 16px;
+		font-weight: 700;
+		line-height: 20px;
+	}
+
+	&__role {
+		margin: 4px 0 0;
+		font-size: 14px;
+		font-weight: 400;
+		line-height: 18px;
+	}
+
+	&__nav {
+		position: absolute;
+		top: 50%;
+		z-index: 2;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 40px;
+		height: 40px;
+		padding: 0;
+		border: 0;
+		border-radius: 50%;
+		background-color: $color__white;
+		color: $color__text;
+		cursor: pointer;
+		transform: translateY(-50%);
+		transition:
+			opacity 0.25s ease,
+			transform 0.25s ease;
+
+		&:hover,
+		&:focus-visible {
+			opacity: 0.85;
+		}
+
+		&.swiper-button-disabled {
+			opacity: 0.35;
+			cursor: default;
+		}
+
+		&--prev {
+			left: 15px;
+		}
+
+		&--next {
+			right: 20px;
+		}
+
+		@include media('<tablet') {
+			&--next {
+				right: 12px;
+			}
+		}
+	}
+
+	&__nav-icon {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+
+		svg {
+			display: block;
+		}
+
+		&--prev svg {
+			transform: scaleX(-1);
+		}
+	}
+}

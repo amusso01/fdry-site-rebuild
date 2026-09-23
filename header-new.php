@@ -174,7 +174,7 @@ if (! defined('FDRY_USING_NEW_HEADER')) {
   <div id="page" class="site">
     <a class="skip-link screen-reader-text" href="#content"><?php esc_html_e('Skip to content', 'foundry'); ?></a>
     <header class="site-header">
-      <div class="site-header__inner content-block">
+      <div class="site-header__inner content-block" data-fade-down>
         <div class="site-header__brand">
           <?php get_template_part('components/header/logo'); ?>
           <?php get_template_part('components/header/hamburger'); ?>
@@ -201,6 +201,10 @@ if (! defined('FDRY_USING_NEW_HEADER')) {
           $nav_button_url    = is_string($nav_button_url) ? $nav_button_url : '#';
           $nav_button_target = is_string($nav_button_target) ? $nav_button_target : '';
           $nav_button_label  = is_string($nav_button_label) ? $nav_button_label : '';
+
+          if (strcasecmp($nav_button_label, 'SEND A BRIEF') === 0) {
+            $nav_button_label = 'Send a brief';
+          }
 
           if ($nav_button_label !== '') {
             get_template_part(

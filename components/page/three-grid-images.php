@@ -64,8 +64,11 @@ if ($images === array()) {
 	<div class="content-block">
 		<div class="content-max">
 			<ul class="three-grid-images__grid">
-				<?php foreach ($images as $image) : ?>
-					<li class="three-grid-images__item">
+				<?php foreach ($images as $index => $image) : ?>
+					<?php
+					$fade_delay = $index * 0.15;
+					?>
+					<li class="three-grid-images__item" data-fade-up<?= $fade_delay > 0 ? ' data-fade-up-delay="' . esc_attr(number_format($fade_delay, 2)) . '"' : ''; ?>>
 						<img
 							class="three-grid-images__image"
 							src="<?= esc_url($image['url']); ?>"

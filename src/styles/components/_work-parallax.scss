@@ -34,14 +34,9 @@
 		}
 	}
 
-	&__link:hover &__arrow,
-	&__link:focus-visible &__arrow {
-		width: 56px;
-		border-radius: 999px;
-
-		svg {
-			transform: translateX(4px);
-		}
+	&__link:hover &__image,
+	&__link:focus-visible &__image {
+		transform: scale(1.04);
 	}
 
 	&__media {
@@ -55,6 +50,8 @@
 		width: 100%;
 		height: 100%;
 		object-fit: cover;
+		transform: scale(1);
+		transition: transform 0.8s ease;
 	}
 
 	&__overlay {
@@ -89,29 +86,12 @@
 	}
 
 	&__arrow {
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		width: 32px;
-		height: 32px;
-		border-radius: 50%;
-		background-color: $color__white;
-		color: $color__black;
-		transform-origin: left center;
-		transition:
-			width 0.4s ease-in-out,
-			border-radius 0.4s ease-in-out,
-			transform 0.4s ease-in-out;
-
-		svg {
-			display: block;
-			transition: transform 0.4s ease-in-out;
-		}
+		display: none;
 	}
 
 	&__categories {
 		position: absolute;
-		top: 83px;
+		top: 34px;
 		right: 32px;
 		display: flex;
 		flex-direction: column;
@@ -157,11 +137,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-	.work-parallax__arrow {
+	.work-parallax__image {
 		transition: none;
-
-		svg {
-			transition: none;
-		}
 	}
 }

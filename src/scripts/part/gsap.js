@@ -25,7 +25,7 @@ function init() {
 		return
 	}
 
-	initReveal()
+	initFade()
 	initParallax()
 	refreshOnLoad()
 }

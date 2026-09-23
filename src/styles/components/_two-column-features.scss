@@ -2,6 +2,10 @@
 @use '../common/media' as *;
 
 .two-column-features {
+	--two-column-features-left: 1.25;
+	--two-column-features-right: 2;
+	--two-column-features-gap: 64px;
+
 	padding-block: 72px;
 	background-color: $color__white;
 
@@ -9,10 +13,23 @@
 		background-color: #f7f7f7;
 	}
 
+	&__header {
+		display: flex;
+		flex-direction: column;
+		margin-bottom: 1.5rem;
+
+		@include media('>=tablet') {
+			max-width: calc(
+				(100% - var(--two-column-features-gap)) * var(--two-column-features-left) /
+					(var(--two-column-features-left) + var(--two-column-features-right))
+			);
+		}
+	}
+
 	&__grid {
 		display: grid;
 		grid-template-columns: minmax(0, 1.25fr) minmax(0, 2fr);
-		column-gap: 64px;
+		column-gap: var(--two-column-features-gap);
 		row-gap: 20px;
 		align-items: start;
 
@@ -44,6 +61,7 @@
 		font-size: 32px;
 		font-weight: 400;
 		line-height: 36px;
+		letter-spacing: -1.6px;
 	}
 
 	&__title + * {
@@ -54,6 +72,16 @@
 		.btn a {
 			text-transform: none;
 		}
+	}
+
+	&__media {
+		width: 100%;
+	}
+
+	&__image {
+		display: block;
+		width: 100%;
+		height: auto;
 	}
 
 	&__right {

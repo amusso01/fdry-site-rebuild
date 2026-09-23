@@ -16,7 +16,7 @@
                 "class": "",
                 "id": ""
             },
-            "default_value": "SEND A BRIEF",
+            "default_value": "Send a brief",
             "maxlength": "",
             "allow_in_bindings": 0,
             "placeholder": "",
@@ -62,5 +62,5 @@
     "display_title": "",
     "allow_ai_access": false,
     "ai_description": "",
-    "modified": 1788281113
+    "modified": 1790090516
 }

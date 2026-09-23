@@ -71,15 +71,15 @@ foreach ($rows as $index => $row) {
 					<?php if ($row['tagline'] !== '' || $row['row_title'] !== '' || $row['row_content'] !== '') : ?>
 						<div class="image-text-alternate__content">
 							<?php if ($row['tagline'] !== '') : ?>
-								<h2 class="image-text-alternate__tagline"><?= esc_html($row['tagline']); ?></h2>
+								<h2 class="image-text-alternate__tagline" data-fade-up><?= esc_html($row['tagline']); ?></h2>
 							<?php endif; ?>
 
 							<?php if ($row['row_title'] !== '') : ?>
-								<p class="image-text-alternate__title"><?= esc_html($row['row_title']); ?></p>
+								<p class="image-text-alternate__title" data-fade-up><?= esc_html($row['row_title']); ?></p>
 							<?php endif; ?>
 
 							<?php if ($row['row_content'] !== '') : ?>
-								<div class="image-text-alternate__body wysiwyg">
+								<div class="image-text-alternate__body wysiwyg" data-fade-up data-fade-up-duration=".2">
 									<?= wp_kses_post($row['row_content']); ?>
 								</div>
 							<?php endif; ?>
@@ -87,7 +87,7 @@ foreach ($rows as $index => $row) {
 					<?php endif; ?>
 
 					<?php if ($has_image) : ?>
-						<div class="image-text-alternate__media">
+						<div class="image-text-alternate__media" data-fade-up>
 							<img
 								class="image-text-alternate__image"
 								src="<?= esc_url($row['image']['url']); ?>"

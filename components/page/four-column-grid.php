@@ -69,8 +69,12 @@ if ($cards === array()) {
 	<div class="content-block">
 		<div class="content-max">
 			<ul class="four-column-grid__cards">
-				<?php foreach ($cards as $card) : ?>
-					<li class="four-column-grid__card">
+				<?php foreach ($cards as $index => $card) : ?>
+					<?php
+					// Cards in a row cascade left to right, 0.15s apart.
+					$fade_delay = ($index % $columns) * 0.15;
+					?>
+					<li class="four-column-grid__card" data-fade-up<?= $fade_delay > 0 ? ' data-fade-up-delay="' . esc_attr(number_format($fade_delay, 2)) . '"' : ''; ?>>
 						<?php if ($card['icon'] !== '') : ?>
 							<div class="four-column-grid__card-icon" aria-hidden="true">
 								<?= $card['icon']; ?>

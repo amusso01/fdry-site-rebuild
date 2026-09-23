@@ -34,6 +34,8 @@ get_header('new');
     'prefix'     => 'two_column_gray',
     'appearance' => 'gray',
   ));
+  get_template_part('components/page/team');
+  get_template_part('components/page/two-images-grid');
   ?>
 
 </main>

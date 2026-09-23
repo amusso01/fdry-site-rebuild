@@ -9,7 +9,7 @@ $nav-main-arrow-size: 2.75rem;
 	color: $color__white;
 
 	&__inner {
-		padding: 32px;
+		padding-block: 32px;
 		background-color: #010100;
 	}
 
@@ -17,6 +17,8 @@ $nav-main-arrow-size: 2.75rem;
 		margin: 0;
 		padding: 0;
 		list-style: none;
+		border-radius: 4px;
+		overflow: hidden;
 	}
 
 	&__row {
@@ -30,6 +32,10 @@ $nav-main-arrow-size: 2.75rem;
 
 		&:last-child {
 			border-bottom: 0;
+		}
+
+		@include media('<desktop') {
+			padding-inline: 0;
 		}
 
 		@include media('<tablet') {

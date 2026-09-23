@@ -122,7 +122,9 @@ document.addEventListener('DOMContentLoaded', () => {
 - One feature per file under `src/scripts/part/`.
 - Export a default function or `{ init }` object.
 - Return early if the DOM elements for that feature are not on the page.
-- Sub-modules (e.g. `gsapReveal.js`, `gsapParallax.js`) are imported **only** by their parent (`gsap.js`), not by `main.js`.
+- Sub-modules (e.g. `gsapFade.js`, `gsapParallax.js`) are imported **only** by their parent (`gsap.js`), not by `main.js`.
+
+**`isolateGsap` must stay the first JS import in `main.js`.** Every page already has a second GSAP: [`loop-templates/tech-banner.php`](loop-templates/tech-banner.php), included from `footer.php`, loads 3.12.5 from a CDN onto `window.gsap`. ScrollTrigger registers itself with `window.gsap` the moment it is imported. Without the isolation it attaches to that copy, our `registerPlugin` calls do nothing, and every `scrollTrigger` in the bundle is ignored: all fades play on load. [`isolateGsap.js`](src/scripts/part/isolateGsap.js) hides the global while our modules load, and `main.js` restores it with `restoreGlobalGsap()` before `DOMContentLoaded`, so the legacy inline code keeps working. Any other global GSAP (GTM, a plugin) is handled the same way.
 
 If `pnpm dev` leaves `dist/` empty, check the terminal — a failed build (often a bad import path) clears `dist/` when `emptyOutDir` is true.
 
@@ -152,6 +154,27 @@ A new overlay that locks the page should send the same kind of event and be adde
 **CSS.** `lenis/dist/lenis.css` is pulled in from [`main.scss`](src/styles/main.scss). It resets the legacy `html, body { height: 100% }` from `typeformstyle.css`. `html.lenis { scroll-behavior: auto }` in `_reset.scss` cancels `theme.css`'s `html { scroll-behavior: smooth }`.
 
 **Scroll-driven effects.** Build them on ScrollTrigger (`scrub` for effects tied to scroll position), not on `lenis.on('scroll')`, so they behave the same where Lenis is off. `getLenis()` returns the instance, or `null` where it is off, for the rare case that needs Lenis itself (e.g. scroll velocity).
+
+## Fade up / fade down
+
+[`gsapFade.js`](src/scripts/part/gsapFade.js) fades elements in as they reach `top 90%` of the viewport, the same technique as [lionandmason.com](https://lionandmason.com/). It is a `gsap.fromTo` on `y` and `opacity` with a ScrollTrigger, `power3.out` over 2 s, and it plays once. Add the attributes in PHP; no JS changes are needed per component.
+
+| Attribute | Effect | Default |
+|-----------|--------|---------|
+| `data-fade-up` | Rises into place from below | 50px, 2 s |
+| `data-fade-down` | Drops into place from above (e.g. the header on load) | 50px, 2 s |
+| `data-fade-up-delay` / `data-fade-down-delay` | Seconds before it starts | `0` |
+| `data-fade-up-duration` / `data-fade-down-duration` | Seconds **added to** the 2 s base, so `".2"` is 2.2 s | `0` |
+| `data-fade-up-distance` / `data-fade-down-distance` | Travel in px | `50` |
+| `data-fade-up-group` | Put on a wrapper: its direct `p`, `h1`–`h6`, `ul`, `ol`, `img`, `figure`, `blockquote` and `hr` children each fade up. A value (e.g. `"0.1"`) staggers them. | no stagger |
+
+The duration attribute works like lionandmason's. Consecutive items with `.2`, `.4`, `.6`… start together and land one after another, which gives a cascade (their logo strip). Use `-delay` to make them start one after another instead.
+
+Elements already past `top 90%` on load play straight away. That covers the header and the page heading, e.g. `data-fade-up data-fade-up-delay="0.5"`.
+
+- **Hiding before JS.** `_helper.scss` sets `opacity: 0` on these elements and on group children, so nothing flashes before the JS runs. With `prefers-reduced-motion` they are simply visible, and `gsap.js` skips the tweens.
+- **Transforms.** GSAP animates the inline `transform` and clears it when the tween ends, leaving `opacity: 1`. An element with its own CSS transform only conflicts during the tween itself.
+- **Header.** Put `data-fade-down` on `.site-header__inner`, **not** `.site-header`. The header's hide-on-scroll animates `transform` with a CSS transition, which would fight GSAP during the fade.
 
 ## Commands
 

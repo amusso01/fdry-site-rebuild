@@ -1,6 +1,9 @@
 import '../styles/main.scss'
 
 // JS IMPORT
+// Must stay the first JS import: it hides a page-level window.gsap until the
+// modules below have registered ScrollTrigger with our own GSAP.
+import { restoreGlobalGsap } from './part/isolateGsap'
 import smoothscroll from 'smoothscroll-polyfill'
 import smoothScroll from './part/smoothScroll'
 import gsapMotion from './part/gsap'
@@ -13,6 +16,9 @@ import navAccordion from './part/navAccordion'
 import headerScroll from './part/headerScroll'
 import workArchive from './part/workArchive'
 import workRowSlider from './part/workRowSlider'
+import teamSlider from './part/teamSlider'
+
+restoreGlobalGsap()
 
 document.addEventListener('DOMContentLoaded', () => {
 	smoothscroll.polyfill()
@@ -27,4 +33,5 @@ document.addEventListener('DOMContentLoaded', () => {
 	showreelModal()
 	workArchive()
 	workRowSlider()
+	teamSlider()
 })
