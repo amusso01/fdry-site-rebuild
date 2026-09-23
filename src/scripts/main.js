@@ -13,6 +13,7 @@ import heroVideo from './part/heroVideo'
 import showreelModal from './part/showreelModal'
 import navMenu from './part/navMenu'
 import navAccordion from './part/navAccordion'
+import footerAccordion from './part/footerAccordion'
 import headerScroll from './part/headerScroll'
 import workArchive from './part/workArchive'
 import workRowSlider from './part/workRowSlider'
@@ -37,6 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	run(headerScroll)
 	run(navMenu)
 	run(navAccordion)
+	run(footerAccordion)
 	run(marquee)
 	run(heroVideo)
 	run(showreelModal)

@@ -356,111 +356,6 @@ endif;
     display: none;
   }
 
-  .Accordions {
-    display: block;
-    max-width: 100%;
-    margin: auto;
-  }
-
-  .Accordion_item {
-    width: 100%;
-    height: auto;
-    margin: 5px 0;
-    border-bottom: 1px solid #363636;
-  }
-
-  .Accordion_item .title_tab {
-    width: 100%;
-    background-color: transparent;
-    color: #fff;
-    padding: 20px 0;
-    cursor: pointer;
-    transition: background-color 0.3s ease-in;
-    border-radius: 0;
-  }
-
-  .Accordion_item .title_tab .title {
-    margin: 0;
-    color: #F7F5F5;
-    font-size: 20px;
-    font-style: normal;
-    font-weight: 500;
-    line-height: normal;
-    position: relative;
-  }
-
-  .inner_content {
-    width: 100%;
-    height: auto;
-    display: none;
-    overflow: hidden;
-  }
-
-  .inner_content p,
-  .inner_content a {
-    color: #F7F5F5;
-    font-size: 16px;
-    font-style: normal;
-    font-weight: 500;
-    line-height: normal;
-  }
-
-  .mobilefootermenu .inner_content h3 {
-    color: #F7F5F5;
-    font-size: 24px;
-    font-style: normal;
-    font-weight: 700;
-    line-height: 36px;
-    margin: 20px 0 5px;
-    font-size: 24px !important;
-  }
-
-  .mobilefootermenu .inner_content h3:first-child {
-    margin-top: 0 !important;
-  }
-
-  .Accordion_item .title_tab .title {
-    position: relative;
-  }
-
-  .Accordion_item .title_tab .title .icon {
-    position: absolute;
-    right: 1%;
-    top: calc(50% - 8px);
-    width: 20px;
-    height: 20px;
-    background-color: transparent;
-    transition: all 0.3s ease-in-out;
-  }
-
-  .Accordion_item .title_tab .title .icon::before,
-  .Accordion_item .title_tab .title .icon::after {
-    content: '';
-    position: absolute;
-    background-color: #fcfcfc;
-    transition: all 0.3s ease-in-out;
-  }
-
-  .Accordion_item .title_tab .title .icon::before {
-    top: 0;
-    left: 50%;
-    width: 2px;
-    height: 100%;
-    transform: translateX(-50%);
-  }
-
-  .Accordion_item .title_tab .title .icon::after {
-    top: 50%;
-    left: 0;
-    width: 100%;
-    height: 2px;
-    transform: translateY(-50%);
-  }
-
-  .Accordion_item .title_tab.active .title .icon::before {
-    opacity: 0;
-  }
-
   .logofdry {
     display: flex;
     justify-content: center;
@@ -653,76 +548,87 @@ endif;
       <div class="mobilefootermenu">
         <div class="">
 
-          <div class="Accordions">
-            <div class="Accordion_item">
-              <div class="title_tab">
-                <h3 class="title">
+          <div class="accordion-container footer-accordion">
+            <div class="ac footer-accordion__item">
+              <h3 class="ac-header footer-accordion__header">
+                <button type="button" class="ac-trigger footer-accordion__trigger">
                   Contact
-                  <span class="icon"></span>
-                </h3>
-              </div>
-              <div class="inner_content">
-                <p><a href="mailto:studio@fdry.com">studio@fdry.com</a></p>
-                <p><a href="tel:+4402081234669">+44 (0) 20 81234669</a></p>
-                <p>123 BPR, London, SW1W 9SH</p>
-              </div>
-            </div>
-
-            <div class="Accordion_item">
-              <div class="title_tab">
-                <h3 class="title">Services<span class="icon"></span></h3>
-              </div>
-              <div class="inner_content">
-                <h3>Create</h3>
-                <ul>
-                  <li><a href="/service/brand-creative/">Brand & Create</a></li>
-                  <li><a href="/service/ux-ui/">UX & UI</a></li>
-                  <li><a href="/service/web-design-agency/">Web Design</a></li>
-                  <li><a href="/service/ecommerce/">Ecommerce</a></li>
-                  <li><a href="/shopify-agency/">Shopify Agency</a></li>
-                  <li><a href="/woocommerce-agency/">WooCommerce Agency</a></li>
-                  <li><a href="/wordpress-agency/">Wordpress Agency</a></li>
-                  <li><a href="/adobe-commerce-agency/">Adobe Commerce Agency</a></li>
-                </ul>
-
-                <h3>Grow</h3>
-                <ul>
-                  <li><a href="/service/seo-agency/">SEO Marketing</a></li>
-                  <li><a href="/service/geo-marketing-agency/">GEO Marketing</a></li>
-                  <li><a href="/service/ecommerce-seo-agency/">Ecommerce SEO</a></li>
-                  <li><a href="/service/b2b-seo-agency-london/">B2B SEO</a></li>
-                  <li><a href="/service/ai-seo-agency-london/">AI SEO</a></li>
-                  <li><a href="/servic/technical-seo-agency/">Technical SEO</a></li>
-                  <li><a href="/service/paid-advertising/">Paid Media Ads</a></li>
-                  <li><a href="/service/social-media-marketing/">Social Media Marketing</a></li>
-                  <li><a href="/service/email-marketing/">Email Marketing Campaigns</a></li>
-                </ul>
-
-                <h3>Sectors</h3>
-                <ul>
-                  <li><a href="/sectors/retail-ecommerce/">Retail and Ecommerce</a></li>
-                  <li><a href="/sectors/healthcare-wellness/">Healthcare and Wellness</a></li>
-                  <li><a href="/sectors/financial-services/">Financial Services</a></li>
-                  <li><a href="/sectors/manufacturing-industrials/">Manufacturing and Industrials</a></li>
-                  <li><a href="/sectors/professional-services/">Professional Services</a></li>
-                </ul>
+                  <span class="footer-accordion__icon" aria-hidden="true"></span>
+                </button>
+              </h3>
+              <div class="ac-panel footer-accordion__panel">
+                <div class="ac-panel-inner footer-accordion__panel-inner">
+                  <p><a href="mailto:studio@fdry.com">studio@fdry.com</a></p>
+                  <p><a href="tel:+4402081234669">+44 (0) 20 81234669</a></p>
+                  <p>123 BPR, London, SW1W 9SH</p>
+                </div>
               </div>
             </div>
 
-            <div class="Accordion_item">
-              <div class="title_tab">
-                <h3 class="title">Company<span class="icon"></span></h3>
-              </div>
-              <div class="inner_content">
-                <ul>
-                  <li><a href="/about/">About</a></li>
-                  <li><a href="/careers/">Careers</a></li>
-                  <li><a href="/service/">Services</a></li>
-                  <li><a href="/work/">Work</a></li>
-                  <li><a href="/insights/">Insights</a></li>
-                  <li><a href="/contact/">Contact</a></li>
-                </ul>
+            <div class="ac footer-accordion__item">
+              <h3 class="ac-header footer-accordion__header">
+                <button type="button" class="ac-trigger footer-accordion__trigger">
+                  Services
+                  <span class="footer-accordion__icon" aria-hidden="true"></span>
+                </button>
+              </h3>
+              <div class="ac-panel footer-accordion__panel">
+                <div class="ac-panel-inner footer-accordion__panel-inner">
+                  <h3>Create</h3>
+                  <ul>
+                    <li><a href="/service/brand-creative/">Brand & Create</a></li>
+                    <li><a href="/service/ux-ui/">UX & UI</a></li>
+                    <li><a href="/service/web-design-agency/">Web Design</a></li>
+                    <li><a href="/service/ecommerce/">Ecommerce</a></li>
+                    <li><a href="/shopify-agency/">Shopify Agency</a></li>
+                    <li><a href="/woocommerce-agency/">WooCommerce Agency</a></li>
+                    <li><a href="/wordpress-agency/">Wordpress Agency</a></li>
+                    <li><a href="/adobe-commerce-agency/">Adobe Commerce Agency</a></li>
+                  </ul>
 
+                  <h3>Grow</h3>
+                  <ul>
+                    <li><a href="/service/seo-agency/">SEO Marketing</a></li>
+                    <li><a href="/service/geo-marketing-agency/">GEO Marketing</a></li>
+                    <li><a href="/service/ecommerce-seo-agency/">Ecommerce SEO</a></li>
+                    <li><a href="/service/b2b-seo-agency-london/">B2B SEO</a></li>
+                    <li><a href="/service/ai-seo-agency-london/">AI SEO</a></li>
+                    <li><a href="/servic/technical-seo-agency/">Technical SEO</a></li>
+                    <li><a href="/service/paid-advertising/">Paid Media Ads</a></li>
+                    <li><a href="/service/social-media-marketing/">Social Media Marketing</a></li>
+                    <li><a href="/service/email-marketing/">Email Marketing Campaigns</a></li>
+                  </ul>
+
+                  <h3>Sectors</h3>
+                  <ul>
+                    <li><a href="/sectors/retail-ecommerce/">Retail and Ecommerce</a></li>
+                    <li><a href="/sectors/healthcare-wellness/">Healthcare and Wellness</a></li>
+                    <li><a href="/sectors/financial-services/">Financial Services</a></li>
+                    <li><a href="/sectors/manufacturing-industrials/">Manufacturing and Industrials</a></li>
+                    <li><a href="/sectors/professional-services/">Professional Services</a></li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <div class="ac footer-accordion__item">
+              <h3 class="ac-header footer-accordion__header">
+                <button type="button" class="ac-trigger footer-accordion__trigger">
+                  Company
+                  <span class="footer-accordion__icon" aria-hidden="true"></span>
+                </button>
+              </h3>
+              <div class="ac-panel footer-accordion__panel">
+                <div class="ac-panel-inner footer-accordion__panel-inner">
+                  <ul>
+                    <li><a href="/about/">About</a></li>
+                    <li><a href="/careers/">Careers</a></li>
+                    <li><a href="/service/">Services</a></li>
+                    <li><a href="/work/">Work</a></li>
+                    <li><a href="/insights/">Insights</a></li>
+                    <li><a href="/contact/">Contact</a></li>
+                  </ul>
+                </div>
               </div>
             </div>
 
@@ -822,9 +728,7 @@ endif;
   <div class="container mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
 
     <div>
-      <p>COPYRIGHT &#169; <script>
-          document.write(new Date().getFullYear())
-        </script> <br> FDRY Digital Marketing Agency - WordPress, WooCommerce and Shopify Web Design Agency.</p>
+      <p>COPYRIGHT &#169; <?php echo date("Y"); ?> <br> FDRY Digital Marketing Agency - WordPress, WooCommerce and Shopify Web Design Agency.</p>
     </div>
 
 
@@ -854,27 +758,6 @@ endif;
 <!-- End Footer FDRY 2025 -->
 
 <?php wp_footer(); ?>
-<script type="text/javascript">
-  jQuery(function($) {
-    var $titleTab = $('.title_tab');
-
-    $titleTab.on('click', function(e) {
-      e.preventDefault();
-      if ($(this).hasClass('active')) {
-        $(this).removeClass('active');
-        $(this).next().stop().slideUp(500);
-        $(this).next().find('p').removeClass('show');
-      } else {
-        $(this).addClass('active');
-        $(this).next().stop().slideDown(500);
-        $(this).parent().siblings().children('.title_tab').removeClass('active');
-        $(this).parent().siblings().children('.inner_content').slideUp(500);
-        $(this).parent().siblings().children('.inner_content').find('p').removeClass('show');
-        $(this).next().find('p').addClass('show');
-      }
-    });
-  });
-</script>
 
 <script src="<?php echo get_template_directory_uri(); ?>/mainjs/footer.js"></script>
 
