@@ -99,7 +99,7 @@ Vite has a **single entry**: [`src/scripts/main.js`](src/scripts/main.js).
 
 1. Import SCSS first (so the build emits `fdry.css`).
 2. Import top-level modules from `./part/` — not `../part/`.
-3. Initialise everything inside one `DOMContentLoaded` handler.
+3. Initialise everything inside one `DOMContentLoaded` handler, each through `run()`, so one module throwing can't stop the ones after it.
 
 ```js
 import '../styles/main.scss'
@@ -110,10 +110,10 @@ import hamburger from './part/hamburger'
 import marquee from './part/marquee'
 
 document.addEventListener('DOMContentLoaded', () => {
-	smoothScroll()
-	gsapMotion.init()
-	hamburger()
-	marquee()
+	run(smoothScroll)
+	run(gsapMotion.init)
+	run(hamburger)
+	run(marquee)
 })
 ```
 
@@ -124,7 +124,7 @@ document.addEventListener('DOMContentLoaded', () => {
 - Return early if the DOM elements for that feature are not on the page.
 - Sub-modules (e.g. `gsapFade.js`, `gsapParallax.js`) are imported **only** by their parent (`gsap.js`), not by `main.js`.
 
-**`isolateGsap` must stay the first JS import in `main.js`.** Every page already has a second GSAP: [`loop-templates/tech-banner.php`](loop-templates/tech-banner.php), included from `footer.php`, loads 3.12.5 from a CDN onto `window.gsap`. ScrollTrigger registers itself with `window.gsap` the moment it is imported. Without the isolation it attaches to that copy, our `registerPlugin` calls do nothing, and every `scrollTrigger` in the bundle is ignored: all fades play on load. [`isolateGsap.js`](src/scripts/part/isolateGsap.js) hides the global while our modules load, and `main.js` restores it with `restoreGlobalGsap()` before `DOMContentLoaded`, so the legacy inline code keeps working. Any other global GSAP (GTM, a plugin) is handled the same way.
+**`isolateGsap` must stay the first JS import in `main.js`.** Every page already has a second GSAP: [`loop-templates/tech-banner.php`](loop-templates/tech-banner.php), included from `footer.php`, loads 3.12.5 from a CDN onto `window.gsap`. ScrollTrigger registers itself with `window.gsap` the moment it is imported. Without the isolation it attaches to that copy, our `registerPlugin` calls do nothing, and every `scrollTrigger` in the bundle is ignored: parallax plays on load instead of following the scroll. [`isolateGsap.js`](src/scripts/part/isolateGsap.js) hides the global while our modules load, and `main.js` restores it with `restoreGlobalGsap()` before `DOMContentLoaded`, so the legacy inline code keeps working. Any other global GSAP (GTM, a plugin) is handled the same way.
 
 If `pnpm dev` leaves `dist/` empty, check the terminal — a failed build (often a bad import path) clears `dist/` when `emptyOutDir` is true.
 
@@ -151,13 +151,13 @@ A new overlay that locks the page should send the same kind of event and be adde
 
 **Anchors.** Same-page `#hash` links glide to the target below the header, update the URL and move focus to the target. The skip link, links in a stopped state (e.g. inside the open menu) and links to other pages are left to the browser.
 
-**CSS.** `lenis/dist/lenis.css` is pulled in from [`main.scss`](src/styles/main.scss). It resets the legacy `html, body { height: 100% }` from `typeformstyle.css`. `html.lenis { scroll-behavior: auto }` in `_reset.scss` cancels `theme.css`'s `html { scroll-behavior: smooth }`.
+**CSS.** `lenis/dist/lenis.css` is pulled in from [`main.scss`](src/styles/main.scss). It resets the legacy `html, body { height: 100% }` from `typeformstyle.css`. `html.lenis { scroll-behavior: auto !important }` in `_reset.scss` cancels `theme.css`'s `html { scroll-behavior: smooth }`. It needs `!important` because the Table of Content block plugin prints `html{scroll-behavior:smooth!important}` inline. Left smooth, `ScrollTrigger.refresh()`, which jumps to the top and back to measure, reads the wrong scroll position and misplaces the parallax ranges.
 
 **Scroll-driven effects.** Build them on ScrollTrigger (`scrub` for effects tied to scroll position), not on `lenis.on('scroll')`, so they behave the same where Lenis is off. `getLenis()` returns the instance, or `null` where it is off, for the rare case that needs Lenis itself (e.g. scroll velocity).
 
 ## Fade up / fade down
 
-[`gsapFade.js`](src/scripts/part/gsapFade.js) fades elements in as they reach `top 90%` of the viewport, the same technique as [lionandmason.com](https://lionandmason.com/). It is a `gsap.fromTo` on `y` and `opacity` with a ScrollTrigger, `power3.out` over 2 s, and it plays once. Add the attributes in PHP; no JS changes are needed per component.
+[`gsapFade.js`](src/scripts/part/gsapFade.js) fades elements in as they reach `top 90%` of the viewport, the same technique as [lionandmason.com](https://lionandmason.com/). It is a paused `gsap.fromTo` on `y` and `opacity`, `power3.out` over 2 s, which an IntersectionObserver plays once. Add the attributes in PHP; no JS changes are needed per component.
 
 | Attribute | Effect | Default |
 |-----------|--------|---------|
@@ -170,9 +170,11 @@ A new overlay that locks the page should send the same kind of event and be adde
 
 The duration attribute works like lionandmason's. Consecutive items with `.2`, `.4`, `.6`… start together and land one after another, which gives a cascade (their logo strip). Use `-delay` to make them start one after another instead.
 
-Elements already past `top 90%` on load play straight away. That covers the header and the page heading, e.g. `data-fade-up data-fade-up-delay="0.5"`.
+Elements already past `top 90%` on load play straight away, and so do elements above the viewport (e.g. after a reload lower down). That covers the header and the page heading, e.g. `data-fade-up data-fade-up-delay="0.5"`.
 
-- **Hiding before JS.** `_helper.scss` sets `opacity: 0` on these elements and on group children, so nothing flashes before the JS runs. With `prefers-reduced-motion` they are simply visible, and `gsap.js` skips the tweens.
+- **Why not ScrollTrigger.** Fades used to be ScrollTriggers. On cold, logged-in loads from wp-admin they sometimes stopped firing, and everything below the fold stayed at `opacity: 0`: a white page. ScrollTrigger works from positions it stores, which can go stale or stop updating. IntersectionObserver checks each element's real box on every scroll and reflow, whatever does the scrolling, so an element on screen can't stay at its start state.
+- **Hiding before JS.** `_helper.scss` sets `opacity: 0` on these elements and on group children, but only under `html.fdry-fade`. `fdry_fade_gate()` in [`function-dev.php`](library/function-dev.php) adds that class from an inline script in `<head>`, so nothing flashes. `gsapFade.js` adds `fdry-fade-ready` once it is set up. If that has not happened by the window `load` event (bundle failed, blocked or delayed by WP Rocket), the gate comes off and the content shows without the fade. With `prefers-reduced-motion` the class is never set, and `gsap.js` skips the tweens.
+- **Layout shifts.** Only parallax still uses ScrollTrigger, which measures on load and on window resize. On a cold cache the layout keeps changing after `load` (runtime Tailwind CSS, late fonts, images without dimensions). `gsap.js` refreshes ScrollTrigger once fonts are ready and, debounced, whenever the body height changes, on pages that have ScrollTriggers.
 - **Transforms.** GSAP animates the inline `transform` and clears it when the tween ends, leaving `opacity: 1`. An element with its own CSS transform only conflicts during the tween itself.
 - **Header.** Put `data-fade-down` on `.site-header__inner`, **not** `.site-header`. The header's hide-on-scroll animates `transform` with a CSS transition, which would fight GSAP during the fade.
 

@@ -44,9 +44,12 @@ body {
 	line-height: 1.5;
 }
 
-/* Lenis animates the scroll itself; theme.css's html smooth would fight it */
+/* Lenis animates the scroll itself; theme.css's html smooth would fight it.
+   !important to beat the Table of Content block plugin, which prints
+   html{scroll-behavior:smooth!important} inline. Smooth there also breaks
+   ScrollTrigger.refresh(), which jumps to the top and back to measure. */
 html.lenis {
-	scroll-behavior: auto;
+	scroll-behavior: auto !important;
 }
 
 /* A elements that don't have a class get default styles */

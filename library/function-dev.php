@@ -322,6 +322,30 @@ function fdry_new_header_body_class(array $classes): array
 add_filter('body_class', 'fdry_new_header_body_class');
 
 /**
+ * Let the stylesheet hide [data-fade-up] elements only when gsapFade.js can
+ * reveal them.
+ *
+ * The fdry-fade class on <html> turns the hide rule on before first paint, so
+ * nothing flashes. gsapFade.js adds fdry-fade-ready once its observer is set up;
+ * if that has not happened by the window load event (bundle failed, blocked or
+ * delayed), the class comes off and the content shows without the fade.
+ * Reduced motion never gets the class.
+ */
+function fdry_fade_gate(): void
+{
+	wp_print_inline_script_tag(
+		"(function (root) {
+	if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+	root.classList.add('fdry-fade');
+	window.addEventListener('load', function () {
+		if (!root.classList.contains('fdry-fade-ready')) root.classList.remove('fdry-fade');
+	});
+})(document.documentElement);"
+	);
+}
+add_action('wp_head', 'fdry_fade_gate', 1);
+
+/**
  * Normalise an ACF link field to url + target parts.
  *
  * @param array|string|false|null $link ACF link field value.

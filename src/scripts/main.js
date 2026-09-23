@@ -20,18 +20,27 @@ import teamSlider from './part/teamSlider'
 
 restoreGlobalGsap()
 
+// One module throwing must not stop the ones after it.
+const run = (init) => {
+	try {
+		init()
+	} catch (error) {
+		console.error(error)
+	}
+}
+
 document.addEventListener('DOMContentLoaded', () => {
-	smoothscroll.polyfill()
-	smoothScroll()
-	gsapMotion.init()
-	hamburger()
-	headerScroll()
-	navMenu()
-	navAccordion()
-	marquee()
-	heroVideo()
-	showreelModal()
-	workArchive()
-	workRowSlider()
-	teamSlider()
+	run(() => smoothscroll.polyfill())
+	run(smoothScroll)
+	run(gsapMotion.init)
+	run(hamburger)
+	run(headerScroll)
+	run(navMenu)
+	run(navAccordion)
+	run(marquee)
+	run(heroVideo)
+	run(showreelModal)
+	run(workArchive)
+	run(workRowSlider)
+	run(teamSlider)
 })

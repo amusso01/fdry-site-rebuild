@@ -32,18 +32,13 @@
 
 // Hidden until gsapFade.js plays them in. Group children are only tagged by
 // the JS, so they are matched here too or they would flash first.
-[data-fade-up],
-[data-fade-down],
-[data-fade-up-group] > :is(p, h1, h2, h3, h4, h5, h6, ul, ol, img, figure, blockquote, hr) {
+// .fdry-fade comes from the inline script fdry_fade_gate() prints in <head>. It
+// is never set with reduced motion, and removed on load if gsapFade.js did not
+// run, so without JS, or with a broken or delayed bundle, the content shows.
+.fdry-fade [data-fade-up],
+.fdry-fade [data-fade-down],
+.fdry-fade [data-fade-up-group] > :is(p, h1, h2, h3, h4, h5, h6, ul, ol, img, figure, blockquote, hr) {
 	opacity: 0;
-}
-
-@media (prefers-reduced-motion: reduce) {
-	[data-fade-up],
-	[data-fade-down],
-	[data-fade-up-group] > :is(p, h1, h2, h3, h4, h5, h6, ul, ol, img, figure, blockquote, hr) {
-		opacity: 1;
-	}
 }
 
 .parallax-clip {
