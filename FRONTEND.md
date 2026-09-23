@@ -130,7 +130,7 @@ If `pnpm dev` leaves `dist/` empty, check the terminal — a failed build (often
 
 ## Smooth scroll
 
-[`smoothScroll.js`](src/scripts/part/smoothScroll.js) runs [Lenis](https://github.com/darkroomengineering/lenis) for wheel and trackpad scrolling. Lenis keeps the native window scroll and only eases the input, so `position: sticky`, the fixed header, `window.scrollY`, AOS and ScrollTrigger all keep working. GSAP ScrollSmoother was ruled out: it moves the page into a transformed wrapper, which breaks `position: sticky` (the `work-parallax` cards) and needs markup changes in the header and footer.
+[`smoothScroll.js`](src/scripts/part/smoothScroll.js) runs [Lenis](https://github.com/darkroomengineering/lenis) for wheel and trackpad scrolling. Lenis keeps the native window scroll and only eases the input, so `position: sticky`, the fixed header, `window.scrollY` and ScrollTrigger all keep working. GSAP ScrollSmoother was ruled out: it moves the page into a transformed wrapper, which breaks `position: sticky` (the `work-parallax` cards) and needs markup changes in the header and footer.
 
 **Where it runs.** `fdry-scripts` loads on every page, legacy `header.php` included, so Lenis only starts when `<body>` has the `fdry-new-header` class. `fdry_new_header_body_class()` in [`function-dev.php`](library/function-dev.php) adds it wherever `FDRY_USING_NEW_HEADER` is set. It never starts with `prefers-reduced-motion`. Touch devices keep native scrolling (`syncTouch` is off).
 

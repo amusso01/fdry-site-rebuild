@@ -84,7 +84,6 @@ if (! defined('FDRY_USING_NEW_HEADER')) {
 
 
   <link rel="stylesheet" href="<?php echo get_template_directory_uri(); ?>/mainstyle/typeformstyle.css">
-  <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
   <link rel="stylesheet" href="<?php echo get_template_directory_uri(); ?>/mainstyle/mainstyle.css">
 
 

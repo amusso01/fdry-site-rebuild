@@ -63,12 +63,7 @@ $promoteWorks = get_field('promote_works');
 
 	<div class="greyboxbanner" style="padding: 125px 0 130px;">
 		<div class="container">
-			<article style="margin-bottom: 0;" 
-			    data-aos="fade-up"  
-			    data-aos-duration="700" 
-			    data-aos-anchor-placement="top-bottom"
-			    data-aos-offset="100"
-			    class="row headline first_home_section aos-animate right-container d-flex">
+			<article style="margin-bottom: 0;" class="row headline first_home_section right-container d-flex">
 			    
 			    <div class="col-md-9">
 			        <p class="headline__pre"><?php echo get_field('preheadline'); ?></p>
@@ -102,14 +97,8 @@ $promoteWorks = get_field('promote_works');
 	</div>
 	<!--End Design 2023-->
 
-	<section data-aos="fade-up"  
-		data-aos-duration="700" 
-		data-aos-offset = "100"
-		data-aos-anchor-placement="top-bottom" class="create home__services aos-animate">
-		<div data-aos="fade-up"  
-		data-aos-duration="700" 
-		data-aos-offset = "100"
-		data-aos-anchor-placement="top-bottom" class=" container-fluid create__relatedWorks home__relatedWorks aos-animate">
+	<section class="create home__services">
+		<div class="container-fluid create__relatedWorks home__relatedWorks">
 		
 			<div class="home-work-grid">
 			<?php foreach($createWorks as $work) : ?>
@@ -272,15 +261,9 @@ $promoteWorks = get_field('promote_works');
 	</section>
 	
 	
-	<section data-aos="fade-up"  
-		data-aos-duration="700" 
-		data-aos-offset = "100"
-		data-aos-anchor-placement="top-bottom"  class="build home__services aos-animate">
+	<section class="build home__services">
 
-		<div data-aos="fade-up"  
-		data-aos-duration="700" 
-		data-aos-offset = "100"
-		data-aos-anchor-placement="top-bottom" class=" container-fluid build__relatedWorks home__relatedWorks aos-animate">
+		<div class="container-fluid build__relatedWorks home__relatedWorks">
 		
 			<div class="home-work-grid">
 			<?php foreach($buildWorks as $work) : ?>
@@ -384,14 +367,8 @@ $promoteWorks = get_field('promote_works');
 
 	</section>
 
-	<section data-aos="fade-up"  
-		data-aos-duration="700" 
-		data-aos-offset = "100"
-		data-aos-anchor-placement="top-bottom" class="create home__services aos-animate" id="lastworkpost">
-		<div data-aos="fade-up"  
-			data-aos-duration="700" 
-			data-aos-offset = "100"
-			data-aos-anchor-placement="top-bottom" class=" container-fluid create__relatedWorks home__relatedWorks aos-animate">
+	<section class="create home__services" id="lastworkpost">
+		<div class="container-fluid create__relatedWorks home__relatedWorks">
 			
 				<div class="home-work-grid">
 					<?php
@@ -440,12 +417,7 @@ $promoteWorks = get_field('promote_works');
 
 	<div class="greyboxbanner secondgreybannerbox">
 		<div class="container">
-			<article   
-			data-aos="fade-up"  
-			data-aos-duration="700" 
-			data-aos-anchor-placement="top-bottom"
-			data-aos-offset = "100"
-			class="row headline first_home_section aos-animate">
+			<article class="row headline first_home_section">
 				<div class="col-md-8">
 					<h1 class="headline__pre" ><?php echo get_field('preheadline_seconfgreybanner'); ?></h1>
 					<h2 class="ultraWeight headline__head"><?php echo get_field('headline_secondgreybanner'); ?></h2>
