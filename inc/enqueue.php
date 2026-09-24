@@ -32,8 +32,6 @@ if ( ! function_exists( 'understrap_scripts' ) ) {
 		wp_deregister_script('jquery');
 		wp_register_script( 'jquery', 'https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js', array(), null, false );
 		wp_enqueue_script('jquery');
-		wp_enqueue_script('three', get_stylesheet_directory_uri().'/js/three.min.js', array(), null, true);
-		wp_enqueue_script('app', get_stylesheet_directory_uri().'/js/app.min.js', array('three'), null, true);
 		//load TweenMax in the pages requested
 		if(is_page('about') || is_page('work')){
 			wp_enqueue_script('tweenmax', 'https://cdnjs.cloudflare.com/ajax/libs/gsap/2.0.2/TweenMax.min.js', array(), null, true);

@@ -1,0 +1,127 @@
+@use '../common/variables' as *;
+@use '../common/media' as *;
+
+// "Let's talk / Send your brief" band in the footer (components/footer/brief.php).
+
+.footer-brief {
+	position: relative;
+	overflow: hidden;
+	padding: 80px 0;
+	background-color: $color__footerBg;
+	color: $color__white;
+
+	@include media('<tablet') {
+		padding: 64px 0;
+	}
+	@include media('<phone') {
+		padding: 48px 0;
+	}
+
+	&__bg {
+		position: absolute;
+		inset: 0;
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		object-position: center;
+		pointer-events: none;
+	}
+
+	&__inner {
+		position: relative;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 40px;
+
+		@include media('<phone') {
+			flex-direction: column;
+			align-items: flex-start;
+		}
+	}
+
+	&__eyebrow,
+	&__title,
+	&__lead {
+		color: $color__white;
+		font-family: $text__fontname;
+		font-style: normal;
+	}
+
+	&__eyebrow {
+		margin: 0 0 8px;
+		font-size: 12px;
+		font-weight: 600;
+		letter-spacing: 2px;
+		text-transform: uppercase;
+	}
+
+	&__title {
+		margin: 0 0 16px;
+		font-size: 32px;
+		font-weight: 400;
+		letter-spacing: -1.5px;
+		line-height: 1.2;
+	}
+
+	&__lead {
+		margin: 0;
+		font-size: 18px;
+		font-weight: 400;
+		line-height: 20px;
+	}
+
+	// The glowing START circle.
+	&__button {
+		display: flex;
+		flex-shrink: 0;
+		align-items: center;
+		justify-content: center;
+		width: 180px;
+		height: 180px;
+		border-radius: 50%;
+		background-color: $color__btn-yellow;
+		color: $color__black;
+		font-family: $text__fontname;
+		font-size: 14px;
+		font-weight: 700;
+		letter-spacing: 1px;
+		text-decoration: none;
+		text-transform: uppercase;
+		animation: footer-brief-pulse 1.5s infinite;
+
+		@include media('<phone') {
+			width: 140px;
+			height: 140px;
+		}
+
+		// One class stronger than the legacy a:hover / a:focus colour and underline.
+		&:hover,
+		&:focus {
+			color: $color__black;
+			text-decoration: none;
+			animation: none;
+		}
+
+		&:focus-visible {
+			outline: 2px solid $color__white;
+			outline-offset: 4px;
+		}
+	}
+}
+
+@keyframes footer-brief-pulse {
+	0% {
+		box-shadow: 0 0 0 0 rgba($color__btn-yellow, 0.35);
+	}
+
+	100% {
+		box-shadow: 0 0 0 35px rgba($color__btn-yellow, 0);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.footer-brief__button {
+		animation: none;
+	}
+}

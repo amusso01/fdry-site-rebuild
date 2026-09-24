@@ -13,7 +13,7 @@ This theme is an old Understrap build. **Never edit compiled legacy assets**, in
 
 All **new** styling and JavaScript goes in `src/`, compiles to hashed files in `dist/` (e.g. `fdry.[hash].css`, `fdry.[hash].js`), and loads **after** the old files so cascade and load order win.
 
-New dev PHP (menus, enqueue, helpers, theme supports) lives in [`library/function-dev.php`](library/function-dev.php), loaded from [`functions.php`](functions.php). Legacy [`inc/enqueue.php`](inc/enqueue.php) is unchanged.
+New dev PHP (menus, enqueue, helpers, theme supports) lives in [`library/function-dev.php`](library/function-dev.php), loaded from [`functions.php`](functions.php). Legacy [`inc/enqueue.php`](inc/enqueue.php) is otherwise unchanged. Only its Vanta/Three.js enqueues (`three.min.js`, `app.min.js`) were removed, together with those files, when the footer brief was rebuilt.
 
 ### Why
 
@@ -36,7 +36,9 @@ dist/
   fdry.[hash].js     # Hashed JS
   .vite/
     manifest.json    # Maps entry to current hashed filenames (read by PHP)
-components/          # PHP partials for header-new templates
+components/          # PHP partials for header-new templates (footer/ is on every page)
+img/
+  footer/            # Footer images, committed (e.g. brief-bg.jpg)
 header-new.php       # New header (legacy <head>, new body markup)
 media/
   showreel-*.mp4     # Full showreel for the modal (gitignored, deployed by hand)
@@ -189,6 +191,16 @@ The platform logo grid above the footer is [`components/footer/tech-banner.php`]
 - **Speeds.** Each comet gets a random speed in `SPEED_MIN`–`SPEED_MAX` (140–500 px/s) that is at least `SPEED_GAP` (60 px/s) away from every comet already on screen, so no two move at the same pace. Delays, speeds and sizes (`DASH`, glow) are constants at the top of the file.
 - **Colours.** The custom properties on `.tech-grid-section` (`--tech-grid-line`, `--tech-grid-cross`, `--tech-grid-accent`) control the colours. The JS never sets a colour.
 - **Cost.** Every live comet and pending delay is kept in a set. It is paused while the grid is off screen (IntersectionObserver), so nothing runs in the background and there's no burst of backlog on return. A debounced ResizeObserver kills everything and rebuilds the SVG on the new lines, including the 8 ↔ 2 column switch. With `prefers-reduced-motion` only the plus marks are drawn.
+
+## Footer brief
+
+The "Let's talk / Send your brief / START" band is [`components/footer/brief.php`](components/footer/brief.php), included from `footer.php` on every page, and styled in [`_footer-brief.scss`](src/styles/components/_footer-brief.scss). It replaced the old `#wrapper-footer` markup and its Vanta HALO WebGL background.
+
+- **Layout.** Text on the left and the START circle on the right, `space-between`, stacking below `phone`. Vertical padding is 80 / 64 / 48px (desktop / below `tablet` / below `phone`).
+- **Side padding.** `content-block content-block--footer` in [`_helper.scss`](src/styles/common/_helper.scss) gives 90px on desktop, 32px below `tablet` and 25px below `phone`. Use it for the other footer sections too.
+- **Background.** A static image, `img/footer/brief-bg.jpg` (2880×720, committed). Keep it under about 300 KB: it's a grainy gradient, so export it as a progressive JPG at around quality 75, which keeps the grain (the current file is mozjpeg q75, 266 KB). It's a lazy `<img>` with `object-fit: cover`. It only renders if the file exists, so without it the band shows `$color__footerBg`.
+- **START.** A `$color__btn-yellow` circle linking to `/brief-1/`, with a box-shadow pulse (`footer-brief-pulse`) that stops on hover and focus and under reduced motion. It has no `id`. Target `.footer-brief__button`, not the old `#box`.
+- **Motion.** Each element has `data-fade-up` with a 0.1s stagger (see **Fade up / fade down**).
 
 ## Commands
 

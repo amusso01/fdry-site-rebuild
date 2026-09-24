@@ -169,10 +169,6 @@ endif;
     object-fit: cover;
   }
 
-  /*Temp*/
-  /*header{display: none;}
-    footer, #wrapper-footer, .footerbanner{display: none;}*/
-
   /*Fdry footer*/
   .fdryfooter {
     background-color: #191919;
@@ -475,26 +471,7 @@ endif;
 
 <?php get_template_part('sidebar-templates/sidebar', 'footerfull'); ?>
 
-<div class="wrapper" id="wrapper-footer" style="display: block!important;">
-  <div class="container-fluid brief-footer footer__brief-bg">
-    <div class="container">
-      <div class="row">
-        <div class="col-lg-9 col-md-6">
-          <div class="canvatext">
-            <span>Let’s talk</span>
-            <h2 class="h2title">Send us<br>your brief</h2>
-            <p>and calculate your budget and timescale</p>
-          </div>
-        </div>
-        <div class="col-lg-3 col-md-3 offset-md-3 left">
-          <a href="<?php echo site_url('/brief-1/'); ?>" id="box" class="btn brief">
-            <p>START</p>
-          </a>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
+<?php get_template_part('components/footer/brief'); ?>
 <!-- New Footer FDRY 2025  -->
 <div class="fdryfooter">
   <div class="container">

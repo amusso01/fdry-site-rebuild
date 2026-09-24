@@ -40,8 +40,13 @@ foreach ($logos as $file => $name) {
       <?php for ($col = 0; $col < $cols; $col++) : ?>
         <?php $logo = $row === $logo_row ? ($logo_urls[$col - 1] ?? null) : null; ?>
         <?php if ($logo) : ?>
+          <?php
+          // Fade the logo, not the cell: the cell hides the line-coloured grid
+          // background, so fading it would flash a grey block.
+          $fade_delay = ($col - 1) * 0.1;
+          ?>
           <div class="tech-grid__cell">
-            <img class="tech-grid__logo" src="<?php echo esc_url($logo['src']); ?>" alt="<?php echo esc_attr($logo['alt']); ?>" loading="lazy">
+            <img class="tech-grid__logo" src="<?php echo esc_url($logo['src']); ?>" alt="<?php echo esc_attr($logo['alt']); ?>" loading="lazy" data-fade-up<?= $fade_delay > 0 ? ' data-fade-up-delay="' . esc_attr(number_format($fade_delay, 1)) . '"' : ''; ?>>
           </div>
         <?php else : ?>
           <div class="tech-grid__cell tech-grid__cell--ghost" aria-hidden="true"></div>
