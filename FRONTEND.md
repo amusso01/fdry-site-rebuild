@@ -124,7 +124,7 @@ document.addEventListener('DOMContentLoaded', () => {
 - Return early if the DOM elements for that feature are not on the page.
 - Sub-modules (e.g. `gsapFade.js`, `gsapParallax.js`) are imported **only** by their parent (`gsap.js`), not by `main.js`.
 
-**`isolateGsap` must stay the first JS import in `main.js`.** Every page already has a second GSAP: [`loop-templates/tech-banner.php`](loop-templates/tech-banner.php), included from `footer.php`, loads 3.12.5 from a CDN onto `window.gsap`. ScrollTrigger registers itself with `window.gsap` the moment it is imported. Without the isolation it attaches to that copy, our `registerPlugin` calls do nothing, and every `scrollTrigger` in the bundle is ignored: parallax plays on load instead of following the scroll. [`isolateGsap.js`](src/scripts/part/isolateGsap.js) hides the global while our modules load, and `main.js` restores it with `restoreGlobalGsap()` before `DOMContentLoaded`, so the legacy inline code keeps working. Any other global GSAP (GTM, a plugin) is handled the same way.
+**`isolateGsap` must stay the first JS import in `main.js`.** GSAP plugins (ScrollTrigger, MotionPath) register themselves with `window.gsap` the moment they are imported. The theme no longer loads a GSAP of its own onto `window` (the old tech banner's CDN copy is gone), but GTM, a WordPress plugin or an old inline script can. Without the isolation our plugins would attach to that copy, our `registerPlugin` calls would do nothing, and every `scrollTrigger` in the bundle would be ignored: parallax plays on load instead of following the scroll. [`isolateGsap.js`](src/scripts/part/isolateGsap.js) hides the global while our modules load, and `main.js` restores it with `restoreGlobalGsap()` before `DOMContentLoaded`, so any code that relies on it keeps working.
 
 If `pnpm dev` leaves `dist/` empty, check the terminal — a failed build (often a bad import path) clears `dist/` when `emptyOutDir` is true.
 
@@ -177,6 +177,18 @@ Elements already past `top 90%` on load play straight away, and so do elements a
 - **Layout shifts.** Only parallax still uses ScrollTrigger, which measures on load and on window resize. On a cold cache the layout keeps changing after `load` (runtime Tailwind CSS, late fonts, images without dimensions). `gsap.js` refreshes ScrollTrigger once fonts are ready and, debounced, whenever the body height changes, on pages that have ScrollTriggers.
 - **Transforms.** GSAP animates the inline `transform` and clears it when the tween ends, leaving `opacity: 1`. An element with its own CSS transform only conflicts during the tween itself.
 - **Header.** Put `data-fade-down` on `.site-header__inner`, **not** `.site-header`. The header's hide-on-scroll animates `transform` with a CSS transition, which would fight GSAP during the fade.
+
+## Tech banner grid
+
+The platform logo grid above the footer is [`components/footer/tech-banner.php`](components/footer/tech-banner.php), included from `footer.php` on every page. Its layout is in [`_tech-banner.scss`](src/styles/components/_tech-banner.scss), and [`techGrid.js`](src/scripts/part/techGrid.js) animates it.
+
+- **Lines.** The grid is 8×3 on desktop (logos in the middle row, empty cells around them) and 2×3 below 768px. There are no borders: the grid has `gap: 1px` and a line-coloured background, so the lines are the gaps.
+- **Overlay.** `techGrid.js` reads the track sizes and gaps from `getComputedStyle(grid)` and draws an SVG over the grid. It has a plus mark at every inner crossing, and "comets": a short dash with a small blurred glow that travels along the lines and leaves a faint trail. It copies terminal-industries.com's `sections-grid`. The glow follows the path with GSAP's MotionPathPlugin.
+- **Random paths.** Each comet takes a random walk in grid-line indices (`randomRoute()`). It starts at an outer edge on a random visible line, steps from crossing to crossing, may turn 90° at a crossing (`TURN_CHANCE`, at most `MAX_TURNS`), and ends at an outer edge. The walk only uses the lines that are drawn, so the same code covers the 8- and 2-column layouts. It picks again (up to `ROUTE_TRIES`) if the new route would share a line with a comet already on screen, so comets rarely meet head-on.
+- **At most 3 on screen.** There is one independent loop per `FIRST_DELAY` range (three). Each waits a random delay, sends a comet and, once it has faded out, waits again. The loops start at different times and overlap freely, and launches are at least `MIN_GAP` apart, so there are never more than three comets and they never pop in together.
+- **Speeds.** Each comet gets a random speed in `SPEED_MIN`–`SPEED_MAX` (140–500 px/s) that is at least `SPEED_GAP` (60 px/s) away from every comet already on screen, so no two move at the same pace. Delays, speeds and sizes (`DASH`, glow) are constants at the top of the file.
+- **Colours.** The custom properties on `.tech-grid-section` (`--tech-grid-line`, `--tech-grid-cross`, `--tech-grid-accent`) control the colours. The JS never sets a colour.
+- **Cost.** Every live comet and pending delay is kept in a set. It is paused while the grid is off screen (IntersectionObserver), so nothing runs in the background and there's no burst of backlog on return. A debounced ResizeObserver kills everything and rebuilds the SVG on the new lines, including the 8 ↔ 2 column switch. With `prefers-reduced-motion` only the plus marks are drawn.
 
 ## Commands
 

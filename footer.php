@@ -75,27 +75,6 @@ endif;
     max-width: 200px;
   }
 
-  .tech-banner {
-    background-color: #F7F5F5;
-  }
-
-  .tech-banner h2 {
-    color: #191919;
-    font-size: 60px;
-    font-style: normal;
-    font-weight: 500;
-    line-height: normal;
-    letter-spacing: -3px;
-  }
-
-  .tech-banner p {
-    color: #686868;
-    font-size: 16px;
-    font-style: normal;
-    font-weight: 500;
-    line-height: normal;
-  }
-
   .stickymenu {
     padding: 12px 32px;
     border-radius: 40px;
@@ -486,18 +465,13 @@ endif;
       display: block;
     }
 
-    .sectiongrid {
-      padding-left: 15px;
-      padding-right: 15px;
-    }
-
     .mainfooter.menufooter {
       display: none;
     }
   }
 </style>
 
-<?php get_template_part('loop-templates/tech', 'banner'); ?>
+<?php get_template_part('components/footer/tech-banner'); ?>
 
 <?php get_template_part('sidebar-templates/sidebar', 'footerfull'); ?>
 

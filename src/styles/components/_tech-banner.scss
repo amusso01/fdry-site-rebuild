@@ -1,0 +1,94 @@
+@use '../common/media' as *;
+
+// Platform logo grid in the footer (components/footer/tech-banner.php).
+// The grid lines are the 1px gaps showing the grid's background through;
+// techGrid.js reads the same tracks to draw the plus marks and the
+// travelling line on an SVG overlay.
+
+.tech-grid-section {
+	--tech-grid-bg: #f7f5f5;
+	--tech-grid-line: #e5e7eb;
+	--tech-grid-cross: #cccccc;
+	--tech-grid-accent: #4951f2;
+
+	padding: 40px 0;
+	background-color: var(--tech-grid-bg);
+
+	@include media('<768px') {
+		padding-inline: 15px;
+	}
+}
+
+.tech-grid {
+	position: relative;
+	display: grid;
+	// 3 rows in both layouts: ghost / logos / ghost on desktop, 6 logos in 2s below 768px.
+	grid-template-columns: repeat(8, minmax(0, 1fr));
+	grid-template-rows: repeat(3, 192px);
+	gap: 1px;
+	background-color: var(--tech-grid-line);
+
+	@include media('<768px') {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+
+	&__cell {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		min-width: 0;
+		background-color: var(--tech-grid-bg);
+
+		&--ghost {
+			@include media('<768px') {
+				display: none;
+			}
+		}
+	}
+
+	&__logo {
+		display: block;
+		width: 85%;
+		height: auto;
+	}
+
+	&__svg {
+		position: absolute;
+		inset: 0;
+		width: 100%;
+		height: 100%;
+		overflow: visible;
+		pointer-events: none;
+	}
+
+	&__cross {
+		fill: none;
+		stroke: var(--tech-grid-cross);
+		stroke-width: 1.94;
+	}
+
+	&__route {
+		opacity: 0;
+	}
+
+	&__trail,
+	&__comet {
+		fill: none;
+		stroke: var(--tech-grid-accent);
+		stroke-width: 1;
+	}
+
+	&__trail {
+		stroke-opacity: 0.2;
+	}
+
+	&__comet {
+		stroke-width: 1.25;
+		stroke-linecap: round;
+	}
+
+	&__glow {
+		fill: var(--tech-grid-accent);
+		fill-opacity: 0.5;
+	}
+}

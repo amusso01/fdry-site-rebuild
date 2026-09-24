@@ -18,6 +18,7 @@ import headerScroll from './part/headerScroll'
 import workArchive from './part/workArchive'
 import workRowSlider from './part/workRowSlider'
 import teamSlider from './part/teamSlider'
+import techGrid from './part/techGrid'
 
 restoreGlobalGsap()
 
@@ -45,4 +46,5 @@ document.addEventListener('DOMContentLoaded', () => {
 	run(workArchive)
 	run(workRowSlider)
 	run(teamSlider)
+	run(techGrid)
 })

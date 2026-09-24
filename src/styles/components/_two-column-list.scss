@@ -63,12 +63,15 @@
 
 	&__media {
 		width: 100%;
+		overflow: hidden;
+		border-radius: 4px;
 	}
 
 	&__image {
 		display: block;
 		width: 100%;
 		height: auto;
+		border-radius: 4px;
 	}
 
 	&__right {

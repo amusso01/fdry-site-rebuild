@@ -4,11 +4,14 @@
 
 	&__picture {
 		display: block;
+		overflow: hidden;
+		border-radius: 4px;
 	}
 
 	&__image {
 		display: block;
 		width: 100%;
 		height: auto;
+		border-radius: 4px;
 	}
 }
