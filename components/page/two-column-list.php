@@ -177,7 +177,7 @@ if ($tagline === '' && $title === '' && ! $has_image && ! $has_list && $content 
 				<?php if ($has_list || $content !== '') : ?>
 					<div class="two-column-list__right">
 						<?php if ($content_before_list && $content !== '') : ?>
-							<div class="two-column-list__body wysiwyg<?= $use_bigger_font ? ' two-column-list__body--bigger-font' : ''; ?>" data-fade-up>
+							<div class="two-column-list__body wysiwyg<?= $use_bigger_font ? ' two-column-list__body--bigger-font' : ''; ?>" data-fade-up-group>
 								<?= wp_kses_post($content); ?>
 							</div>
 						<?php endif; ?>
@@ -211,7 +211,7 @@ if ($tagline === '' && $title === '' && ! $has_image && ! $has_list && $content 
 						<?php endif; ?>
 
 						<?php if (! $content_before_list && $content !== '') : ?>
-							<div class="two-column-list__body wysiwyg<?= $use_bigger_font ? ' two-column-list__body--bigger-font' : ''; ?>" data-fade-up>
+							<div class="two-column-list__body wysiwyg<?= $use_bigger_font ? ' two-column-list__body--bigger-font' : ''; ?>" data-fade-up-group>
 								<?= wp_kses_post($content); ?>
 							</div>
 						<?php endif; ?>
