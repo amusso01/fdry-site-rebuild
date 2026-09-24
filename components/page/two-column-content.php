@@ -125,19 +125,23 @@ if ($tagline === '' && $title === '' && $links === array() && $content === '') {
 				<?php if ($tagline !== '' || $title !== '') : ?>
 					<div class="two-column-content__header">
 						<?php if ($tagline !== '') : ?>
-							<<?= esc_attr($tagline_tag); ?> class="two-column-content__tagline"><?= esc_html($tagline); ?></<?= esc_attr($tagline_tag); ?>>
+							<<?= esc_attr($tagline_tag); ?> class="two-column-content__tagline" data-fade-up><?= esc_html($tagline); ?></<?= esc_attr($tagline_tag); ?>>
 						<?php endif; ?>
 
 						<?php if ($title !== '') : ?>
-							<p class="two-column-content__title"><?= esc_html($title); ?></p>
+							<p class="two-column-content__title" data-fade-up data-fade-up-duration=".2"><?= esc_html($title); ?></p>
 						<?php endif; ?>
 					</div>
 				<?php endif; ?>
 
 				<?php if ($links !== array()) : ?>
 					<ul class="two-column-content__links">
-						<?php foreach ($links as $link) : ?>
-							<li class="two-column-content__link-item">
+						<?php foreach ($links as $index => $link) : ?>
+							<?php
+							// Rows cascade top to bottom, 0.1s apart.
+							$fade_delay = $index * 0.1;
+							?>
+							<li class="two-column-content__link-item" data-fade-up<?= $fade_delay > 0 ? ' data-fade-up-delay="' . esc_attr(number_format($fade_delay, 2)) . '"' : ''; ?>>
 								<a
 									class="two-column-content__link"
 									href="<?= esc_attr($escape_link_href($link['url'])); ?>"
@@ -159,7 +163,7 @@ if ($tagline === '' && $title === '' && $links === array() && $content === '') {
 				<?php endif; ?>
 
 				<?php if ($content !== '') : ?>
-					<div class="two-column-content__body wysiwyg">
+					<div class="two-column-content__body wysiwyg" data-fade-up-group>
 						<?= wp_kses_post($content); ?>
 					</div>
 				<?php endif; ?>

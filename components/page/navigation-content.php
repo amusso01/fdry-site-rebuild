@@ -99,6 +99,7 @@ if ($rows === array()) {
 						<a
 							class="navigation-content__main"
 							href="<?= esc_attr($escape_link_href($row['url'])); ?>"
+							data-fade-up
 							<?php if ($row['target'] !== '') : ?>
 								target="<?= esc_attr($row['target']); ?>"
 								<?php if ($row['target'] === '_blank') : ?>
@@ -116,7 +117,7 @@ if ($rows === array()) {
 						<?php if ($row['sublinks'] !== array()) : ?>
 							<ul class="navigation-content__sublinks">
 								<?php foreach ($row['sublinks'] as $sublink) : ?>
-									<li class="navigation-content__sublink-item">
+									<li class="navigation-content__sublink-item" data-fade-up>
 										<a
 											class="navigation-content__sublink"
 											href="<?= esc_attr($escape_link_href($sublink['url'])); ?>"

@@ -154,15 +154,15 @@ if ($tagline === '' && $title === '' && $content === '' && $logos === array() &&
 			<div class="intro-content__grid">
 				<div class="intro-content__copy">
 					<?php if ($tagline !== '') : ?>
-						<<?= esc_attr($tagline_tag); ?> class="intro-content__tagline"><?= esc_html($tagline); ?></<?= esc_attr($tagline_tag); ?>>
+						<<?= esc_attr($tagline_tag); ?> class="intro-content__tagline" data-fade-up><?= esc_html($tagline); ?></<?= esc_attr($tagline_tag); ?>>
 					<?php endif; ?>
 
 					<?php if ($title !== '') : ?>
-						<p class="intro-content__title"><?= esc_html($title); ?></p>
+						<p class="intro-content__title" data-fade-up data-fade-up-duration=".2"><?= esc_html($title); ?></p>
 					<?php endif; ?>
 
 					<?php if ($content !== '') : ?>
-						<div class="intro-content__body wysiwyg">
+						<div class="intro-content__body wysiwyg" data-fade-up>
 							<?= wp_kses_post($content); ?>
 						</div>
 					<?php endif; ?>
@@ -171,7 +171,7 @@ if ($tagline === '' && $title === '' && $content === '' && $logos === array() &&
 				<?php if ($logos !== array() || $has_button_1 || $has_button_2) : ?>
 					<div class="intro-content__aside">
 						<?php if ($logos !== array()) : ?>
-							<ul class="intro-content__badges" aria-label="<?php esc_attr_e('Awards and recognition', 'foundry'); ?>">
+							<ul class="intro-content__badges" data-fade-up data-fade-up-duration=".2" aria-label="<?php esc_attr_e('Awards and recognition', 'foundry'); ?>">
 								<?php foreach ($logos as $logo) : ?>
 									<li class="intro-content__badge">
 										<img
@@ -192,7 +192,7 @@ if ($tagline === '' && $title === '' && $content === '' && $logos === array() &&
 						<?php endif; ?>
 
 						<?php if ($has_button_1 || $has_button_2) : ?>
-							<div class="intro-content__actions">
+							<div class="intro-content__actions" data-fade-up data-fade-up-duration=".2">
 								<?php if ($has_button_1) : ?>
 									<?php
 									get_template_part(

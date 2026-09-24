@@ -39,6 +39,11 @@ $variant          = is_string($variant) && in_array($variant, $allowed_variants,
 $is_inner         = $variant === 'inner';
 $enable_slider    = ! array_key_exists('slider', $args) || (bool) $args['slider'];
 
+// The inner variant fades the whole section. Otherwise the cards fade as one
+// block: on the grid, or on the slider when there is one, because Swiper
+// moves the grid (its wrapper) with an inline transform the fade would clear.
+$fade_attr = $is_inner ? '' : ' data-fade-up';
+
 if (! $post_id || ! have_rows($field, $post_id)) {
 	return;
 }
@@ -111,9 +116,9 @@ if ($cards === array()) {
 
 <section class="work-row<?= $is_inner ? ' work-row--inner' : ''; ?><?= $enable_slider ? '' : ' work-row--stack'; ?>"<?= $is_inner ? ' data-fade-up' : ''; ?> aria-label="<?php esc_attr_e('Featured work', 'foundry'); ?>">
 	<?php if ($enable_slider) : ?>
-		<div class="swiper work-row__slider">
+		<div class="swiper work-row__slider"<?= $fade_attr; ?>>
 	<?php endif; ?>
-		<div class="work-row__grid<?= $enable_slider ? ' swiper-wrapper' : ''; ?>">
+		<div class="work-row__grid<?= $enable_slider ? ' swiper-wrapper' : ''; ?>"<?= $enable_slider ? '' : $fade_attr; ?>>
 			<?php foreach ($cards as $card) : ?>
 				<article class="work-row__card<?= $enable_slider ? ' swiper-slide' : ''; ?>">
 					<a
