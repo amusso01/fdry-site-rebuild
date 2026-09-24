@@ -1,7 +1,8 @@
 import gsap from 'gsap'
-import { MotionPathPlugin } from 'gsap/MotionPathPlugin'
 
-gsap.registerPlugin(MotionPathPlugin)
+// The comets are drawn on a <canvas>, never as animated DOM: Hotjar and the
+// Tailwind browser runtime both watch DOM changes, and per-frame style or
+// attribute writes (~1,000 a second) froze tabs left open on the footer.
 
 const SVG_NS = 'http://www.w3.org/2000/svg'
 
@@ -14,8 +15,10 @@ const FIRST_DELAY = [
 	[3, 6],
 ]
 const DELAY = [0.8, 3.5]
-// Least time between two comets starting, so they never pop in together.
+// Least time between two comets starting, so they never pop in together,
+// and the shortest wait when a comet is held back by it.
 const MIN_GAP = 0.8
+const MIN_RETRY = 0.05
 // Travel speed in px per second, picked per comet, and the least difference
 // from every other comet on screen so no two move alike.
 const SPEED_MIN = 140
@@ -27,12 +30,25 @@ const TURN_CHANCE = 0.35
 const MAX_TURNS = 2
 // Tries to find a route that shares no line with the other comets.
 const ROUTE_TRIES = 5
-// Length of the bright dash, in px.
+// Length and width of the bright dash, and width and opacity of the faint
+// trail it draws behind it, in px.
 const DASH = 20
-// Glow ellipse radii and blur, in px.
+const DASH_WIDTH = 1.25
+const TRAIL_WIDTH = 1
+const TRAIL_ALPHA = 0.2
+// The glow: an ellipse (radii in px) at GLOW_ALPHA, blurred like a Gaussian
+// with a GLOW_BLUR px standard deviation (the old SVG feGaussianBlur).
 const GLOW_RX = 14
 const GLOW_RY = 3
 const GLOW_BLUR = 4
+const GLOW_ALPHA = 0.5
+// How far the glow can reach past its centre: the ellipse plus 3 standard
+// deviations of blur.
+const GLOW_PAD = GLOW_RX + GLOW_BLUR * 3
+// Spacing of the points sampled along a route for the glow, in px.
+const SAMPLE_STEP = 4
+// Sharper canvas on high-density screens, capped to keep it cheap.
+const MAX_DPR = 2
 // Seconds to fade a comet in, and out as it reaches the edge.
 const FADE_IN = 0.3
 const FADE_OUT = 0.5
@@ -41,7 +57,6 @@ const CORNER = 12
 // Half the width of a plus mark (the old 15px icon).
 const CROSS = 7.44
 const RESIZE_DEBOUNCE = 200
-const FILTER_ID = 'tech-grid-glow'
 
 function svgElement(name, attributes = {}) {
 	const element = document.createElementNS(SVG_NS, name)
@@ -213,8 +228,53 @@ function crossesPath(lines) {
 	return d
 }
 
-// The overlay: plus marks at every inner crossing. Comets are added and
-// removed as they run.
+// The accent colour from the CSS custom property, as [r, g, b], so the
+// canvas can fade it. Letting the canvas parse it accepts any CSS colour.
+function accentRgb(grid, ctx) {
+	const value = getComputedStyle(grid).getPropertyValue('--tech-grid-accent').trim()
+
+	ctx.fillStyle = '#4951f2'
+	ctx.fillStyle = value || ctx.fillStyle
+
+	// The canvas reports "#rrggbb", or "rgba(r, g, b, a)" for colours with alpha.
+	const color = ctx.fillStyle
+
+	if (color.startsWith('#')) {
+		return [1, 3, 5].map((i) => parseInt(color.slice(i, i + 2), 16))
+	}
+
+	return color.match(/[\d.]+/g).slice(0, 3).map(Number)
+}
+
+// The glow, blurred once into an off-screen canvas (never added to the page)
+// and stamped each frame. Only the ellipse's shadow is kept: it is drawn far
+// to the side and its shadow offset back into view. A canvas shadow blur of B
+// is a Gaussian with a standard deviation of B / 2, so this matches the old
+// SVG feGaussianBlur exactly. Shadow blur and offset ignore the canvas
+// transform, hence the scaling by dpr.
+function glowSprite([r, g, b], dpr) {
+	const width = GLOW_PAD * 2
+	const height = (GLOW_RY + GLOW_BLUR * 3) * 2
+	const sprite = document.createElement('canvas')
+	const ctx = sprite.getContext('2d')
+	const shift = width * 2
+
+	sprite.width = Math.ceil(width * dpr)
+	sprite.height = Math.ceil(height * dpr)
+	ctx.scale(dpr, dpr)
+	ctx.shadowColor = `rgba(${r}, ${g}, ${b}, ${GLOW_ALPHA})`
+	ctx.shadowBlur = GLOW_BLUR * 2 * dpr
+	ctx.shadowOffsetX = shift * dpr
+	ctx.fillStyle = '#000'
+	ctx.beginPath()
+	ctx.ellipse(width / 2 - shift, height / 2, GLOW_RX, GLOW_RY, 0, 0, Math.PI * 2)
+	ctx.fill()
+
+	return { sprite, width, height }
+}
+
+// The overlay: a static SVG with the plus marks, written once, and a canvas
+// on top that the comets are drawn on.
 function buildScene(grid) {
 	const lines = measure(grid)
 	const svg = svgElement('svg', {
@@ -223,93 +283,151 @@ function buildScene(grid) {
 		'aria-hidden': 'true',
 		focusable: 'false',
 	})
-	const defs = svgElement('defs')
-	const filter = svgElement('filter', {
-		id: FILTER_ID,
-		x: '-100%',
-		y: '-300%',
-		width: '300%',
-		height: '700%',
-	})
+	const canvas = document.createElement('canvas')
+	const ctx = canvas.getContext('2d')
+	const dpr = Math.min(window.devicePixelRatio || 1, MAX_DPR)
 
-	filter.appendChild(svgElement('feGaussianBlur', { stdDeviation: GLOW_BLUR }))
-	defs.appendChild(filter)
-	svg.append(
-		defs,
+	svg.appendChild(
 		svgElement('path', { class: 'tech-grid__cross', d: crossesPath(lines) }),
 	)
-	grid.appendChild(svg)
+	// The canvas reaches GLOW_PAD past the grid on every side so a glow
+	// entering or leaving at an outer edge isn't cut off; its origin is the
+	// grid's top-left corner.
+	canvas.className = 'tech-grid__canvas'
+	canvas.setAttribute('aria-hidden', 'true')
+	canvas.style.inset = `${-GLOW_PAD}px`
+	canvas.style.width = `calc(100% + ${GLOW_PAD * 2}px)`
+	canvas.style.height = `calc(100% + ${GLOW_PAD * 2}px)`
+	canvas.width = Math.round((lines.width + GLOW_PAD * 2) * dpr)
+	canvas.height = Math.round((lines.height + GLOW_PAD * 2) * dpr)
+	ctx.setTransform(dpr, 0, 0, dpr, GLOW_PAD * dpr, GLOW_PAD * dpr)
+	grid.append(svg, canvas)
 
-	return { svg, lines, cols: lines.x.length - 1, rows: lines.y.length - 1 }
+	const rgb = accentRgb(grid, ctx)
+
+	return {
+		svg,
+		canvas,
+		ctx,
+		lines,
+		accent: `rgb(${rgb.join(', ')})`,
+		glow: glowSprite(rgb, dpr),
+		cols: lines.x.length - 1,
+		rows: lines.y.length - 1,
+		dirty: false,
+	}
 }
 
-// One comet: a faint trail that draws in, a short bright dash, and a
-// blurred glow at its head.
-function buildComet(svg, route, lines) {
+// One comet's geometry: the route as a Path2D to stroke, and points sampled
+// along it for placing and turning the glow. The samples come from a
+// throwaway <path> (added, measured, removed), since Path2D can't be measured.
+function buildComet(scene, route) {
 	const d = routePath(
-		route.map(([column, row]) => ({ x: lines.x[column], y: lines.y[row] })),
+		route.map(([column, row]) => ({
+			x: scene.lines.x[column],
+			y: scene.lines.y[row],
+		})),
 	)
-	const group = svgElement('g', { class: 'tech-grid__route' })
-	const trail = svgElement('path', { class: 'tech-grid__trail', d })
-	const comet = svgElement('path', { class: 'tech-grid__comet', d })
-	const glow = svgElement('ellipse', {
-		class: 'tech-grid__glow',
-		rx: GLOW_RX,
-		ry: GLOW_RY,
-		filter: `url(#${FILTER_ID})`,
-	})
+	const probe = svgElement('path', { d, fill: 'none' })
 
-	group.append(trail, comet, glow)
-	svg.appendChild(group)
+	scene.svg.appendChild(probe)
 
-	const length = comet.getTotalLength()
+	const length = probe.getTotalLength()
+	const count = Math.max(1, Math.ceil(length / SAMPLE_STEP))
+	const points = []
 
-	trail.setAttribute('stroke-dasharray', `${length} ${length}`)
-	comet.setAttribute('stroke-dasharray', `${DASH} ${length + DASH}`)
+	for (let i = 0; i <= count; i++) {
+		const { x, y } = probe.getPointAtLength((length * i) / count)
 
-	return { group, trail, comet, glow, length }
+		points.push({ x, y })
+	}
+
+	probe.remove()
+
+	return {
+		path: new Path2D(d),
+		length,
+		points,
+		step: length / count,
+		// Animated by GSAP; only these numbers change while it runs.
+		state: { alpha: 0, progress: 0 },
+	}
 }
 
-function cometTimeline({ group, trail, comet, glow, length }, speed) {
-	const duration = length / speed
+// The glow's position and heading at a distance along the route.
+function pointAt({ points, step }, distance) {
+	const index = Math.min(points.length - 2, Math.floor(distance / step))
+	const from = points[Math.max(0, index)]
+	const to = points[Math.max(0, index) + 1]
+	const t = Math.min(1, Math.max(0, distance / step - index))
+
+	return {
+		x: from.x + (to.x - from.x) * t,
+		y: from.y + (to.y - from.y) * t,
+		angle: Math.atan2(to.y - from.y, to.x - from.x),
+	}
+}
+
+// Trail, dash and glow for one comet. The dash's head travels from the start
+// of the route to DASH past its end, so it slides fully out. The glow sits on
+// the middle of the dash, and the trail ends there too.
+function drawComet(scene, comet) {
+	const { ctx, accent, glow } = scene
+	const { path, length, state } = comet
+	const head = state.progress * (length + DASH)
+	const centre = Math.min(length, Math.max(0, head - DASH / 2))
+
+	if (state.alpha <= 0) {
+		return
+	}
+
+	ctx.strokeStyle = accent
+
+	ctx.globalAlpha = TRAIL_ALPHA * state.alpha
+	ctx.lineWidth = TRAIL_WIDTH
+	ctx.lineCap = 'butt'
+	ctx.setLineDash([centre, length + 1])
+	ctx.lineDashOffset = 0
+	ctx.stroke(path)
+
+	ctx.globalAlpha = state.alpha
+	ctx.lineWidth = DASH_WIDTH
+	ctx.lineCap = 'round'
+	ctx.setLineDash([DASH, length + DASH])
+	ctx.lineDashOffset = DASH - head
+	ctx.stroke(path)
+
+	const { x, y, angle } = pointAt(comet, centre)
+
+	ctx.save()
+	ctx.globalAlpha = state.alpha
+	ctx.translate(x, y)
+	ctx.rotate(angle)
+	ctx.drawImage(glow.sprite, -glow.width / 2, -glow.height / 2, glow.width, glow.height)
+	ctx.restore()
+}
+
+// Tweens the comet's plain state object: nothing is written to the DOM.
+function cometTimeline({ length, state }, speed) {
+	const duration = (length + DASH) / speed
 
 	return gsap
 		.timeline()
 		.fromTo(
-			group,
-			{ opacity: 0 },
-			{ opacity: 1, duration: FADE_IN, ease: 'none' },
+			state,
+			{ alpha: 0 },
+			{ alpha: 1, duration: FADE_IN, ease: 'none' },
 			0,
 		)
 		.fromTo(
-			trail,
-			{ strokeDashoffset: length },
-			{ strokeDashoffset: 0, duration, ease: 'none' },
-			0,
-		)
-		.fromTo(
-			comet,
-			{ strokeDashoffset: DASH + 2 },
-			{ strokeDashoffset: -(length + 2), duration, ease: 'none' },
+			state,
+			{ progress: 0 },
+			{ progress: 1, duration, ease: 'none' },
 			0,
 		)
 		.to(
-			glow,
-			{
-				motionPath: {
-					path: comet,
-					align: comet,
-					alignOrigin: [0.5, 0.5],
-					autoRotate: true,
-				},
-				duration,
-				ease: 'none',
-			},
-			0,
-		)
-		.to(
-			group,
-			{ opacity: 0, duration: FADE_OUT, ease: 'none' },
+			state,
+			{ alpha: 0, duration: FADE_OUT, ease: 'none' },
 			Math.max(FADE_IN, duration - FADE_OUT),
 		)
 }
@@ -326,7 +444,8 @@ export default function techGrid() {
 	).matches
 	// Every comet timeline and pending delay, so they can be paused together.
 	const live = new Set()
-	// The lines and speed of each slot's comet on screen.
+	// The comets being drawn, and the lines and speed of each slot's comet.
+	const comets = new Set()
 	const lanes = new Map()
 	const speeds = new Map()
 	let lastLaunch = -Infinity
@@ -346,8 +465,13 @@ export default function techGrid() {
 	const launch = (slot) => {
 		const gap = MIN_GAP - (gsap.ticker.time - lastLaunch)
 
+		// Never retry after a near-zero delay: rounding can leave `gap` at
+		// ~1e-15, GSAP rounds that delay to 0 and can run the call again in the
+		// same tick, where `gap` is unchanged, and the page loops forever.
 		if (gap > 0) {
-			wait(slot, [gap, gap])
+			const delay = Math.max(gap, MIN_RETRY)
+
+			wait(slot, [delay, delay])
 
 			return
 		}
@@ -363,17 +487,18 @@ export default function techGrid() {
 			route = randomRoute(scene.cols, scene.rows)
 		}
 
-		const parts = buildComet(scene.svg, route, scene.lines)
+		const comet = buildComet(scene, route)
 		const speed = randomSpeed([...speeds.values()])
-		const timeline = track(cometTimeline(parts, speed))
+		const timeline = track(cometTimeline(comet, speed))
 
+		comets.add(comet)
 		lanes.set(slot, routeLines(route))
 		speeds.set(slot, speed)
 		timeline.eventCallback('onComplete', () => {
 			live.delete(timeline)
+			comets.delete(comet)
 			lanes.delete(slot)
 			speeds.delete(slot)
-			parts.group.remove()
 			wait(slot, DELAY)
 		})
 	}
@@ -387,12 +512,31 @@ export default function techGrid() {
 		)
 	}
 
+	// Redraws the canvas each frame while comets are on screen, and clears it
+	// once after the last one goes.
+	const draw = () => {
+		if (!scene || !visible || (!comets.size && !scene.dirty)) {
+			return
+		}
+
+		scene.ctx.clearRect(
+			-GLOW_PAD,
+			-GLOW_PAD,
+			scene.lines.width + GLOW_PAD * 2,
+			scene.lines.height + GLOW_PAD * 2,
+		)
+		comets.forEach((comet) => drawComet(scene, comet))
+		scene.dirty = comets.size > 0
+	}
+
 	const build = () => {
 		live.forEach((animation) => animation.kill())
 		live.clear()
+		comets.clear()
 		lanes.clear()
 		speeds.clear()
 		scene?.svg.remove()
+		scene?.canvas.remove()
 		scene = null
 
 		if (!grid.clientWidth) {
@@ -407,6 +551,10 @@ export default function techGrid() {
 	}
 
 	build()
+
+	if (!reduceMotion) {
+		gsap.ticker.add(draw)
+	}
 
 	// The grid sits in the footer on every page; only animate it on screen.
 	new IntersectionObserver(([entry]) => {
