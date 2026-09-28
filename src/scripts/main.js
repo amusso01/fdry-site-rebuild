@@ -14,6 +14,7 @@ import showreelModal from './part/showreelModal'
 import navMenu from './part/navMenu'
 import navAccordion from './part/navAccordion'
 import footerAccordion from './part/footerAccordion'
+import newsletterForm from './part/newsletterForm'
 import headerScroll from './part/headerScroll'
 import workArchive from './part/workArchive'
 import workRowSlider from './part/workRowSlider'
@@ -40,6 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	run(navMenu)
 	run(navAccordion)
 	run(footerAccordion)
+	run(newsletterForm)
 	run(marquee)
 	run(heroVideo)
 	run(showreelModal)

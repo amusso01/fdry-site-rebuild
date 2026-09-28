@@ -13,9 +13,9 @@ const REFRESH_DEBOUNCE = 200
 
 // Parallax is the only ScrollTrigger user (fades run on IntersectionObserver).
 // ScrollTrigger measures its ranges once and only re-measures on window resize,
-// but on a cold cache the layout keeps moving after load (runtime Tailwind CSS,
-// late fonts, lazy images without dimensions), so the ranges drift. Re-measure
-// whenever the body height settles on a new value.
+// but on a cold cache the layout keeps moving after load (late fonts, lazy
+// images without dimensions), so the ranges drift. Re-measure whenever the
+// body height settles on a new value.
 function refreshOnLayoutChange() {
 	const refresh = () => ScrollTrigger.refresh()
 

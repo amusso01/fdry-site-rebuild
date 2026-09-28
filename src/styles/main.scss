@@ -1,3 +1,5 @@
+// Tailwind's reset, in @layer base. Loses to every unlayered rule below.
+@use 'common/preflight';
 @use 'overrides';
 
 //Custom styles start here
@@ -43,10 +45,12 @@
 @use 'components/work-archive';
 @use 'components/tech-banner';
 @use 'components/footer-brief';
+@use 'components/site-footer';
 
 // Templates
 @use 'templates/contact';
 @use 'templates/one-column';
+@use 'templates/front-page';
 
 // Vendors (after @use)
 @import 'swiper/css';

@@ -1,0 +1,55 @@
+// Client logo slider on the legacy homepage (front-page.php →
+// loop-templates/content-home.php). Moved from the inline <style> in the old
+// footer.
+//
+// The keyframes have their own name. The old footer called them `scroll`,
+// which overrode the `scroll` keyframes in mainstyle.css and made the
+// subservice .wordslider travel this slider's distance instead of its own.
+
+.sliderbody {
+	--slide-w: 250px;
+	--slide-gap: 60px;
+	--unit: calc(var(--slide-w) + var(--slide-gap));
+	// Logos per loop. The template prints the list twice, so the track
+	// moves one list's width and starts again.
+	--visible: 6;
+
+	.slider {
+		position: relative;
+		overflow: hidden;
+		width: 100%;
+		max-width: 100%;
+		height: 56px;
+		margin: 44px 0;
+	}
+
+	.slider .slide-track {
+		display: flex;
+		width: calc(var(--unit) * (var(--visible) * 2));
+		animation: sliderbody-scroll 40s linear infinite;
+	}
+
+	.slider .slide {
+		flex: 0 0 auto;
+		box-sizing: border-box;
+		width: var(--slide-w);
+		height: 56px;
+	}
+
+	.slider .slide img {
+		width: 100%;
+		max-width: 200px;
+		height: 100%;
+		object-fit: contain;
+	}
+}
+
+@keyframes sliderbody-scroll {
+	from {
+		transform: translateX(0);
+	}
+
+	to {
+		transform: translateX(calc(-1 * var(--unit) * var(--visible)));
+	}
+}

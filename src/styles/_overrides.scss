@@ -19,3 +19,9 @@
 		display: block;
 	}
 }
+
+// The brief form (page-templates/typeform.php) wraps its form in
+// <div class="relative">. Only the Tailwind runtime styled that class.
+.relative {
+	position: relative;
+}

@@ -176,7 +176,7 @@ Elements already past `top 90%` on load play straight away, and so do elements a
 
 - **Why not ScrollTrigger.** Fades used to be ScrollTriggers. On cold, logged-in loads from wp-admin they sometimes stopped firing, and everything below the fold stayed at `opacity: 0`: a white page. ScrollTrigger works from positions it stores, which can go stale or stop updating. IntersectionObserver checks each element's real box on every scroll and reflow, whatever does the scrolling, so an element on screen can't stay at its start state.
 - **Hiding before JS.** `_helper.scss` sets `opacity: 0` on these elements and on group children, but only under `html.fdry-fade`. `fdry_fade_gate()` in [`function-dev.php`](library/function-dev.php) adds that class from an inline script in `<head>`, so nothing flashes. `gsapFade.js` adds `fdry-fade-ready` once it is set up. If that has not happened by the window `load` event (bundle failed, blocked or delayed by WP Rocket), the gate comes off and the content shows without the fade. With `prefers-reduced-motion` the class is never set, and `gsap.js` skips the tweens.
-- **Layout shifts.** Only parallax still uses ScrollTrigger, which measures on load and on window resize. On a cold cache the layout keeps changing after `load` (runtime Tailwind CSS, late fonts, images without dimensions). `gsap.js` refreshes ScrollTrigger once fonts are ready and, debounced, whenever the body height changes, on pages that have ScrollTriggers.
+- **Layout shifts.** Only parallax still uses ScrollTrigger, which measures on load and on window resize. On a cold cache the layout keeps changing after `load` (late fonts, images without dimensions). `gsap.js` refreshes ScrollTrigger once fonts are ready and, debounced, whenever the body height changes, on pages that have ScrollTriggers.
 - **Transforms.** GSAP animates the inline `transform` and clears it when the tween ends, leaving `opacity: 1`. An element with its own CSS transform only conflicts during the tween itself. Never fade a `.swiper-wrapper`: Swiper moves it with an inline `transform`, which the tween clears. Fade the `.swiper` container instead, as `work-row.php` does in slider mode.
 - **Header.** Put `data-fade-down` on `.site-header__inner`, **not** `.site-header`. The header's hide-on-scroll animates `transform` with a CSS transition, which would fight GSAP during the fade.
 
@@ -203,6 +203,23 @@ The "Let's talk / Send your brief / START" band is [`components/footer/brief.php
 - **Background.** A static image, `img/footer/brief-bg.jpg` (2880×720, committed). Keep it under about 300 KB: it's a grainy gradient, so export it as a progressive JPG at around quality 75, which keeps the grain (the current file is mozjpeg q75, 266 KB). It's a lazy `<img>` with `object-fit: cover`. It only renders if the file exists, so without it the band shows `$color__footerBg`.
 - **START.** A `$color__btn-yellow` circle linking to `/brief-1/`, with a box-shadow pulse (`footer-brief-pulse`) that stops on hover and focus and under reduced motion. It has no `id`. Target `.footer-brief__button`, not the old `#box`.
 - **Motion.** Each element has `data-fade-up` with a 0.1s stagger (see **Fade up / fade down**).
+
+## Site footer
+
+The contact block, menus, logo, social and legal links and the copyright bar are [`components/footer/site-footer.php`](components/footer/site-footer.php). `footer.php` includes it on every page, after the brief. The styles are in [`_site-footer.scss`](src/styles/components/_site-footer.scss). The mobile accordion uses [`_footer-accordion.scss`](src/styles/components/_footer-accordion.scss) and [`footerAccordion.js`](src/scripts/part/footerAccordion.js).
+
+- **Content.** The menus and contact details are arrays at the top of the component. Each one renders twice: as four columns from 768px, and inside the accordion below that. Change a link once, in the array.
+- **Breakpoint.** 768px (`media('<768px')`), the old Tailwind `md:`. Side padding is `content-block content-block--footer`.
+- **Wrapper.** A `div` with `role="contentinfo"`, not a `<footer>`, because `mainstyle/linktree.css` hides every `<footer>` on the linktree template.
+- **Spacing from legacy CSS.** The contact row's desktop padding (55px / 58px) used to come from an old `.mainfooter` rule in `mainstyle.css`. `.site-footer__top` now sets it itself.
+- **Newsletter.** "Join our newsletter" is a `<button class="site-footer__newsletter">`. [`newsletterForm.js`](src/scripts/part/newsletterForm.js) uses it to open Klaviyo form `RdsGcP`. The old `#fdryklaviyo-open-btn` id and `.fdryklaviyo-open-button` class are gone.
+- **Rollback.** [`legacy-footer.php`](components/footer/legacy-footer.php) holds the old footer verbatim, including the Tailwind runtime and its inline styles. To roll back, point the include in `footer.php` at it. Delete it once the new footer is confirmed.
+
+## Tailwind (removed)
+
+`footer.php` used to load the Tailwind browser runtime (`@tailwindcss/browser`, 282 KB of JS from jsdelivr) on every page. It is gone, so Tailwind utility classes no longer do anything. Use BEM classes and SCSS.
+
+Its reset (Preflight) applied to every page, legacy templates included: no list bullets, no default borders on buttons, inputs and iframes, and `img`, `svg` and `video` displayed as blocks. It is kept as static CSS in [`_preflight.scss`](src/styles/common/_preflight.scss), inside `@layer base` as before, so any unlayered rule wins over it. The only other class Tailwind alone styled was `.relative` on the brief form (`page-templates/typeform.php`), which is kept in `_overrides.scss`.
 
 ## Commands
 

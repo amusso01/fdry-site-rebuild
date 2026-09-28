@@ -1,9 +1,10 @@
 @use '../common/variables' as *;
 
-// Mobile footer menu (Contact / Services / Company) in footer.php.
-// Base accordion-js styles are imported in _nav-mobile.scss. The legacy
-// inline <style> in footer.php prints after this file, so the selectors
-// below are one class stronger than its .mainfooter rules.
+// Mobile footer menu (Contact / Services / Company) in
+// components/footer/site-footer.php. Base accordion-js styles are imported in
+// _nav-mobile.scss. The rollback footer (legacy-footer.php) prints inline
+// .mainfooter rules after this file, so the selectors below stay one class
+// stronger than those.
 
 $footer-accordion-text: #f7f5f5;
 $footer-accordion-border: #363636;
@@ -89,6 +90,14 @@ $footer-accordion-border: #363636;
 		font-style: normal;
 		font-weight: 500;
 		line-height: normal;
+	}
+
+	p {
+		margin: 0 0 10px;
+	}
+
+	li {
+		margin-bottom: 10px;
 	}
 
 	h3 {

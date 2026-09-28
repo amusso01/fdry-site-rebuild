@@ -1,0 +1,274 @@
+@use '../common/variables' as *;
+@use '../common/media' as *;
+
+// Site footer (components/footer/site-footer.php). Sizes and colours come
+// from the old inline footer styles. Below 768px the contact details and
+// menus are in the footer accordion (_footer-accordion.scss) instead.
+//
+// Links inherit their colour (see _general.scss, including :hover and
+// :focus), so colours are set on the containers and only hover states
+// on the links.
+
+$site-footer-bg: #191919;
+$site-footer-bottom-bg: #212121;
+$site-footer-text: #f7f5f5;
+$site-footer-muted: #a4a4a4;
+$site-footer-info-hover: #ccc;
+
+.site-footer {
+	&__main {
+		padding-top: 94px;
+		background-color: $site-footer-bg;
+		color: $site-footer-text;
+
+		@include media('<768px') {
+			padding-top: 0;
+		}
+	}
+
+	// The old footer took this padding from a .mainfooter rule in
+	// mainstyle.css, left over from an earlier footer.
+	&__top {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 32px;
+		padding: 55px 0 58px;
+
+		@include media('<768px') {
+			grid-template-columns: minmax(0, 1fr);
+			padding: 20px 0 36px;
+		}
+	}
+
+	&__title {
+		margin: 0 0 24px;
+		color: inherit;
+		font-size: 80px;
+		font-weight: 500;
+		line-height: 84px;
+
+		@include media('<768px') {
+			font-size: 46px;
+			line-height: normal;
+		}
+	}
+
+	&__address {
+		margin: 0 0 26px;
+		font-size: 24px;
+		font-weight: 400;
+		line-height: 36px;
+
+		@include media('<768px') {
+			font-size: 17px;
+			line-height: normal;
+		}
+	}
+
+	&__actions {
+		display: flex;
+		gap: 16px;
+	}
+
+	&__button {
+		flex: 1;
+		width: 100%;
+		max-width: 250px;
+		padding: 16px 10px;
+		border: 2px solid $color__white;
+		border-radius: 6px;
+		font-size: 20px;
+		font-weight: 600;
+		line-height: normal;
+		text-align: center;
+		cursor: pointer;
+		transition:
+			background-color 0.3s,
+			border-color 0.3s,
+			color 0.3s;
+
+		// A ring rather than an outline: theme.css removes button outlines
+		// on focus with !important.
+		&:focus-visible {
+			outline: 0;
+			box-shadow:
+				0 0 0 2px $site-footer-bg,
+				0 0 0 4px $color__white;
+		}
+
+		// :focus is listed so a:focus { color: inherit } can't turn the
+		// text white on the white button.
+		&--solid,
+		&--solid:focus {
+			border-color: transparent;
+			background-color: $color__white;
+			color: $color__text;
+		}
+
+		&--solid:hover {
+			border-color: $color__white;
+			background-color: transparent;
+			color: $color__white;
+		}
+
+		&--outline,
+		&--outline:focus {
+			background-color: transparent;
+			color: $color__white;
+		}
+
+		&--outline:hover {
+			background-color: $color__white;
+			color: $color__text;
+		}
+	}
+
+	// Bottom right of its grid cell, as the old place-items: end.
+	&__info {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-end;
+		justify-content: flex-end;
+		margin: 0;
+		font-style: normal;
+		text-align: right;
+
+		p {
+			margin: 0 0 10px;
+			font-size: 16px;
+			font-weight: 500;
+			line-height: 22px;
+		}
+
+		@include media('<768px') {
+			display: none;
+		}
+	}
+
+	&__info-link {
+		font-size: 16px;
+		font-weight: 500;
+		line-height: normal;
+
+		&:hover {
+			color: $site-footer-info-hover;
+		}
+	}
+
+	&__accordion {
+		@include media('>=768px') {
+			display: none;
+		}
+	}
+
+	&__menus {
+		display: grid;
+		grid-template-columns: repeat(4, minmax(0, 1fr));
+		gap: 8px;
+		padding-top: 68px;
+
+		@include media('<768px') {
+			display: none;
+		}
+	}
+
+	&__menu-title {
+		margin: 0 0 10px;
+		color: inherit;
+		font-size: 16px;
+		font-weight: 400;
+		line-height: 36px;
+	}
+
+	&__menu {
+		color: $site-footer-muted;
+
+		li {
+			margin-bottom: 10px;
+		}
+	}
+
+	&__menu-link {
+		font-size: 16px;
+		font-weight: 500;
+		line-height: normal;
+
+		&:hover {
+			color: $color__white;
+		}
+	}
+
+	&__logo {
+		display: block;
+		width: 100%;
+		height: auto;
+		margin-top: 123px;
+
+		@include media('<768px') {
+			margin-top: 0;
+		}
+	}
+
+	&__meta {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 16px;
+		padding: 36px 0;
+		color: $site-footer-muted;
+		font-size: 16px;
+		font-weight: 500;
+		line-height: normal;
+
+		@include media('<768px') {
+			flex-direction: column;
+		}
+	}
+
+	&__social {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 24px;
+	}
+
+	&__legal {
+		display: flex;
+		align-items: center;
+		gap: 24px;
+	}
+
+	&__meta-link:hover {
+		color: $color__white;
+	}
+
+	&__bottom {
+		padding: 22px 0;
+		background-color: $site-footer-bottom-bg;
+	}
+
+	&__bottom-inner {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 16px;
+
+		@include media('<768px') {
+			flex-direction: column;
+			align-items: flex-start;
+		}
+	}
+
+	&__copyright {
+		margin: 0;
+		color: $site-footer-muted;
+		font-size: 13px;
+		font-weight: 500;
+		line-height: normal;
+
+		br {
+			@include media('<768px') {
+				display: none;
+			}
+		}
+	}
+}

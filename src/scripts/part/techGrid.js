@@ -1,8 +1,8 @@
 import gsap from 'gsap'
 
-// The comets are drawn on a <canvas>, never as animated DOM: Hotjar and the
-// Tailwind browser runtime both watch DOM changes, and per-frame style or
-// attribute writes (~1,000 a second) froze tabs left open on the footer.
+// The comets are drawn on a <canvas>, never as animated DOM: Hotjar watches
+// DOM changes, and per-frame style or attribute writes (~1,000 a second)
+// froze tabs left open on the footer.
 
 const SVG_NS = 'http://www.w3.org/2000/svg'
 
