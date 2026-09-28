@@ -1060,6 +1060,13 @@
 				"operator": "==",
 				"value": "template-home.php"
 			}
+		],
+		[
+			{
+				"param": "page_type",
+				"operator": "==",
+				"value": "front_page"
+			}
 		]
 	],
 	"menu_order": 0,
@@ -1074,5 +1081,5 @@
 	"display_title": "",
 	"allow_ai_access": false,
 	"ai_description": "",
-	"modified": 1789983447
+	"modified": 1790587455
 }

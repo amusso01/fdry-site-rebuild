@@ -3,7 +3,13 @@
 /**
  * The template for displaying Front-page AKA homepage of the website.
  *
- * This is the template that displays the HOME of the website by default.
+ * WordPress ranks front-page.php above the template picked in the page editor,
+ * so this file renders the homepage whatever template the page has. The
+ * sections mirror template-home.php and read the "Homepage" ACF group, which
+ * is also located on page_type == front_page.
+ *
+ * The old homepage body is kept in components/page/legacy-home.php for
+ * rollback (see that file).
  *
  */
 
@@ -13,61 +19,28 @@ if (! defined('ABSPATH')) {
 
 get_header('new');
 
-$container   = get_theme_mod('understrap_container_type');
-
 ?>
 
+<main class="main homepage-main" role="main">
 
-<section id="full-screen-video">
-  <div id="loading-animation" style="min-height: 900px!important; height: 100%!important;">
-    <div id="loader">
-      <div class="dot"></div>
-      <div class="dot"></div>
-      <div class="dot"></div>
-      <div class="dot"></div>
-      <div class="dot"></div>
-      <div class="dot"></div>
-      <div class="dot"></div>
-      <div class="dot"></div>
-      <div class="lading"></div>
-    </div>
-  </div>
-  <header class="jumbo-video" style="">
-    <div class="container-video">
-      <div id="video_overlays"></div>
-
-      <script src="https://player.vimeo.com/api/player.js"></script>
-
-
-      <video muted="" id="iframe" autoplay="" playsinline="" loop="" style=" width:100%;
-       margin: auto;">
-        <source src="<?php echo get_stylesheet_directory_uri(); ?>/video/showreel.mp4" type="video/mp4">
-      </video>
-
-      <img id="iframeresponsive" data-src="<?php echo get_stylesheet_directory_uri(); ?>/video/mobile-still.jpg" alt="Showcase of Projects">
-    </div>
-
-    <img id="iframeresponsive" src="https://www.fdry.com/wp-content/uploads/2023/07/mobile-hero.png">
-
-  </header>
-
-</section>
-
-
-
-
-
-
-
-<div class="wrapper" id="home-wrapper">
-
-  <main class="site-main" id="main">
-
-    <?php get_template_part('loop-templates/content', 'home'); ?>
-
-  </main><!-- #main -->
-
-
-</div><!-- Wrapper end #home-wrapper -->
+  <?php get_template_part('components/page/hero-video');
+  ?>
+  <?php get_template_part('components/page/marquee');
+  ?>
+  <?php get_template_part('components/page/intro-content');
+  ?>
+  <?php get_template_part('components/page/work-parallax');
+  ?>
+  <?php get_template_part('components/page/navigation-content');
+  ?>
+  <?php get_template_part('components/page/work-row', null, array('slider' => false));
+  ?>
+  <?php get_template_part('components/page/two-column-content');
+  ?>
+  <?php get_template_part('components/page/work-row', null, array('field' => 'work_row_2', 'slider' => false));
+  ?>
+  <?php get_template_part('components/page/two-column-content', null, array('prefix' => 'two_column_2'));
+  ?>
+</main>
 
 <?php get_footer(); ?>

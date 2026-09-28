@@ -94,6 +94,7 @@ Legacy assets remain in [`inc/enqueue.php`](inc/enqueue.php) (`understrap-styles
 - `header-new.php` sets `FDRY_USING_NEW_HEADER` and opens `#page` + `#content`.
 - [`footer.php`](footer.php) closes `#content` and `#page` when that constant is set.
 - PHP partials live under [`components/`](components/) (`get_template_part()`).
+- **Homepage.** WordPress ranks [`front-page.php`](front-page.php) above the template picked in the page editor, so the homepage always renders from `front-page.php`. Its sections mirror [`template-home.php`](template-home.php), and the new "Homepage" ACF group is located on both that template and `page_type == front_page`. Keep the homepage page on "NEW template homepage" anyway: that template is what hides the content editor and turns on the hero and work-parallax preloads. The legacy front-page ACF groups are disabled (`"active": false`). To roll back, swap the `<main>` block in `front-page.php` for [`legacy-home.php`](components/page/legacy-home.php) and set Settings → Reading → Homepage back to the old page.
 
 ## JavaScript modules
 
