@@ -102,9 +102,15 @@ Legacy assets remain in [`inc/enqueue.php`](inc/enqueue.php) (`understrap-styles
   - The post body is a 750px column: the category, then the Gutenberg content, then a back link to Insights.
   - The "Our Work" banner at the bottom also has 4px corners.
   - LinkedIn and X share the post. Instagram has no share URL, so that icon opens FDRY's profile.
-  - **Legacy typography.** The Gutenberg output still sits inside `.insight-content .entry-content`, because its heading sizes, bullets and link colours come from `theme.css` and `mainstyle.css`. Those two classes are kept only as hooks. Move that typography into `src/` before dropping `theme.css`. The category is outside `.insight-content`, so the old purple `.insight-info .category` style no longer applies.
+  - **Legacy typography.** The Gutenberg output still sits inside `.insight-content .entry-content`, because its heading sizes and bullets come from `theme.css` and `mainstyle.css`. Those two classes are kept only as hooks. Move that typography into `src/` before dropping `theme.css`. The category is outside `.insight-content`, so the old purple `.insight-info .category` style no longer applies.
+  - **Gutenberg links and images.** These are overridden in `_single-insight.scss`. Links use the `wysiwyg-link` mixin (underlined, fading to grey), which beats the purple `theme.css` link. Images get 4px corners and a 20px top margin. The margin needs `!important` to beat `mainstyle.css`'s `.aligncenter img` margin.
   - **Links.** The Insights and Work links come from `fdry_template_page_url()` in `function-dev.php`, not from hard-coded page IDs.
   - **Rollback.** The old partial is still at [`content-single-insight.php`](loop-templates/content-single-insight.php). To roll back, point the include in `single.php` back at it.
+- **Single job.** [`single-job.php`](single-job.php) (the `job` CPT) is unchanged and still renders `content-page.php`. Its Gutenberg content gets the WYSIWYG styling from CSS alone, in [`_single-job.scss`](src/styles/templates/_single-job.scss). The selector is `.single-job .entry-content`, which uses the body class WordPress adds for the CPT.
+  - It gets list bullets back (the reset strips them from `ul.wp-block-list`), block spacing, heading sizes and underlined links.
+  - `p + p` is 15px.
+  - **Editor output mixin.** The rules are the `wysiwyg-content` mixin in [`_wysiwyg.scss`](src/styles/common/_wysiwyg.scss), which `.wysiwyg` uses too. Include it to style any other editor output.
+  - **Rule order.** In the mixin, the heading `margin: 0` comes before the spacing rules. Otherwise it cancels `* + h2`, and a heading after a list or another heading gets no gap.
 
 ## JavaScript modules
 

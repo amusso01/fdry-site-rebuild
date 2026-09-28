@@ -3,25 +3,28 @@
 .two-images-grid {
 	&__grid {
 		display: grid;
-		grid-template-columns: repeat(2, 1fr);
+		grid-template-columns: repeat(2, minmax(0, 1fr));
 		gap: 0;
 		width: 100%;
-		max-height: 760px;
-		aspect-ratio: 1920 / 760;
 
 		@include media('<phone') {
 			grid-template-columns: 1fr;
-			aspect-ratio: auto;
-			max-height: none;
 		}
 	}
 
 	&__item {
-		overflow: hidden;
+		display: flex;
+		flex-direction: column;
 		min-width: 0;
-		min-height: 0;
+	}
+
+	// Half of the old 1920 / 760 row, so the pair keeps the same proportions.
+	&__media {
+		overflow: hidden;
+		aspect-ratio: 960 / 760;
 
 		@include media('<phone') {
+			aspect-ratio: auto;
 			max-height: 760px;
 		}
 	}
@@ -39,11 +42,22 @@
 		}
 	}
 
+	// Side padding matches .content-block, since the images are edge-to-edge.
 	&__copy {
-		max-width: 110ch;
-		margin-inline: auto;
-		padding-block: clamp(3rem, 6vw, 5rem);
+		display: flex;
+		flex: 1 1 auto;
+		flex-direction: column;
+		gap: 13px;
+		padding: 16px 54px clamp(3rem, 6vw, 5rem);
 		text-align: center;
+
+		@include media('<desktop') {
+			padding-inline: 32px;
+		}
+
+		@include media('<phone') {
+			padding-inline: 25px;
+		}
 	}
 
 	&__title {
@@ -54,12 +68,8 @@
 		letter-spacing: -1.6px;
 	}
 
-	&__title + * {
-		margin-top: 24px;
-	}
-
 	&__body {
-		max-width: 65ch;
+		max-width: 48ch;
 		margin-inline: auto;
 		font-size: 16px;
 		font-weight: 300;
@@ -78,12 +88,19 @@
 		}
 	}
 
-	&__body + * {
-		margin-top: 24px;
-	}
-
+	// Pushed to the bottom so both buttons line up when the copy lengths differ.
 	&__actions {
 		display: flex;
 		justify-content: center;
+		margin-top: auto;
+
+		.btn {
+			padding: 8px 28px;
+		}
+
+		// Show the label as typed in the link field.
+		.btn a {
+			text-transform: none;
+		}
 	}
 }

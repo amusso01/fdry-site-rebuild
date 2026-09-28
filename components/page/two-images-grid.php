@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Two images grid — edge-to-edge 50/50 image row within content-max, with optional centred title, WYSIWYG body and button below
+ * Two images grid — edge-to-edge 50/50 image row within content-max, each image with an optional centred title, WYSIWYG body and button below it
  *
  * @author Andrea Musso
  *
@@ -10,11 +10,15 @@
  * @param array $args {
  *     Optional. Pass to override ACF values on any page.
  *
- *     @type array  $images  List of ACF image arrays or URLs (max 2).
- *     @type string $title   Title below the images, rendered as H2.
- *     @type string $content WYSIWYG body content.
- *     @type array  $button  ACF link array for the white button.
- *     @type int    $post_id Post ID for ACF fallback. Default queried object.
+ *     @type array $items {
+ *         List of up to two items.
+ *
+ *         @type array|string $image   ACF image array or URL.
+ *         @type string       $title   Title below the image, rendered as H2.
+ *         @type string       $content WYSIWYG body content.
+ *         @type array        $button  ACF link array for the white button.
+ *     }
+ *     @type int   $post_id Post ID for ACF fallback. Default queried object.
  * }
  */
 
@@ -28,124 +32,121 @@ if (! isset($args) || ! is_array($args)) {
 
 $post_id = isset($args['post_id']) ? (int) $args['post_id'] : (int) get_queried_object_id();
 
-$field_names = array(
-	'two_images_image_1',
-	'two_images_image_2',
-);
+$raw_items = array();
 
-$images = array();
-
-if (isset($args['images']) && is_array($args['images'])) {
-	foreach ($args['images'] as $image) {
-		$image_parts = fdry_image_parts($image);
-
-		if ($image_parts['url'] === '') {
-			continue;
-		}
-
-		$images[] = $image_parts;
-	}
+if (isset($args['items']) && is_array($args['items'])) {
+	$raw_items = $args['items'];
 } elseif ($post_id) {
-	foreach ($field_names as $field_name) {
-		$image_parts = fdry_image_parts(get_field($field_name, $post_id));
-
-		if ($image_parts['url'] === '') {
-			continue;
-		}
-
-		$images[] = $image_parts;
+	foreach (array(1, 2) as $index) {
+		$raw_items[] = array(
+			'image'   => get_field('two_images_image_' . $index, $post_id),
+			'title'   => get_field('two_images_title_' . $index, $post_id),
+			'content' => get_field('two_images_content_' . $index, $post_id),
+			'button'  => get_field('two_images_button_' . $index, $post_id),
+		);
 	}
 }
 
-$title = $args['title'] ?? null;
+$items = array();
 
-if (! is_string($title) || $title === '') {
-	$acf_title = $post_id ? get_field('two_images_title', $post_id) : '';
-	$title     = is_string($acf_title) ? trim($acf_title) : '';
+foreach (array_slice($raw_items, 0, 2) as $raw_item) {
+	if (! is_array($raw_item)) {
+		continue;
+	}
+
+	$image   = fdry_image_parts($raw_item['image'] ?? null);
+	$title   = is_string($raw_item['title'] ?? null) ? trim($raw_item['title']) : '';
+	$content = is_string($raw_item['content'] ?? null) ? trim($raw_item['content']) : '';
+
+	$button       = $raw_item['button'] ?? null;
+	$button_parts = fdry_acf_link_parts($button);
+	$button_label = is_array($button) && ! empty($button['title']) ? $button['title'] : '';
+	$has_button   = $button_label !== '' && $button_parts['url'] !== '#';
+
+	if ($image['url'] === '' && $title === '' && $content === '' && ! $has_button) {
+		continue;
+	}
+
+	$items[] = array(
+		'image'        => $image,
+		'title'        => $title,
+		'content'      => $content,
+		'button'       => $button,
+		'button_parts' => $button_parts,
+		'button_label' => $button_label,
+		'has_button'   => $has_button,
+	);
 }
 
-$content = $args['content'] ?? null;
-
-if (! is_string($content) || $content === '') {
-	$acf_content = $post_id ? get_field('two_images_content', $post_id) : '';
-	$content     = is_string($acf_content) ? trim($acf_content) : '';
-}
-
-$button = $args['button'] ?? null;
-
-if ($button === null && $post_id) {
-	$button = get_field('two_images_button', $post_id);
-}
-
-$button_parts = fdry_acf_link_parts($button);
-$button_label = is_array($button) && ! empty($button['title']) ? $button['title'] : '';
-$has_button   = $button_label !== '' && $button_parts['url'] !== '#';
-
-$has_copy = $title !== '' || $content !== '' || $has_button;
-
-if ($images === array() && ! $has_copy) {
+if ($items === array()) {
 	return;
 }
 ?>
 
 <section class="two-images-grid">
 	<div class="content-max">
-		<?php if ($images !== array()) : ?>
-			<div class="two-images-grid__grid" data-fade-up>
-				<?php foreach ($images as $image) : ?>
-					<div class="two-images-grid__item">
-						<img
-							class="two-images-grid__image"
-							src="<?= esc_url($image['url']); ?>"
-							<?php if ($image['srcset'] !== '') : ?>
-								srcset="<?= esc_attr($image['srcset']); ?>"
-								sizes="(min-width: 640px) 50vw, 100vw"
-							<?php endif; ?>
-							alt="<?= esc_attr($image['alt']); ?>"
-							loading="lazy"
-							decoding="async"
-							<?php if ($image['width'] > 0) : ?>
-								width="<?= esc_attr((string) $image['width']); ?>"
-							<?php endif; ?>
-							<?php if ($image['height'] > 0) : ?>
-								height="<?= esc_attr((string) $image['height']); ?>"
-							<?php endif; ?>>
-					</div>
-				<?php endforeach; ?>
-			</div>
-		<?php endif; ?>
-
-		<?php if ($has_copy) : ?>
-			<div class="content-block">
-				<div class="two-images-grid__copy">
-					<?php if ($title !== '') : ?>
-						<h2 class="two-images-grid__title" data-fade-up><?= esc_html($title); ?></h2>
-					<?php endif; ?>
-
-					<?php if ($content !== '') : ?>
-						<div class="two-images-grid__body wysiwyg" data-fade-up>
-							<?= wp_kses_post($content); ?>
+		<div class="two-images-grid__grid">
+			<?php foreach ($items as $index => $item) : ?>
+				<?php
+				$image      = $item['image'];
+				$fade_delay = $index * 0.15;
+				$fade_attrs = 'data-fade-up' . ($fade_delay > 0 ? ' data-fade-up-delay="' . esc_attr(number_format($fade_delay, 2)) . '"' : '');
+				$has_copy   = $item['title'] !== '' || $item['content'] !== '' || $item['has_button'];
+				?>
+				<div class="two-images-grid__item">
+					<?php if ($image['url'] !== '') : ?>
+						<div class="two-images-grid__media" <?= $fade_attrs; ?>>
+							<img
+								class="two-images-grid__image"
+								src="<?= esc_url($image['url']); ?>"
+								<?php if ($image['srcset'] !== '') : ?>
+									srcset="<?= esc_attr($image['srcset']); ?>"
+									sizes="(min-width: 640px) 50vw, 100vw"
+								<?php endif; ?>
+								alt="<?= esc_attr($image['alt']); ?>"
+								loading="lazy"
+								decoding="async"
+								<?php if ($image['width'] > 0) : ?>
+									width="<?= esc_attr((string) $image['width']); ?>"
+								<?php endif; ?>
+								<?php if ($image['height'] > 0) : ?>
+									height="<?= esc_attr((string) $image['height']); ?>"
+								<?php endif; ?>>
 						</div>
 					<?php endif; ?>
 
-					<?php if ($has_button) : ?>
-						<div class="two-images-grid__actions" data-fade-up>
-							<?php
-							get_template_part(
-								'components/partials/button',
-								null,
-								array(
-									'variant' => 'white',
-									'label'   => $button_label,
-									'url'     => $button,
-									'target'  => $button_parts['target'],
-								)
-							);
-							?>
+					<?php if ($has_copy) : ?>
+						<div class="two-images-grid__copy">
+							<?php if ($item['title'] !== '') : ?>
+								<h2 class="two-images-grid__title" <?= $fade_attrs; ?>><?= esc_html($item['title']); ?></h2>
+							<?php endif; ?>
+
+							<?php if ($item['content'] !== '') : ?>
+								<div class="two-images-grid__body wysiwyg" <?= $fade_attrs; ?>>
+									<?= wp_kses_post($item['content']); ?>
+								</div>
+							<?php endif; ?>
+
+							<?php if ($item['has_button']) : ?>
+								<div class="two-images-grid__actions" <?= $fade_attrs; ?>>
+									<?php
+									get_template_part(
+										'components/partials/button',
+										null,
+										array(
+											'variant' => 'white',
+											'label'   => $item['button_label'],
+											'url'     => $item['button'],
+											'target'  => $item['button_parts']['target'],
+										)
+									);
+									?>
+								</div>
+							<?php endif; ?>
 						</div>
 					<?php endif; ?>
 				</div>
-			</div>
-		<?php endif; ?>
+			<?php endforeach; ?>
+		</div>
 	</div>
 </section>

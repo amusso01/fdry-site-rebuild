@@ -2,8 +2,9 @@
 @use 'media' as *;
 @use 'mixin' as *;
 
-/* WYSIWYG output from ACF editor fields */
-.wysiwyg {
+/// Editor output: ACF WYSIWYG fields (.wysiwyg) and Gutenberg content
+/// (.single-job .entry-content in templates/_single-job.scss).
+@mixin wysiwyg-content() {
 	--text-h1: 32px;
 	--text-h2: 24px;
 	--text-h3: 20px;
@@ -37,13 +38,22 @@
 		@include wysiwyg-link;
 	}
 
-	.centered-content--dark & a {
-		color: $color__white;
-
-		&:hover,
-		&:focus-visible {
-			color: rgba($color__white, 0.72);
-		}
+	// Before the spacing rules: same specificity, so a later margin: 0 would
+	// cancel `* + h2` and leave no gap above a heading after a list or heading.
+	.h1,
+	.h2,
+	.h3,
+	.h4,
+	.h5,
+	.h6,
+	h1,
+	h2,
+	h3,
+	h4,
+	h5,
+	h6 {
+		margin: 0;
+		font-family: $header__fontname;
 	}
 
 	ul + p,
@@ -63,22 +73,6 @@
 	* + h5,
 	* + h6 {
 		margin-top: 1rem;
-	}
-
-	.h1,
-	.h2,
-	.h3,
-	.h4,
-	.h5,
-	.h6,
-	h1,
-	h2,
-	h3,
-	h4,
-	h5,
-	h6 {
-		margin: 0;
-		font-family: $header__fontname;
 	}
 
 	p + h1,
@@ -164,6 +158,20 @@
 		h3,
 		.h3 {
 			font-size: calc(var(--text-h3) * 0.75);
+		}
+	}
+}
+
+/* WYSIWYG output from ACF editor fields */
+.wysiwyg {
+	@include wysiwyg-content;
+
+	.centered-content--dark & a {
+		color: $color__white;
+
+		&:hover,
+		&:focus-visible {
+			color: rgba($color__white, 0.72);
 		}
 	}
 }

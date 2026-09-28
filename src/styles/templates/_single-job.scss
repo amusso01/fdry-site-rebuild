@@ -1,0 +1,12 @@
+@use '../common/wysiwyg' as *;
+
+// Gutenberg content on job posts (single-job.php → content-page.php).
+// Scoped by the `single-job` body class WordPress adds for the job CPT, so
+// the shared PHP partial stays untouched.
+.single-job .entry-content {
+	@include wysiwyg-content;
+
+	p + p {
+		margin-top: 15px;
+	}
+}
