@@ -1,3 +1,5 @@
+@use 'variables' as *;
+
 // MIXINS
 
 //- Mixin: Fluid Type
@@ -157,5 +159,18 @@
 		visibility: visible;
 		-webkit-transform: scaleX(1);
 		transform: scaleX(1);
+	}
+}
+
+/// Links in editor output: ACF WYSIWYG fields (.wysiwyg) and Gutenberg
+/// content (single insight). Underlined text colour that fades on hover.
+@mixin wysiwyg-link() {
+	color: $color__text;
+	text-decoration: underline;
+	transition: color 0.2s ease;
+
+	&:hover,
+	&:focus-visible {
+		color: rgba($color__text, 0.65);
 	}
 }

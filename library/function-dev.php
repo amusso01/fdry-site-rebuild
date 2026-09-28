@@ -439,6 +439,30 @@ function fdry_image_parts($image): array
 }
 
 /**
+ * Permalink of the first published page using a page template.
+ *
+ * Avoids hard-coded page IDs, which break when a page is rebuilt (the old
+ * "BACK TO WORK" link points at page 50, which no longer exists).
+ *
+ * @param string $template      Template file, e.g. 'template-insight.php'.
+ * @param string $fallback_path Path passed to home_url() if no page uses it.
+ */
+function fdry_template_page_url(string $template, string $fallback_path): string
+{
+	$pages = get_pages(
+		array(
+			'meta_key'   => '_wp_page_template',
+			'meta_value' => $template,
+			'number'     => 1,
+		)
+	);
+
+	$url = $pages ? get_permalink($pages[0]) : '';
+
+	return $url ? (string) $url : home_url($fallback_path);
+}
+
+/**
  * Viewport width at or below which the hero shows a still instead of video.
  *
  * Single source of truth: feeds the <picture> art-direction switch, the

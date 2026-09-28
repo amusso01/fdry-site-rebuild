@@ -1,0 +1,197 @@
+@use '../common/variables' as *;
+@use '../common/media' as *;
+@use '../common/mixin' as *;
+
+// Single insight (components/single/insight.php). The top offset comes from
+// #single-wrapper in _legacy-header-offset.scss. The Gutenberg output inside
+// .single-insight__content is still styled by theme.css / mainstyle.css.
+
+.single-insight {
+	color: $color__text;
+
+	&__header {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		padding-bottom: 56px;
+		text-align: center;
+	}
+
+	&__eyebrow {
+		margin: 0;
+		font-size: 11px;
+		font-weight: 600;
+		line-height: 16px;
+		letter-spacing: 1px;
+		text-transform: uppercase;
+	}
+
+	&__eyebrow-link {
+		&:link,
+		&:visited,
+		&:hover,
+		&:focus {
+			color: inherit;
+			text-decoration: none;
+		}
+	}
+
+	&__title {
+		max-width: 960px;
+		margin: 20px 0 0;
+		font-family: $header__fontname;
+		font-size: 32px;
+		font-weight: 400;
+		line-height: 36px;
+		letter-spacing: -1.6px;
+		text-transform: none;
+		color: $color__text;
+	}
+
+	&__share {
+		display: flex;
+		justify-content: center;
+		gap: 24px;
+		margin: 24px 0 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	&__share-link {
+		display: block;
+		transition: opacity 0.25s ease;
+
+		&:link,
+		&:visited,
+		&:hover,
+		&:focus {
+			color: $color__text;
+		}
+
+		&:hover,
+		&:focus-visible {
+			opacity: 0.6;
+		}
+	}
+
+	&__share-icon {
+		display: block;
+
+		svg {
+			display: block;
+			width: 20px;
+			height: 20px;
+		}
+
+		// Beats the SVGs' fill="#676767" presentation attribute.
+		path {
+			fill: currentColor;
+		}
+	}
+
+	&__image {
+		display: block;
+		width: 100%;
+		height: 600px;
+		object-fit: cover;
+		border-radius: 4px;
+
+		@include media('<1000px') {
+			height: auto;
+		}
+	}
+
+	&__body {
+		padding-block: 74px;
+	}
+
+	&__column {
+		max-width: 750px;
+		margin-inline: auto;
+	}
+
+	&__category {
+		margin: 0 0 24px;
+		font-size: 11px;
+		font-weight: 600;
+		line-height: 16px;
+		letter-spacing: 1px;
+		text-transform: uppercase;
+		color: $color__text;
+	}
+
+	// Cancels the 74px padding .insight-content gets from theme.css (same
+	// specificity, loads later). The block typography is left alone.
+	&__content {
+		padding: 0;
+	}
+
+	// Gutenberg links and images. The doubled class outranks theme.css's
+	// purple `.insight-content .entry-content p a`.
+	&__content.insight-content .entry-content {
+		a {
+			@include wysiwyg-link;
+		}
+
+		// Emoji and smilies are inline images, so they are left out.
+		img:not(.emoji, .wp-smiley) {
+			// !important: mainstyle.css has
+			// `.insight-content .aligncenter img { margin: 0 auto !important }`.
+			margin-top: 20px !important;
+			border-radius: 4px;
+		}
+	}
+
+	&__back {
+		display: inline-flex;
+		align-items: center;
+		gap: 8px;
+		margin-top: 44px;
+		font-size: 16px;
+		font-weight: 600;
+		line-height: 19px;
+		text-decoration-line: underline;
+		text-decoration-color: rgba($color__black, 0.1);
+		text-decoration-thickness: 1px;
+		text-underline-offset: 4px;
+		transition: text-decoration-color 0.25s ease;
+
+		&:link,
+		&:visited,
+		&:hover,
+		&:focus {
+			color: $color__text;
+			text-decoration-line: underline;
+		}
+
+		&:hover,
+		&:focus-visible {
+			text-decoration-color: $color__text;
+		}
+
+		svg {
+			flex-shrink: 0;
+			transform: scaleX(-1);
+		}
+	}
+
+	&__work-link {
+		display: block;
+		max-width: 1170px;
+		margin-inline: auto;
+	}
+
+	&__work-image {
+		display: block;
+		width: 100%;
+		height: auto;
+		border-radius: 4px;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.single-insight__share-link,
+	.single-insight__back {
+		transition: none;
+	}
+}

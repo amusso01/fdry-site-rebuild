@@ -38,7 +38,8 @@ get_header('new');
 
 		} elseif (get_post_type() == 'post') {
 
-			get_template_part('loop-templates/content', 'single-insight');
+			// Rollback: loop-templates/content-single-insight.php
+			get_template_part('components/single/insight');
 		}
 		?>
 

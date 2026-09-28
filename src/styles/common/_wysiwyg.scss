@@ -1,5 +1,6 @@
 @use 'variables' as *;
 @use 'media' as *;
+@use 'mixin' as *;
 
 /* WYSIWYG output from ACF editor fields */
 .wysiwyg {
@@ -33,14 +34,7 @@
 	}
 
 	a {
-		color: $color__text;
-		text-decoration: underline;
-		transition: color 0.2s ease;
-
-		&:hover,
-		&:focus-visible {
-			color: rgba($color__text, 0.65);
-		}
+		@include wysiwyg-link;
 	}
 
 	.centered-content--dark & a {
