@@ -28,7 +28,7 @@ get_header('new');
 		margin-top: 0;
 	}
 
-	.btn {
+	#step1 .btn {
 		margin-top: 70px;
 	}
 </style>
