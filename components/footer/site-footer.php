@@ -87,7 +87,7 @@ $accordion_groups = [
   <div class="site-footer__main content-block content-block--footer">
     <div class="site-footer__top">
       <div class="site-footer__contact">
-        <h2 class="site-footer__title" data-fade-up><?php esc_html_e('Come & say hello', 'foundry'); ?></h2>
+        <p class="site-footer__title" data-fade-up><?php esc_html_e('Come & say hello', 'foundry'); ?></p>
         <p class="site-footer__address" data-fade-up data-fade-up-delay="0.1"><?php esc_html_e('123 Buckingham Palace Rd, London SW1W 9SH', 'foundry'); ?></p>
         <div class="site-footer__actions" data-fade-up data-fade-up-delay="0.2">
           <a class="site-footer__button site-footer__button--solid" href="/brief-1/"><?php esc_html_e('Book an appointment', 'foundry'); ?></a>
@@ -104,12 +104,12 @@ $accordion_groups = [
       <div class="site-footer__accordion">
         <div class="accordion-container footer-accordion">
           <div class="ac footer-accordion__item">
-            <h3 class="ac-header footer-accordion__header">
+            <div class="ac-header footer-accordion__header">
               <button type="button" class="ac-trigger footer-accordion__trigger">
                 <?php esc_html_e('Contact', 'foundry'); ?>
                 <span class="footer-accordion__icon" aria-hidden="true"></span>
               </button>
-            </h3>
+            </div>
             <div class="ac-panel footer-accordion__panel">
               <div class="ac-panel-inner footer-accordion__panel-inner">
                 <p><a href="mailto:<?php echo esc_attr($contact['email']); ?>"><?php echo esc_html($contact['email']); ?></a></p>
@@ -121,17 +121,17 @@ $accordion_groups = [
 
           <?php foreach ($accordion_groups as $label => $keys) : ?>
             <div class="ac footer-accordion__item">
-              <h3 class="ac-header footer-accordion__header">
+              <div class="ac-header footer-accordion__header">
                 <button type="button" class="ac-trigger footer-accordion__trigger">
                   <?php echo esc_html($label); ?>
                   <span class="footer-accordion__icon" aria-hidden="true"></span>
                 </button>
-              </h3>
+              </div>
               <div class="ac-panel footer-accordion__panel">
                 <div class="ac-panel-inner footer-accordion__panel-inner">
                   <?php foreach ($keys as $key) : ?>
                     <?php if (count($keys) > 1) : ?>
-                      <h3><?php echo esc_html($menus[$key]['title']); ?></h3>
+                      <p class="footer-accordion__group-title"><?php echo esc_html($menus[$key]['title']); ?></p>
                     <?php endif; ?>
                     <ul class="footer-accordion__list">
                       <?php foreach ($menus[$key]['links'] as $url => $text) : ?>
@@ -150,7 +150,7 @@ $accordion_groups = [
     <nav class="site-footer__menus" aria-label="<?php esc_attr_e('Footer', 'foundry'); ?>">
       <?php foreach (array_values($menus) as $i => $menu) : ?>
         <div class="site-footer__menu-col" data-fade-up data-fade-up-delay="<?php echo esc_attr($i / 10); ?>">
-          <h3 class="site-footer__menu-title"><?php echo esc_html($menu['title']); ?></h3>
+          <p class="site-footer__menu-title"><?php echo esc_html($menu['title']); ?></p>
           <ul class="site-footer__menu">
             <?php foreach ($menu['links'] as $url => $text) : ?>
               <li><a class="site-footer__menu-link" href="<?php echo esc_url($url); ?>"><?php echo esc_html($text); ?></a></li>

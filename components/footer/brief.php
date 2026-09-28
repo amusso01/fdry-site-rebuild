@@ -25,7 +25,7 @@ $has_bg  = file_exists(get_template_directory() . $bg_path);
   <div class="footer-brief__inner content-block content-block--footer">
     <div class="footer-brief__text">
       <p class="footer-brief__eyebrow" data-fade-up><?php esc_html_e('Let’s talk', 'foundry'); ?></p>
-      <h2 class="footer-brief__title" id="footer-brief-title" data-fade-up data-fade-up-delay="0.1"><?php esc_html_e('Send your brief', 'foundry'); ?></h2>
+      <p class="footer-brief__title" id="footer-brief-title" data-fade-up data-fade-up-delay="0.1"><?php esc_html_e('Send your brief', 'foundry'); ?></p>
       <p class="footer-brief__lead" data-fade-up data-fade-up-delay="0.2"><?php esc_html_e('and calculate your budget and timescale', 'foundry'); ?></p>
     </div>
 
