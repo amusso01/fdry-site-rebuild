@@ -14,9 +14,24 @@ if (! defined('ABSPATH')) {
 	exit; // Exit if accessed directly.
 }
 
-get_header();
+get_header('new');
 ?>
 
+<style>
+	#content {
+		padding-top: 56px;
+		padding-bottom: 56px;
+	}
+
+	/* typeformstyle.css sets #startbtn { margin-top: 177px }, which stretches the new button. */
+	#startbtn {
+		margin-top: 0;
+	}
+
+	.btn {
+		margin-top: 70px;
+	}
+</style>
 
 <?php if (isset($_GET['send']) && $_GET['send'] == 'yes') { ?>
 
@@ -173,11 +188,12 @@ get_header();
 													<h1>Send us your brief</h1>
 													<h2 style="text-transform: uppercase;">We are ready to start working on your project. Calculate your budget and timescale to launch your digital business.</h2>
 
-													<!--<a id="startbtn" class="blackbuttom" href="javascript:void(0)">START</a>-->
-
-													<div class="pic blackbutton" style="margin-top: 177px;display: block;"><a id="startbtn" href="javascript:void(0)">
-															<div class="button"><span>START</span></div>
-														</a></div>
+													<div class="btn btn--primary">
+														<a id="startbtn" href="javascript:void(0)">
+															Start
+															<?php get_template_part('svg-template/svg-arrow'); ?>
+														</a>
+													</div>
 
 												</center>
 											</div>

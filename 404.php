@@ -15,7 +15,7 @@ header("Location: ".get_bloginfo('url'));
 exit();
 
 
-get_header();
+get_header('new');
 
 $container   = get_theme_mod( 'understrap_container_type' );
 ?>

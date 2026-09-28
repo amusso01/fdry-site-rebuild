@@ -1,0 +1,26 @@
+// Top offset for legacy templates using get_header( 'new' ).
+// Matches one-column / contact: header height + 56px breathing room.
+
+$legacy-header-gap: 56px;
+$legacy-header-offset: calc(var(--site-header-height, 88px) + #{$legacy-header-gap});
+
+body.fdry-new-header {
+	#single-wrapper,
+	#page-wrapper,
+	#index-wrapper,
+	#archive-wrapper,
+	#search-wrapper,
+	#author-wrapper,
+	#error-404-wrapper {
+		padding-top: $legacy-header-offset;
+	}
+
+	// mainstyle.css loads after wp_head(); !important beats its padding shorthand.
+	.greybanner,
+	.servicepage > .greybanner,
+	#career.defaultpage,
+	.darkbluebanner.headercontact {
+		padding-top: $legacy-header-offset !important;
+	}
+
+}

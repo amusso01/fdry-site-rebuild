@@ -51,6 +51,7 @@
 @use 'templates/contact';
 @use 'templates/one-column';
 @use 'templates/front-page';
+@use 'templates/legacy-header-offset';
 
 // Vendors (after @use)
 @import 'swiper/css';
