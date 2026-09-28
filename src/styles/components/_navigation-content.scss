@@ -11,6 +11,10 @@ $nav-main-arrow-size: 2.75rem;
 	&__inner {
 		padding-block: 32px;
 		background-color: #010100;
+
+		@include media('<phone') {
+			padding-block: 25px;
+		}
 	}
 
 	&__list {
@@ -35,13 +39,18 @@ $nav-main-arrow-size: 2.75rem;
 		}
 
 		@include media('<desktop') {
-			padding-inline: 0;
+			padding-inline: 24px;
 		}
 
 		@include media('<tablet') {
 			grid-template-columns: 1fr;
-			gap: 1.5rem;
+			gap: 1.25rem;
 			align-items: start;
+			padding-block: 40px;
+		}
+
+		@include media('<phone') {
+			padding: 32px 20px;
 		}
 	}
 
@@ -102,6 +111,10 @@ $nav-main-arrow-size: 2.75rem;
 		border-radius: 50%;
 		background-color: $color__white;
 		color: $color__text;
+
+		@include media('<tablet') {
+			display: none;
+		}
 
 		svg {
 			display: block;

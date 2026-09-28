@@ -200,7 +200,7 @@
 		// The link clips the image and the overlay. isolation keeps Safari
 		// clipping the corners while the image scales on hover.
 		.work-row__link {
-			border-radius: 15px;
+			border-radius: 8px;
 			isolation: isolate;
 		}
 
