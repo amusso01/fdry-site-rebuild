@@ -51,6 +51,7 @@ function fdry_acf_only_page_templates(): array
 		'template-about.php',
 		'template-contact.php',
 		'template-home.php',
+		'template-insight.php',
 		'template-service.php',
 		'template-service-child.php',
 		'template-service-inner.php',

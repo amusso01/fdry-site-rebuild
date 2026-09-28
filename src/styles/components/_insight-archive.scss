@@ -1,0 +1,65 @@
+@use '../common/variables' as *;
+@use '../common/media' as *;
+
+// Cards (.grid-insight / .insight-grid) are still styled by the legacy
+// css/theme.css and mainstyle.css until they are redesigned.
+
+.insight-archive {
+	padding-top: calc(var(--site-header-height, 88px) + 56px);
+	padding-bottom: clamp(3rem, 6vw, 5rem);
+	background-color: $color__white;
+	color: $color__text;
+
+	&__intro {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+		column-gap: 64px;
+		row-gap: 20px;
+		align-items: start;
+
+		@include media('<tablet') {
+			grid-template-columns: 1fr;
+		}
+	}
+
+	&__header {
+		display: flex;
+		flex-direction: column;
+		gap: 1.5rem;
+	}
+
+	&__tagline {
+		margin: 0;
+		font-size: 11px;
+		font-weight: 600;
+		line-height: 16px;
+		letter-spacing: 1px;
+		text-transform: uppercase;
+	}
+
+	&__title {
+		margin: 0;
+		font-size: 32px;
+		font-weight: 400;
+		line-height: 36px;
+		letter-spacing: -1.6px;
+	}
+
+	&__body {
+		> :first-child {
+			margin-top: 0;
+		}
+
+		> :last-child {
+			margin-bottom: 0;
+		}
+
+		p + p {
+			margin-top: 1rem;
+		}
+	}
+
+	&__intro + &__grid {
+		margin-top: 72px;
+	}
+}
