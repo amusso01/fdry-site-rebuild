@@ -23,7 +23,7 @@ export default function workRowSlider() {
 		const swiper = new Swiper(el, {
 			modules: [Pagination],
 			slidesPerView: 1,
-			spaceBetween: 0,
+			spaceBetween: el.closest('.work-row--contained') ? 5 : 0,
 			pagination: pagination
 				? {
 						el: pagination,

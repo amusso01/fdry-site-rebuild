@@ -14,6 +14,7 @@
  *     @type bool   $show_more_work When true, show a More work CTA below the grid. Default false.
  *     @type string $variant        Visual variant: default or inner. Default default.
  *     @type bool   $slider         When false, stack cards on mobile instead of Swiper. Default true.
+ *     @type bool   $contained      Wrap the cards in .content-block with a gap and rounded corners. Default false. Always on for the inner variant.
  *     @type int    $post_id        Post ID for ACF fallback. Default queried object.
  * }
  */
@@ -38,6 +39,11 @@ $variant          = $args['variant'] ?? 'default';
 $variant          = is_string($variant) && in_array($variant, $allowed_variants, true) ? $variant : 'default';
 $is_inner         = $variant === 'inner';
 $enable_slider    = ! array_key_exists('slider', $args) || (bool) $args['slider'];
+
+// The inner variant already sits in centered-content's .content-block, so it
+// gets the contained look without a second wrapper.
+$wrap_content_block = ! empty($args['contained']) && ! $is_inner;
+$is_contained       = $is_inner || $wrap_content_block;
 
 // The inner variant fades the whole section. Otherwise the cards fade as one
 // block: on the grid, or on the slider when there is one, because Swiper
@@ -114,7 +120,12 @@ if ($cards === array()) {
 }
 ?>
 
-<section class="work-row<?= $is_inner ? ' work-row--inner' : ''; ?><?= $enable_slider ? '' : ' work-row--stack'; ?>"<?= $is_inner ? ' data-fade-up' : ''; ?> aria-label="<?php esc_attr_e('Featured work', 'foundry'); ?>">
+<section class="work-row<?= $is_inner ? ' work-row--inner' : ''; ?><?= $enable_slider ? '' : ' work-row--stack'; ?><?= $is_contained ? ' work-row--contained' : ''; ?>"<?= $is_inner ? ' data-fade-up' : ''; ?> aria-label="<?php esc_attr_e('Featured work', 'foundry'); ?>">
+	<?php if ($wrap_content_block) : ?>
+		<div class="content-block">
+			<div class="content-max">
+	<?php endif; ?>
+
 	<?php if ($enable_slider) : ?>
 		<div class="swiper work-row__slider"<?= $fade_attr; ?>>
 	<?php endif; ?>
@@ -172,6 +183,11 @@ if ($cards === array()) {
 
 	<?php if ($enable_slider) : ?>
 		<div class="swiper-pagination work-row__pagination"></div>
+		</div>
+	<?php endif; ?>
+
+	<?php if ($wrap_content_block) : ?>
+			</div>
 		</div>
 	<?php endif; ?>
 

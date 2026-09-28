@@ -191,6 +191,33 @@
 		}
 	}
 
+	&--contained {
+		// Keep the cards off the dark navigation band above (homepage work row 1).
+		.navigation-content + & {
+			padding-top: 35px;
+		}
+
+		// The link clips the image and the overlay. isolation keeps Safari
+		// clipping the corners while the image scales on hover.
+		.work-row__link {
+			border-radius: 15px;
+			isolation: isolate;
+		}
+
+		&.work-row--stack .work-row__grid {
+			gap: 5px;
+		}
+
+		// Below tablet the slider's grid is Swiper's wrapper. Swiper spaces the
+		// slides itself (spaceBetween in workRowSlider.js), and a CSS gap there
+		// would throw off its slide positions.
+		@include media('>=tablet') {
+			.work-row__grid {
+				gap: 5px;
+			}
+		}
+	}
+
 	@include media('>=tablet') {
 		.work-row__grid {
 			transform: none !important;

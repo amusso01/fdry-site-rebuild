@@ -33,11 +33,11 @@ get_header('new');
   ?>
   <?php get_template_part('components/page/navigation-content');
   ?>
-  <?php get_template_part('components/page/work-row', null, array('slider' => false));
+  <?php get_template_part('components/page/work-row', null, array('slider' => false, 'contained' => true));
   ?>
   <?php get_template_part('components/page/two-column-content');
   ?>
-  <?php get_template_part('components/page/work-row', null, array('field' => 'work_row_2', 'slider' => false));
+  <?php get_template_part('components/page/work-row', null, array('field' => 'work_row_2', 'slider' => false, 'contained' => true));
   ?>
   <?php get_template_part('components/page/two-column-content', null, array('prefix' => 'two_column_2'));
   ?>
