@@ -44,16 +44,16 @@ $has_more   = $query->max_num_pages > 1;
 	<div class="content-block">
 		<div class="content-max">
 			<div class="work-archive__intro">
-				<p class="work-archive__tagline"><?= esc_html($tagline); ?></p>
+				<p class="work-archive__tagline" data-fade-up><?= esc_html($tagline); ?></p>
 
 				<?php if ($content !== '') : ?>
-					<div class="work-archive__content">
+					<div class="work-archive__content" data-fade-up data-fade-up-delay="0.2">
 						<?= wp_kses_post($content); ?>
 					</div>
 				<?php endif; ?>
 			</div>
 
-			<nav class="work-archive__nav" aria-label="<?php esc_attr_e('Work categories', 'foundry'); ?>">
+			<nav class="work-archive__nav" aria-label="<?php esc_attr_e('Work categories', 'foundry'); ?>" data-fade-up data-fade-up-delay="0.4">
 				<ul class="work-archive__filters">
 					<li>
 						<button
@@ -78,14 +78,21 @@ $has_more   = $query->max_num_pages > 1;
 				</ul>
 			</nav>
 
-			<div class="work-archive__grid" aria-live="polite">
-				<?= $cards_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- cards are escaped in fdry_render_work_card() ?>
-			</div>
+			<?php
+			// The fade sits on this wrapper, not the grid: workArchive.js swaps the
+			// grid's cards after gsapFade.js has run, and the grid's own opacity is
+			// the is-loading dim, which the tween's inline opacity would override.
+			?>
+			<div class="work-archive__results" data-fade-up data-fade-up-delay="0.6">
+				<div class="work-archive__grid" aria-live="polite">
+					<?= $cards_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- cards are escaped in fdry_render_work_card() ?>
+				</div>
 
-			<div class="work-archive__more"<?= $has_more ? '' : ' hidden'; ?>>
-				<button type="button" class="work-archive__load-more">
-					<?php esc_html_e('Load more', 'foundry'); ?>
-				</button>
+				<div class="work-archive__more"<?= $has_more ? '' : ' hidden'; ?>>
+					<button type="button" class="work-archive__load-more">
+						<?php esc_html_e('Load more', 'foundry'); ?>
+					</button>
+				</div>
 			</div>
 		</div>
 	</div>
