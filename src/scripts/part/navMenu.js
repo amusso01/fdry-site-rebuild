@@ -17,8 +17,20 @@ export default function navMenu() {
 		})
 	}
 
+	// The videos ship with data-src only (secondary.php), so a closed menu
+	// downloads nothing. The file is attached the first time its panel is
+	// shown. Below the tablet breakpoint the desktop panels are display: none,
+	// so the video has no box and phones never fetch it.
 	const playPanelVideos = (panel) => {
 		panel.querySelectorAll('video').forEach((video) => {
+			if (!video.getClientRects().length) {
+				return
+			}
+
+			if (!video.getAttribute('src') && video.dataset.src) {
+				video.src = video.dataset.src
+			}
+
 			const playPromise = video.play()
 
 			if (playPromise !== undefined) {

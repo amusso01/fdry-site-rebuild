@@ -145,18 +145,16 @@ $view_all_work = fdry_acf_link_parts(
 										?>
 
 										<?php if ($menu_video !== '') : ?>
+											<?php // No src or autoplay: either makes every page download the video. navMenu.js sets src when the panel is shown. ?>
 											<video
 												class="site-nav-overlay__video"
-												src="<?php echo esc_url($menu_video); ?>"
+												data-src="<?php echo esc_url($menu_video); ?>"
 												muted
-												autoplay
 												loop
 												playsinline
-												preload="metadata"></video>
+												preload="none"></video>
 										<?php else : ?>
-											<div class="site-nav-overlay__video-placeholder">
-												<span class="site-nav-overlay__video-label"><?php esc_html_e('Video placeholder', 'foundry'); ?></span>
-											</div>
+											<div class="site-nav-overlay__video-placeholder"></div>
 										<?php endif; ?>
 									</div>
 								</div>

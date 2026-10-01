@@ -55,8 +55,8 @@ The site runs on the new templates: `header-new.php`, `components/`, `library/fu
 | 4 | **P0** | **Missing H1** on `/work/` (the tagline is a `<p>`) and `/sectors/`. The Service and Service Child templates only get an H1 if an editor picks it (the ACF default is h2). | Code + CMS | S | **Done 1 Oct** (live, checked) |
 | 5 | **P1** | **Titles**: every page except Home ends in the 50-character slogan "Ecommerce Web Design \| WooCommerce and Shopify Agency", and the brand never appears. For example, a blog post title runs to 113 characters. | CMS | S | Partly done (Home); fix is the WP Site Title |
 | 6 | **P1** | Mobile nav accordion prints **three `<h2>`s before the H1** on every page (`navigation/mobile.php:74`). | Code | S | **Code done 1 Oct**, deploy pending |
-| 7 | **P1** | **No og:image** on Home, About, Contact, Work, Services, service pages and Insights. ACF-only pages have no content or featured image for Yoast to use. | Code + CMS | S | Open |
-| 8 | **P1** | The nav overlay embeds **3 × ~2.9 MB webm with `src` + `autoplay`** on every page (`navigation/secondary.php`). | Code | S | Open |
+| 7 | **P1** | **No og:image** on Home, About, Contact, Work, Services, service pages and Insights. ACF-only pages have no content or featured image for Yoast to use. | Code + CMS | S | **Deferred**: default card with the designer |
+| 8 | **P1** | The nav overlay embeds **3 × ~2.9 MB webm with `src` + `autoplay`** on every page (`navigation/secondary.php`). | Code | S | **Code done 1 Oct**, deploy pending |
 | 9 | **P1** | **Homepage LCP contention**: all parallax cards are preloaded, and card 1 gets `fetchpriority="high"` alongside the hero poster. The work-row images are `eager`. | Code | S | Open |
 | 10 | **P1** | Contact has **no meta description**. Other new pages are unchecked. | CMS | S | Open |
 | 11 | **P1** | robots.txt blocks `AdsBot` (a Yoast setting) while the Google Ads tag `AW-11543866131` runs. Verify, then turn it off if Ads land on the site. | CMS | S | Open |
@@ -229,6 +229,11 @@ Reuse the fallback in `centered-content.php` ("A page H1 must never be empty; fa
 In `components/navigation/mobile.php:74`, change `<h2 class="ac-header …">` to `<div class="ac-header …">`, matching the footer accordion. Check that `navAccordion.js` and accordion-js select by class, not by tag.
 
 ### #7 og:image
+> **Deferred (1 Oct)** until the default share card is agreed with the designer. Agreed approach:
+> - **Code:** the page's own ACF hero/banner image. Checked live, that covers about 26 of the 34 pages with no image.
+> - **CMS:** a 1200×630 branded card as the Yoast Site image for the rest (Work, Insights, Contact, Careers, Terms, Privacy).
+> - **Not the bare logo:** at about 4:1 it crops badly in share previews.
+
 - **Code:** in the new `library/function-seo.php` (see "New file" below), hook `wpseo_add_opengraph_images`.
   - It applies to pages that use one of `fdry_acf_only_page_templates()` and have no featured image.
   - It adds the first available of `hero_poster`, `showreel_poster`, `banner_desktop_image`, `banner_image`, then the first `work_row` card thumbnail.
@@ -236,9 +241,18 @@ In `components/navigation/mobile.php:74`, change `<h2 class="ac-header …">` to
 - **CMS:** set Yoast → Site basics → Site image (1200×630) as the last fallback.
 
 ### #8 Nav overlay videos
-- In `components/navigation/secondary.php`, change `src` to `data-src`, drop `autoplay`, and set `preload="none"`.
-- In `navMenu.js` `playPanelVideos()`, copy `dataset.src` to `src` on first play.
-- Delete the visible "Video placeholder" text and leave the placeholder empty.
+> **Code done (1 Oct), deploy pending.**
+> - **Before:** every page downloaded all three menu videos with the menu closed, on desktop and on phones (where they are never shown). That was 6.17 MB of the About page's 8.07 MB (76%), measured in headless Chrome.
+> - **Change:**
+>   - `secondary.php` now ships `data-src` and `preload="none"`, with no `src` or `autoplay`.
+>   - `navMenu.js` attaches the file the first time a panel is shown, and skips panels with no layout box (phones).
+>   - The "Video placeholder" label is gone.
+> - **Tested before deploy** against the live page, with the new HTML and bundle swapped in:
+>   - Menu closed: 2.06 MB and no video.
+>   - Desktop open: only the first panel's 0.56 MB file loads and plays.
+>   - Hovering another parent loads that panel's file.
+>   - Phone open: no video.
+> - **Follow-up (optional):** the files are 1080×1080 but show at 280px. 560×560 exports would cut what desktop visitors download when they open the menu. `pnpm encode` has no size option, so ask the designer, or add one to `scripts/encode-video.mjs`.
 
 ### #9 Homepage LCP
 - In `function-dev.php` `fdry_preload_work_parallax_images()`, drop `fetchpriority="high"` from card 1 and stop preloading cards 2 onwards.

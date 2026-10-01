@@ -371,3 +371,21 @@ How [`showreelModal.js`](src/scripts/part/showreelModal.js) loads it:
 The 720p file is served at or below `data-mobile-max` (the same `FDRY_HERO_MOBILE_MAX_PX` cutoff as the hero), with save-data on, or when `navigator.connection.effectiveType` is 3g or slower. That API only exists in Chromium, so other browsers decide on screen size alone. Unlike the background loop, phones **do** play the full reel, since the visitor asked for it.
 
 To replace the reel, see "Full showreel" in [`video-encode.md`](video-encode.md).
+
+## Nav overlay videos
+
+Each desktop menu panel can show a looping video (the `menu_video` ACF field on the menu item, rendered in [`secondary.php`](components/navigation/secondary.php)).
+
+- The `<video>` ships with `data-src`, `preload="none"`, and **no `src` and no `autoplay`**. Either one makes the browser download the file on every page, even with the menu closed: `autoplay` overrides `preload`, as with the hero.
+- [`navMenu.js`](src/scripts/part/navMenu.js) `playPanelVideos()` copies `data-src` to `src` the first time a panel is shown, when the menu opens or another parent is hovered or focused.
+- It skips videos with no layout box (`getClientRects()` is empty). Below the tablet breakpoint the desktop panels are `display: none`, so phones never download them.
+
+Measured on 1 Oct 2026 (/about/, headless Chrome), before and after:
+
+| | Before | After |
+|---|---|---|
+| Page load, menu closed | 8.07 MB (6.17 MB of it video) | 2.06 MB, no video |
+| Menu opened on a phone | 6.17 MB already loaded | No video |
+| Menu opened on desktop | 6.17 MB already loaded | Only the active panel's file |
+
+The files are 1080×1080 but show at 280px. Exports at 560×560 would make them much smaller.
