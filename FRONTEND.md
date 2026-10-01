@@ -59,7 +59,7 @@ All **new dev site (2026/27)** logic goes in [`library/function-dev.php`](librar
 | Concern | Function / hook | Notes |
 |---------|-----------------|--------|
 | Block editor palette | `ea_setup()` | `after_setup_theme` |
-| Nav menu locations | `fdry_register_theme_menus()` | `mainmenu`, `secondarymenu`, `footermenu_1`, `footermenu_2`. Understrap's old `primary` location is no longer registered (removed from `inc/setup.php`). |
+| Nav menu locations | `fdry_register_theme_menus()` | `mainmenu`, `secondarymenu`, `footermenu_1` to `footermenu_4`. Understrap's old `primary` location is no longer registered (removed from `inc/setup.php`). |
 | Vite assets | `fdry_get_vite_assets()`, `fdry_enqueue_assets()` | Reads `dist/.vite/manifest.json` |
 | ACF SVG helper | `acfFile_toSvg()` | Used by components (e.g. marquee logos) |
 
@@ -234,11 +234,33 @@ The "Let's talk / Send your brief / START" band is [`components/footer/brief.php
 
 The contact block, menus, logo, social and legal links and the copyright bar are [`components/footer/site-footer.php`](components/footer/site-footer.php). `footer.php` includes it on every page, after the brief. The styles are in [`_site-footer.scss`](src/styles/components/_site-footer.scss).
 
-- **Layout.** One row. On the left: "Come & say hello", the address and two buttons. On the right, three columns: the contact details, then **Footer menu 1**, then **Footer menu 2**. When the row runs out of room (roughly below 1100px), the right-hand columns wrap under the contact block.
-  - **Mobile.** Below 768px everything stacks: the contact block, then the contact details, then the two menus side by side. There is no accordion.
-- **Column widths.** The contact details column is 190px, so the address breaks after "Palace" as in the design. Each menu column is at least 84px. The gap between columns is 64px.
-- **Type.** Title 34/36px, weight 500. Address 20px, weight 400. Contact details and menu links 16px, weight 500, `line-height: normal`, 12px apart. The menu type is on the `ul`, not the links, so each `li` gets a 16px line box.
-- **Menus.** Both menus are WordPress menus, assigned in Appearance → Menus to the `footermenu_1` and `footermenu_2` locations. They are printed with `wp_nav_menu()` (one level, no fallback). Each sits in its own `<nav>`, labelled with the menu's name. A location with no menu assigned prints nothing.
+- **Layout.**
+  - **Top row.** The top row has "Come & say hello", the address and two buttons on the left, and the contact details column on the right.
+  - **Menu grid.** Below the top row is the menu grid: **Footer menu 1** to **Footer menu 4**, one column each.
+  - **Shared columns.** The top row and the menu grid share the same four columns (`repeat(4, minmax(0, 1fr))`, 32px gap). From `tablet` (1140px), the contact block spans columns 1–3 and the contact details sit in column 4, lined up with the fourth menu.
+  - **Below 1140px.** The contact details stack under the contact block. The menu grid stays four columns down to 768px.
+  - **Below 768px.** The menu grid is hidden and the mobile accordion takes its place. The contact details stay visible above it.
+- **Contact details width.** The contact details column is at most 190px, so the address breaks after "Palace" as in the design.
+- **Type.**
+  - Title: 34/36px, weight 500.
+  - Address: 20px, weight 400.
+  - Contact details: 16px, weight 500, `line-height: normal`, 12px apart.
+  - Column headings: 18px, weight 500, line-height 36px, white.
+  - Menu links: 16px, weight 500, `line-height: normal`, 12px apart, muted grey turning white on hover.
+  - The menu type is on the `ul`, not the links, so each `li` gets a 16px line box.
+- **Menus.** All four are WordPress menus, assigned in Appearance → Menus to the `footermenu_1` … `footermenu_4` locations.
+  - **Rendering.** They are printed with `wp_nav_menu()` (one level, no fallback), each in its own `<nav>`.
+  - **Unassigned locations.** A location with no menu assigned is skipped, and the menus that are assigned fill the grid from the left.
+- **Column headings.**
+  - **Source.** Each heading is the menu's **Footer title** field (`footer_title`), from ACF group [`group_fd_footer_menu.json`](acf-json/group_fd_footer_menu.json). The field only shows on menus assigned to a footer location, and the component reads it with `fdry_get_nav_menu_acf_field()`.
+  - **Empty title.** A menu with no title shows no heading, so give all four a title or the columns won't line up.
+  - **Screen readers.** The title labels the `<nav>`. Without a title, the menu's name labels it.
+- **Mobile accordion.** Below 768px, Footer menu 1–4 render as an accordion, one panel per menu.
+  - **Files.** The markup is [`menu-accordion.php`](components/footer/menu-accordion.php), styled in [`_footer-accordion.scss`](src/styles/components/_footer-accordion.scss). [`footerAccordion.js`](src/scripts/part/footerAccordion.js) starts accordion-js on `.footer-accordion` with one panel open at a time. accordion-js's base CSS comes from `_nav-mobile.scss`.
+  - **Triggers.** Each trigger is the menu's Footer title, or the menu's name when it has none.
+  - **Shared data.** `site-footer.php` builds the menu list once (`$footer_menus`: location, title, label) and passes it to the partial, so the grid and the accordion always show the same menus in the same order.
+  - **Menus print twice.** Each menu is printed in both places, and the copy for the other breakpoint is `display: none`, so screen readers skip it. `wp_nav_menu()` adds a suffix to the repeated `menu-{slug}` ids, so they stay unique.
+  - **Fade.** The fade is on the `.site-footer__accordion` wrapper, not the panels, which accordion-js changes.
 - **Contact details.** The email, phone and address are the `$contact` array at the top of the component. The address prints both under the title and in the contact details column.
 - **Buttons.** Both use the BTN partial, [`components/partials/button.php`](components/partials/button.php): "Book an appointment" is `white` and "Join our newsletter" is `transparent`.
   - **Partial args.** The partial takes a `tag` arg (`'a'` or `'button'`) and a `class` arg for an extra class on the inner element.
@@ -248,9 +270,6 @@ The contact block, menus, logo, social and legal links and the copyright bar are
 - **Breakpoint.** 768px (`media('<768px')`), the old Tailwind `md:`. Side padding is `content-block content-block--footer`.
 - **Wrapper.** A `div` with `role="contentinfo"`, not a `<footer>`, because `mainstyle/linktree.css` hides every `<footer>` on the linktree template.
 - **Spacing from legacy CSS.** The contact row's desktop padding (55px / 58px) used to come from an old `.mainfooter` rule in `mainstyle.css`. `.site-footer__top` now sets it itself.
-- **Rollback.** [`legacy-footer.php`](components/footer/legacy-footer.php) holds the old footer verbatim, including the Tailwind runtime and its inline styles. To roll back, point the include in `footer.php` at it.
-  - **Accordion files.** It still uses the mobile accordion, so [`_footer-accordion.scss`](src/styles/components/_footer-accordion.scss) and [`footerAccordion.js`](src/scripts/part/footerAccordion.js) stay for now, although the new footer no longer uses them.
-  - **Cleanup.** Once the new footer is confirmed, delete all three.
 
 ## Tailwind (removed)
 

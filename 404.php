@@ -1,58 +1,39 @@
 <?php
+
 /**
  * The template for displaying 404 pages (not found).
+ *
+ * Styled in src/styles/templates/_error-page.scss. The old markup used
+ * #error-404-wrapper / .overlay-404, which theme.css still styles, so the new
+ * classes avoid those names.
  *
  * @package understrap
  */
 
-if ( ! defined( 'ABSPATH' ) ) {
+if (! defined('ABSPATH')) {
 	exit; // Exit if accessed directly.
 }
 
 
+// For now every 404 redirects to the homepage, so the markup below never renders.
 header("HTTP/1.1 301 Moved Permanently");
-header("Location: ".get_bloginfo('url'));
+header("Location: " . get_bloginfo('url'));
 exit();
 
 
 get_header('new');
-
-$container   = get_theme_mod( 'understrap_container_type' );
 ?>
 
-<div class="wrapper" id="error-404-wrapper">
-
-	<div class="container-fluid" id="content" tabindex="-1">
-
-		<div class="row">
-
-			<div class="col-md-8 offset-md-1 content-area" id="primary">
-
-				<main class="site-main" id="main">
-
-					<section class="error-404 not-found">
-
-						<header class="header pt-5 overlay-404">
-
-
-							<h1 class="large">Oops!</h1>
-							<h2 class="page-title">We are looking for your page...</h2>
-							<h2 class="page-title">but we can't find it.</h2>
-
-							<p class="error">Error code: 404</p>
-
-						</header><!-- .page-header -->
-
-					</section><!-- .error-404 -->
-
-				</main><!-- #main -->
-
-			</div><!-- #primary -->
-
-		</div><!-- .row -->
-
-	</div><!-- Container end -->
-
-</div><!-- Wrapper end -->
+<main class="main error-page" role="main">
+	<div class="content-block">
+		<div class="content-max">
+			<div class="error-page__inner">
+				<h1 class="error-page__title" data-fade-up>Oops!</h1>
+				<h2 class="error-page__subtitle" data-fade-up data-fade-up-delay="0.1">Page not found (404)</h2>
+				<p class="error-page__text" data-fade-up data-fade-up-delay="0.2">Go back to our <a class="error-page__link" href="<?php echo esc_url(home_url('/')); ?>">homepage</a>.</p>
+			</div>
+		</div>
+	</div>
+</main>
 
 <?php get_footer(); ?>

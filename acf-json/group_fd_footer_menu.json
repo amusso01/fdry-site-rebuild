@@ -1,0 +1,70 @@
+{
+    "key": "group_fd_footer_menu",
+    "title": "Footer menu 2026",
+    "fields": [
+        {
+            "key": "field_fd_footer_menu001",
+            "label": "Footer title",
+            "name": "footer_title",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "Heading shown above this menu in the site footer.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "placeholder": "",
+            "prepend": "",
+            "append": "",
+            "maxlength": "",
+            "allow_in_bindings": 0
+        }
+    ],
+    "location": [
+        [
+            {
+                "param": "nav_menu",
+                "operator": "==",
+                "value": "location/footermenu_1"
+            }
+        ],
+        [
+            {
+                "param": "nav_menu",
+                "operator": "==",
+                "value": "location/footermenu_2"
+            }
+        ],
+        [
+            {
+                "param": "nav_menu",
+                "operator": "==",
+                "value": "location/footermenu_3"
+            }
+        ],
+        [
+            {
+                "param": "nav_menu",
+                "operator": "==",
+                "value": "location/footermenu_4"
+            }
+        ]
+    ],
+    "menu_order": 0,
+    "position": "normal",
+    "style": "default",
+    "label_placement": "top",
+    "instruction_placement": "label",
+    "hide_on_screen": "",
+    "active": true,
+    "description": "",
+    "show_in_rest": 0,
+    "display_title": "",
+    "allow_ai_access": false,
+    "ai_description": "",
+    "modified": 1790847882
+}

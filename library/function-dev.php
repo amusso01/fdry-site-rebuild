@@ -125,6 +125,8 @@ function fdry_register_theme_menus()
 			'secondarymenu' => __('Secondary menu 2026', 'foundry'),
 			'footermenu_1' => __('Footer menu 1', 'foundry'),
 			'footermenu_2' => __('Footer menu 2', 'foundry'),
+			'footermenu_3' => __('Footer menu 3', 'foundry'),
+			'footermenu_4' => __('Footer menu 4', 'foundry'),
 		)
 	);
 }

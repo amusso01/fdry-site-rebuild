@@ -1,9 +1,9 @@
 @use '../common/variables' as *;
 @use '../common/media' as *;
 
-// Site footer (components/footer/site-footer.php). The contact block and the
-// right-hand columns (contact details, Footer menu 1, Footer menu 2) share
-// the top row, then stack below 768px.
+// Site footer (components/footer/site-footer.php). The top row (contact
+// block and contact details) and the menu grid below it share the same four
+// columns, so the contact details line up with the fourth menu.
 //
 // Links inherit their colour (see _general.scss, including :hover and
 // :focus), so colours are set on the containers and only hover states
@@ -14,6 +14,8 @@ $site-footer-bottom-bg: #212121;
 $site-footer-text: #f7f5f5;
 $site-footer-muted: #a4a4a4;
 $site-footer-info-hover: #ccc;
+$site-footer-columns: repeat(4, minmax(0, 1fr));
+$site-footer-column-gap: 32px;
 
 .site-footer {
 	&__main {
@@ -27,20 +29,29 @@ $site-footer-info-hover: #ccc;
 	}
 
 	// The old footer took this padding from a .mainfooter rule in
-	// mainstyle.css, left over from an earlier footer. The right-hand
-	// columns wrap under the contact block when the row runs out of room.
+	// mainstyle.css, left over from an earlier footer. Below tablet the
+	// contact details stack under the contact block.
 	&__top {
 		display: flex;
-		flex-wrap: wrap;
-		align-items: flex-start;
-		justify-content: space-between;
-		gap: 48px 32px;
+		flex-direction: column;
+		gap: 40px;
 		padding: 55px 0 58px;
 
+		@include media('>=tablet') {
+			display: grid;
+			grid-template-columns: $site-footer-columns;
+			align-items: start;
+			column-gap: $site-footer-column-gap;
+		}
+
 		@include media('<768px') {
-			flex-direction: column;
-			gap: 40px;
 			padding: 48px 0 40px;
+		}
+	}
+
+	&__contact {
+		@include media('>=tablet') {
+			grid-column: 1 / 4;
 		}
 	}
 
@@ -89,21 +100,9 @@ $site-footer-info-hover: #ccc;
 		}
 	}
 
-	// Column widths are measured from the design: 190px keeps the address
-	// on two lines, and 84px lines the second menu up with the first.
-	&__links {
-		display: flex;
-		column-gap: 64px;
-
-		@include media('<768px') {
-			flex-wrap: wrap;
-			row-gap: 32px;
-		}
-	}
-
+	// 190px keeps the address on two lines, as in the design.
 	&__info {
-		flex: none;
-		width: 190px;
+		max-width: 190px;
 		margin: 0;
 		font-style: normal;
 
@@ -118,8 +117,8 @@ $site-footer-info-hover: #ccc;
 			margin-top: 12px;
 		}
 
-		@include media('<768px') {
-			width: 100%;
+		@include media('>=tablet') {
+			grid-column: 4;
 		}
 	}
 
@@ -127,12 +126,39 @@ $site-footer-info-hover: #ccc;
 		color: $site-footer-info-hover;
 	}
 
-	&__nav {
-		min-width: 84px;
+	// Footer menu 1–4. Below 768px the accordion replaces the grid.
+	&__menus {
+		display: grid;
+		grid-template-columns: $site-footer-columns;
+		gap: 32px $site-footer-column-gap;
+		padding-top: 68px;
+
+		@include media('<768px') {
+			display: none;
+		}
+	}
+
+	// The logo has no top margin on mobile, so the accordion carries the
+	// bottom spacing.
+	&__accordion {
+		padding-bottom: 40px;
+
+		@include media('>=768px') {
+			display: none;
+		}
+	}
+
+	&__menu-title {
+		margin: 0 0 10px;
+		color: inherit;
+		font-size: 18px;
+		font-weight: 500;
+		line-height: 36px;
 	}
 
 	// Type is on the list, not the links, so each li's line box is 16px too.
 	&__menu {
+		color: $site-footer-muted;
 		font-size: 16px;
 		font-weight: 500;
 		line-height: normal;
@@ -142,7 +168,7 @@ $site-footer-info-hover: #ccc;
 		}
 
 		a:hover {
-			color: $site-footer-info-hover;
+			color: $color__white;
 		}
 	}
 

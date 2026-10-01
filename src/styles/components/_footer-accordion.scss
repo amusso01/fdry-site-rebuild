@@ -1,11 +1,8 @@
 @use '../common/variables' as *;
 
-// Mobile footer menu (Contact / Services / Company) in the rollback footer,
-// components/footer/legacy-footer.php. site-footer.php no longer has an
-// accordion, so delete this file (and footerAccordion.js) with
-// legacy-footer.php. Base accordion-js styles are imported in
-// _nav-mobile.scss. legacy-footer.php prints inline .mainfooter rules after
-// this file, so the selectors below stay one class stronger than those.
+// Footer menu accordion (components/footer/menu-accordion.php), below 768px.
+// footerAccordion.js starts it. Base accordion-js styles are imported in
+// _nav-mobile.scss.
 
 $footer-accordion-text: #f7f5f5;
 $footer-accordion-border: #363636;
@@ -83,35 +80,17 @@ $footer-accordion-border: #363636;
 	}
 }
 
+// Type is on the panel, not the links, so each li's line box is 16px too.
 .footer-accordion .footer-accordion__panel-inner {
-	p,
-	a {
-		color: $footer-accordion-text;
-		font-size: 16px;
-		font-style: normal;
-		font-weight: 500;
-		line-height: normal;
-	}
-
-	p {
-		margin: 0 0 10px;
-	}
+	padding-bottom: 10px;
+	color: $footer-accordion-text;
+	font-size: 16px;
+	font-style: normal;
+	font-weight: 500;
+	line-height: normal;
 
 	li {
 		margin-bottom: 10px;
-	}
-
-	.footer-accordion__group-title {
-		margin: 20px 0 5px;
-		color: $footer-accordion-text;
-		font-size: 24px !important;
-		font-style: normal;
-		font-weight: 700;
-		line-height: 36px;
-
-		&:first-child {
-			margin-top: 0 !important;
-		}
 	}
 }
 
