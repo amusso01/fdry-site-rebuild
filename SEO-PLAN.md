@@ -53,8 +53,8 @@ The site runs on the new templates: `header-new.php`, `components/`, `library/fu
 | 2 | **P0** | **Duplicate and orphaned pages are live and in the sitemap**, two of them linked from the footer. | CMS | S | **Deferred** until the footer menu build is done |
 | 3 | **P0** | `/works/` → 301 `?page_id=50` → 404, plus every link to the unpublished old Work page (ID 50), including "BACK TO WORK" on 150 case studies and the Yoast breadcrumbs. | Code + CMS | S | **Done 1 Oct** (live, checked) |
 | 4 | **P0** | **Missing H1** on `/work/` (the tagline is a `<p>`) and `/sectors/`. The Service and Service Child templates only get an H1 if an editor picks it (the ACF default is h2). | Code + CMS | S | **Done 1 Oct** (live, checked) |
-| 5 | **P0** | **Titles**: every page except Home ends in the 50-character slogan "Ecommerce Web Design \| WooCommerce and Shopify Agency", and the brand never appears. For example, a blog post title runs to 113 characters. | CMS | S | Partly done (Home); fix is the WP Site Title |
-| 6 | **P1** | Mobile nav accordion prints **three `<h2>`s before the H1** on every page (`navigation/mobile.php:74`). | Code | S | Open |
+| 5 | **P1** | **Titles**: every page except Home ends in the 50-character slogan "Ecommerce Web Design \| WooCommerce and Shopify Agency", and the brand never appears. For example, a blog post title runs to 113 characters. | CMS | S | Partly done (Home); fix is the WP Site Title |
+| 6 | **P1** | Mobile nav accordion prints **three `<h2>`s before the H1** on every page (`navigation/mobile.php:74`). | Code | S | **Code done 1 Oct**, deploy pending |
 | 7 | **P1** | **No og:image** on Home, About, Contact, Work, Services, service pages and Insights. ACF-only pages have no content or featured image for Yoast to use. | Code + CMS | S | Open |
 | 8 | **P1** | The nav overlay embeds **3 × ~2.9 MB webm with `src` + `autoplay`** on every page (`navigation/secondary.php`). | Code | S | Open |
 | 9 | **P1** | **Homepage LCP contention**: all parallax cards are preloaded, and card 1 gets `fetchpriority="high"` alongside the hero poster. The work-row images are `eager`. | Code | S | Open |
@@ -204,7 +204,11 @@ Reuse the fallback in `centered-content.php` ("A page H1 must never be empty; fa
   - Remove `h1` from the `choices` of every non-first `*_tagline_tag`: `two_column_tagline_tag` and `two_column_2_tagline_tag` in `group_6a969320685b0.json` and `group_6aa2aa6f622e4.json`, and `centered_dark_tagline_tag` in `group_6aa185527a283.json`.
   - Delete the now-overridden first-section `intro_tagline_tag` and `centered_tagline_tag` fields.
 
+## P1: High
+
 ### #5 Titles and brand (CMS, no code) — partly done
+> **Moved from P0 to P1 on 1 Oct.** Nothing is broken, but it is a two-minute change that affects every page. The slogan was probably a deliberate old tactic: keywords in every title. The homepage keeps those keywords in its own custom title.
+
 **Where the slogan comes from (checked 1 Oct).** The suffix is Yoast's `%%sitename%%`, which reads the **WordPress Site Title** (Settings → General), not Yoast's "Website name". The Site Title is "Ecommerce Web Design | WooCommerce and Shopify Agency". The same value shows up in `og:site_name` and in the header's `apple-mobile-web-app-title`. Yoast's "Website name" is a separate setting ("Ecommerce Web Design | Digital Marketing Agency"). It only feeds the WebSite schema, which Google uses for the site name shown above results. The earlier note here said that setting fixed the suffix; it doesn't.
 
 - **Done:** the homepage custom title.
@@ -219,9 +223,9 @@ Reuse the fallback in `centered-content.php` ("A page H1 must never be empty; fa
   5. **Optional:** about 20 of 86 posts are still over 60 characters with "| FDRY". The longest is 101 ("Black Friday 2024 meets Green Friday…"). Shorten their SEO titles (not the H1) where it matters, starting with posts that get traffic.
 - **Then:** write custom titles of 60 characters or fewer for the top service pages, e.g. "Shopify Agency London | FDRY".
 
-## P1: High
-
 ### #6 Nav headings
+> **Code done (1 Oct).** The header is now a `<div>`, like the footer accordion. Live check before deploy: those three `<h2>`s were the only headings before the H1. accordion-js and `navAccordion.js` select by class, and the styles set the trigger font, size, weight and colour, so it looks the same. No build needed.
+
 In `components/navigation/mobile.php:74`, change `<h2 class="ac-header …">` to `<div class="ac-header …">`, matching the footer accordion. Check that `navAccordion.js` and accordion-js select by class, not by tag.
 
 ### #7 og:image
@@ -348,8 +352,8 @@ Also update the "Homepage" preload note.
 ## Suggested order
 1. **P0:**
    - #2 first, because it's CMS-only and fast. Fix the footer menu item, then add the 301s before unpublishing.
-   - Then #1, with the redirect map from Search Console done first, alongside #3, #4 and #5.
-2. **P1:** #6–#11.
+   - Then #1, with the redirect map from Search Console done first, alongside #3 and #4.
+2. **P1:** #5–#11.
 3. **P2:**
    - #12, #13, #16 and #20, which are small code changes.
    - Then #14 as its own piece of work.

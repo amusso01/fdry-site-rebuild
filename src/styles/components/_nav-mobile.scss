@@ -58,14 +58,14 @@ $nav-mobile-padding-inline: 16px;
 	.site-nav-mobile__main-list {
 		display: flex;
 		flex-wrap: wrap;
-		gap: 1rem 14px;
+		gap: 1rem 12px;
 		margin: 0;
 		padding: 0;
 		list-style: none;
 
 		a {
 			color: $color__white;
-			font-size: 13px;
+			font-size: 12px;
 			font-weight: 600;
 			line-height: 1.2;
 			text-transform: none;

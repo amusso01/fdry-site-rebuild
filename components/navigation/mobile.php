@@ -71,11 +71,12 @@ if (! is_array($view_all_work)) {
 					endif;
 					?>
 					<div class="ac site-nav-mobile__ac">
-						<h2 class="ac-header site-nav-mobile__ac-header">
+						<?php // A div, not a heading: the nav prints before the page's H1 on every page. ?>
+						<div class="ac-header site-nav-mobile__ac-header">
 							<button type="button" class="ac-trigger site-nav-mobile__ac-trigger">
 								<?php echo esc_html($item->title); ?>
 							</button>
-						</h2>
+						</div>
 						<div class="ac-panel site-nav-mobile__ac-panel">
 							<div class="ac-panel-inner site-nav-mobile__ac-panel-inner">
 								<ul class="site-nav-overlay__children" role="list">
