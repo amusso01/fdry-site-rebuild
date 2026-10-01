@@ -46,7 +46,7 @@ $container = get_theme_mod('understrap_container_type');
 
 
 						<!--<ul id="customnavtax" class="fadeInUp">
-                            <li ><a href="<?php echo get_the_permalink(50); ?>" class="category-all active" data-category="category-all">Featured</a></li>
+                            <li ><a href="<?php echo esc_url(fdry_template_page_url('template-work.php', '/work/')); ?>" class="category-all active" data-category="category-all">Featured</a></li>
                             <li  ><a href="/work/category/design/" >Brand &amp; Design</a></li>
                             <li  ><a href="/work/category/website/" >Web Development</a></li>
                             <li  ><a href="/work/category/ecommerce/" >E-commerce Design</a></li>

@@ -150,7 +150,7 @@ get_header('new');
 					<img style="margin-top: 80px;" src="<?php echo get_stylesheet_directory_uri(); ?>/img/typeformimg/icon-thanks.svg">
 					<h1 style="text-transform: uppercase;">We've received your brief!</h1>
 					<h2 style="text-transform: uppercase;">Sit back and relax, we'll get in touch with you soon.</h2>
-					<a class="morebtn" href="<?php echo get_the_permalink(50); ?>">Take a look at our work</a>
+					<a class="morebtn" href="<?php echo esc_url(fdry_template_page_url('template-work.php', '/work/')); ?>">Take a look at our work</a>
 				</center>
 			</div>
 		</div>

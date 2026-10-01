@@ -14,7 +14,7 @@
                     <nav class="col-md-12">
                         <ul id="category-menu" class="fadeInUp">
                             <li class="cat-item">
-                                <a href="<?php echo get_the_permalink(50); ?>" class="<?php echo (is_category() && get_query_var('cat') == 50) ? 'active' : ''; ?>">Featured</a>
+                                <a href="<?php echo esc_url(fdry_template_page_url('template-work.php', '/work/')); ?>" class="<?php echo (is_category() && get_query_var('cat') == 50) ? 'active' : ''; ?>">Featured</a>
                             </li>
                             <li class="cat-item">
                                 <a href="/work/category/design/" class="<?php echo (is_category('design')) ? 'active' : ''; ?>">Brand &amp; Design</a>

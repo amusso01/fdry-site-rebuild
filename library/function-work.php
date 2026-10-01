@@ -291,3 +291,65 @@ function fdry_localize_work_archive(): void
 	);
 }
 add_action('wp_enqueue_scripts', 'fdry_localize_work_archive', 12);
+
+/**
+ * The works_post archive (/works/) duplicates the Work page, so its link is
+ * the Work page. Yoast's case-study breadcrumbs and canonicals use this link.
+ *
+ * @param string|false $link      Archive link.
+ * @param string       $post_type Post type.
+ * @return string|false
+ */
+function fdry_works_archive_link($link, string $post_type)
+{
+	return $post_type === 'works_post'
+		? fdry_template_page_url('template-work.php', '/work/')
+		: $link;
+}
+add_filter('post_type_archive_link', 'fdry_works_archive_link', 10, 2);
+
+/**
+ * Send /works/, its feed and ?post_type=works_post to the Work page.
+ *
+ * /work/category/{slug}/ also queries works_post (the rewrite rule in
+ * functions.php) and must keep rendering, so requests with a category_name
+ * are left alone. Priority 1 runs before redirect_canonical and Yoast's feed
+ * cleanup, so there is a single 301.
+ */
+function fdry_redirect_works_archive(): void
+{
+	if (! is_post_type_archive('works_post') || get_query_var('category_name') !== '') {
+		return;
+	}
+
+	wp_safe_redirect(fdry_template_page_url('template-work.php', '/work/'), 301, 'FDRY theme');
+	exit;
+}
+add_action('template_redirect', 'fdry_redirect_works_archive', 1);
+
+/**
+ * Point the case-study breadcrumb at the Work page.
+ *
+ * Yoast stores each indexable's permalink, so the works_post archive crumb
+ * keeps the old /works/ URL even with fdry_works_archive_link() in place.
+ * Yoast's BreadcrumbList schema is built from the same crumbs.
+ *
+ * @param array $crumbs Yoast breadcrumb links.
+ */
+function fdry_works_breadcrumb(array $crumbs): array
+{
+	foreach ($crumbs as $i => $crumb) {
+		$path     = untrailingslashit((string) wp_parse_url((string) ($crumb['url'] ?? ''), PHP_URL_PATH));
+		$is_works = ($crumb['ptarchive'] ?? '') === 'works_post' || $path === '/works';
+
+		if (! $is_works) {
+			continue;
+		}
+
+		$crumbs[$i]['url']  = fdry_template_page_url('template-work.php', '/work/');
+		$crumbs[$i]['text'] = __('Work', 'foundry');
+	}
+
+	return $crumbs;
+}
+add_filter('wpseo_breadcrumb_links', 'fdry_works_breadcrumb');

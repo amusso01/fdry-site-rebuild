@@ -28,7 +28,7 @@ get_header('new');
 			<div class="backwork">
 				<center>
 					<div class="pic blackbutton">
-						<a href="<?php echo get_the_permalink(50); ?>">
+						<a href="<?php echo esc_url(fdry_template_page_url('template-work.php', '/work/')); ?>">
 							<div class="button"><span>BACK TO WORK</span></div>
 						</a>
 					</div>

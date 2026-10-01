@@ -50,8 +50,8 @@ The site runs on the new templates: `header-new.php`, `components/`, `library/fu
 | # | Priority | Issue | Type | Effort | Status |
 |---|---|---|---|---|---|
 | 1 | **P0** | Every 404 returned a **301 to the homepage** (`404.php`). This caused soft-404s, hid broken URLs, and passed missing URLs' equity nowhere. | Code + CMS | M | **Code done 1 Oct**; pre-deploy redirect export pending |
-| 2 | **P0** | **Duplicate and orphaned pages are live and in the sitemap**, one of them linked from the footer. | CMS | S | **New** |
-| 3 | **P0** | `/works/` → 301 `?page_id=50` → 404 → 301 home. That is a redirect chain ending on the homepage. | Code + CMS | S | Open |
+| 2 | **P0** | **Duplicate and orphaned pages are live and in the sitemap**, two of them linked from the footer. | CMS | S | **Deferred** until the footer menu build is done |
+| 3 | **P0** | `/works/` → 301 `?page_id=50` → 404, plus every link to the unpublished old Work page (ID 50), including "BACK TO WORK" on 150 case studies and the Yoast breadcrumbs. | Code + CMS | S | **Done 1 Oct** (live, checked) |
 | 4 | **P0** | **Missing H1** on `/work/` (the tagline is a `<p>`) and `/sectors/`. The Service and Service Child templates only get an H1 if an editor picks it (the ACF default is h2). | Code | S | Open |
 | 5 | **P0** | **Titles**: every page except Home ends in the 50-character slogan "Ecommerce Web Design \| WooCommerce and Shopify Agency", and the brand never appears. For example, a blog post title runs to 113 characters. | CMS | S | Partly done (Home) |
 | 6 | **P1** | Mobile nav accordion prints **three `<h2>`s before the H1** on every page (`navigation/mobile.php:74`). | Code | S | Open |
@@ -80,14 +80,14 @@ The site runs on the new templates: `header-new.php`, `components/`, `library/fu
 
 **Resolved since 28 September:** the footer links that redirected. The footer now uses WordPress menus, and all its links return 200 directly.
 
-**Flagged, out of scope:** `single.php:31` "BACK TO WORK" → `get_the_permalink(50)` → `?page_id=50` → 404 → home, on all 150 case studies. It's now a one-line fix: `fdry_template_page_url('template-work.php', '/work/')`. The legacy page templates that also use page 50 (`mainservice.php`, `pageservices.php`, `typeform.php`, `parent.php`) don't show that link on any live page we checked.
+**Flagged, out of scope:** nothing at the moment. The "BACK TO WORK" link on the case studies was fixed under #3.
 
 ---
 
 ## P0: Critical
 
 ### #1 Real 404 page
-> **Done in code (1 Oct 2026).** The redirect is removed from `404.php`, which now renders the existing "Oops!" page (`_error-page.scss`) with a 404 status. A search of the theme found no other redirect (no `wp_redirect`, `template_redirect`, JS or `.htaccess`). The live headers show nothing at Cloudflare or server level either. **Still to do before deploying:** steps 1–2 below.
+> **Done in code (1 Oct 2026).** The redirect is removed from `404.php`, which now renders the existing "Oops!" page (`_error-page.scss`) with a 404 status. A search of the theme found no other redirect (no `wp_redirect`, `template_redirect`, JS or `.htaccess`). The live headers show nothing at Cloudflare or server level either. **Confirmed live on 1 Oct:** a non-matching URL now returns 404. **Still to do:** steps 1–2 below, using the 301 Redirects plugin.
 
 - **What changed:** the `header()` / `exit()` redirect is gone. `404.php` renders the "Oops!" page that was already built below it: `main.error-page`, styled in `_error-page.scss`, with an `h1`, an `h2` and a homepage link. The site header and footer navigation are on the page too.
 - WordPress sets the 404 status before the template loads, and Yoast adds noindex.
@@ -96,28 +96,99 @@ The site runs on the new templates: `header-new.php`, `components/`, `library/fu
 - **Expected after deploy:** WordPress core may still 301 a mistyped URL when it can guess the intended page from the slug (`redirect_guess_404_permalink`). That's normal. Browsers that cached one of the old permanent redirects keep following it until their cache clears; Google will see the 404s on its next crawl.
 - **Before deploying:**
   1. Export the "Not found (404)" and "Page with redirect" URLs from Search Console, plus server and Cloudflare 404 logs.
-  2. For every URL with backlinks or traffic, add a 301 to the closest live page, using Yoast Premium redirects or the Redirection plugin.
-  3. ~~Review CMS redirect rules that target the homepage.~~ Checked 1 Oct: there are none. Every homepage redirect, `/service/build/security/` and `?page_id=50` included, came from `404.php`. The responses carry WordPress's 404 no-cache headers (`Expires: Wed, 11 Jan 1984`). The CMS rules (`/works/`, `/service/…`, root service slugs) each go to a specific page.
-- **Sequencing with #2:** once this is live, an unpublished page returns 404, so add the duplicate pages' 301s before unpublishing them.
+  2. For every URL with backlinks or traffic, add a 301 to the closest live page, using the 301 Redirects plugin that's already installed.
+  3. ~~Review CMS redirect rules that target the homepage.~~ Checked 1 Oct: there are none. Every homepage redirect, `/service/build/security/` and `?page_id=50` included, came from `404.php`. The responses carry WordPress's 404 no-cache headers (`Expires: Wed, 11 Jan 1984`). Of the other redirects, some may be rules in the 301 Redirects plugin (it has no REST routes, which is why it was missed at first). Others are WordPress core guessing the target (`redirect_guess_404_permalink`): made-up partial slugs redirect too, e.g. `/shopify-agenc/` → `/services/shopify-agency/`. Make a guess explicit in the plugin if it matters. `/works/` was a plugin rule; see #3.
+- **Solid Security 404 detection (found 1 Oct).** Now that missing URLs return real 404s, Solid Security (iThemes) counts them and locks out any IP that hits too many in a short time. It returned a 403 "Your access to this site has been temporarily denied" on every PHP page, wp-login included, after our redirect audit hit about 20 404s from the office IP (151.83.242.197). Before the fix, 404s redirected and never counted.
+  - **Risk:** the same lockout can hit Googlebot or real visitors following several old links.
+  - **Action:** in Solid Security, turn off 404 Detection (Cloudflare already filters bots) or raise its threshold a lot. Add the office IP to Authorized IPs. Check that proxy detection reads Cloudflare's `CF-Connecting-IP`; otherwise a lockout can land on a Cloudflare edge IP and block everyone behind it.
+- **Old rules in the 301 Redirects plugin (found 1 Oct).** Many rules date from before the rebuild and pick their target **by page ID**. When that page was unpublished in the rebuild, the rule fell back to `?page_id=N` and now ends on the 404 page. Example: `/service/create/web-design/` (about 2,900 hits) → `?page_id=6877` → 404.
+  - **Spotting rules from outside:** plugin rules send no `x-redirect-by` header. WordPress's own guesses send `x-redirect-by: WordPress`.
+  - **Fix:** don't delete rules that still get hits. Repoint each one at the new page, **typed as a URL**, so the next rebuild can't break it again.
+  - **Old page IDs referenced in the legacy theme, checked live on 1 Oct:**
 
-### #2 Duplicate and orphaned pages (CMS) — new
-When the old "service" parent page (ID 10) was trashed, its child pages stayed published, under a renamed `service__trashed` slug. Two "-new" copies of sector pages were also published.
+    | Old ID | Old page | Now | Repoint rules to |
+    |---|---|---|---|
+    | 10 | Services (old parent) | 404 | `/services/` |
+    | 16 | About | 404 | `/about/` |
+    | 21 | Build (old parent) | not public | `/services/build/` |
+    | 50 | Work | 404 | `/work/` |
+    | 5321 | "Work with us" | 404 | `/careers/` |
+    | 6801 | Create | 404 | `/services/create/` |
+    | 6821 | Grow | 404 | `/services/growth/` |
+    | 6828 | Brand & Creative | 404 | `/services/create/` (or `/services/brand-identity/`) |
+    | 6833 | UX & UI | 404 | `/services/ux-ui-design/` |
+    | 6877 | Web Design | 404 | `/services/web-design-agency/` |
+    | 6892 | Ecommerce (the `__trashed` duplicate, #2) | live, to be removed | `/services/ecommerce-web-agency/` |
+    | 6929 | SEO Services & AI Search | 404 | `/services/seo-agency/` |
+    | 6940 | Email Marketing | 404 | `/services/email-marketing/` |
+    | 6949 | Paid Media Ads | 404 | `/services/paid-advertising/` |
+    | 7020 | WooCommerce Agency | 404 | `/services/woocommerce-agency/` |
+    | 7042 | Shopify Agency | 404 | `/services/shopify-agency/` |
+    | 7634 | Social Media Marketing | not public | `/services/social-media-marketing/` |
+    | 14, 1355, 1361 | Insights, Brief, Agency Life | live | Fine; retype as URLs when convenient |
+  - **Other rules:** export the full rule list (source, target, hits) and test every source live. Keep rules that land on a 200 in one hop. Retarget chains and homepage targets. Delete any rule whose source is now a live page, because the plugin runs before WordPress and would hide that page.
+  - **Rule audit, 1 Oct (after repointing):** all 36 active rules 301 once to a live, indexable page that is its own canonical. None fall back to `?page_id=`. Still to do in the plugin:
+    - Turn on rules 1 and 2 (`/service/build/woocommerce-agency/`, `/service/build/shopify-agency/`). Both are OFF, and their URLs now return 404.
+    - Delete duplicate rules 16, 17 and 42–48. Each has the same source and target as an older rule.
+    - `/service/create/` has no rule. WordPress's slug guess currently sends it to `/services/create/`.
+  - The rules target page IDs again, so they follow slug changes. If a page is ever rebuilt as a new page, though, its rules fall back to `?page_id=` again. Re-check this list after any rebuild.
+- **Sequencing with #2:** now that this is live, an unpublished page returns 404. Add the duplicate pages' 301s in the 301 Redirects plugin before unpublishing them.
 
-| Live URL | Duplicates | 301 to |
-|---|---|---|
-| `/service__trashed/ecommerce/` (page 6892, legacy subservice template; H1 "London Ecommerce Agency") | `/services/ecommerce-web-agency/`, which has the same H1 | `/services/ecommerce-web-agency/` |
-| `/retail-ecommerce-new/` (title "Retail Ecommerce NEW") | `/sectors/retail-ecommerce/`, which has the same H1 | `/sectors/retail-ecommerce/` |
-| `/healthcare-wellness-new/` | `/sectors/healthcare-wellness/`, which has the same H1 | `/sectors/healthcare-wellness/` |
-| `/service__trashed/build__trashed/security/` ("Security") | Nothing; it's an orphan | Closest live page, probably `/services/build/` (decide in the meeting) |
+### #2 Duplicate and orphaned pages (CMS) — deferred
+> **Deferred** until the footer menu build is finished. Nothing has been changed in the CMS yet. The findings and decisions below are ready for when we pick it up.
 
-1. **Footer menu:** in Appearance → Menus, open the footer menu with the service links. Replace the "Ecommerce" item, which points at page 6892, with the "Ecommerce Web Agency" page (page 15000). Page-type items follow the permalink, so they can't drift again.
-2. **Search Console:** URL-inspect the four URLs to see whether they're indexed and whether they have impressions or links.
-3. **Redirects and unpublishing:** add the 301s above, then move the four pages to draft or trash. They drop out of the sitemap automatically.
-4. **Spot-check:** look for other children of trashed parents in Pages → Trash and in `page-sitemap.xml` (search for `__trashed` and `-new`).
+**Findings (checked 1 Oct 2026):**
+- **Redirect tool: the 301 Redirects plugin is already installed.** It has no REST routes, so the first check missed it. Yoast is the free version, which has no redirect manager.
+- **The "-new" sector pages are rebuilds, not leftovers.**
+  - `/retail-ecommerce-new/` (page 15272) and `/healthcare-wellness-new/` (page 15296) were published on 21 Sep on the Service Inner template, with about 660 words each.
+  - The originals `/sectors/retail-ecommerce/` (8907) and `/sectors/healthcare-wellness/` (8905) still use the legacy subservice template.
+- **`/service__trashed/ecommerce/`** (page 6892, legacy, parent 10 trashed) duplicates `/services/ecommerce-web-agency/` (page 15000), which has the same H1 "London Ecommerce Agency". It's no longer in the footer.
+- **`/service__trashed/build__trashed/security/`** (page 3070, parent 21 trashed) is a 2020 "Website Security" page with no current equivalent.
+- **Only the footer links to these URLs.** A crawl of all 127 sitemap URLs found site-wide links to the two "-new" pages from the footer, and nothing else beyond each page linking to itself.
 
-### #3 `/works/` archive
-- In `library/function-work.php`, add a `template_redirect` hook: when `is_post_type_archive('works_post')` is true, 301 with `wp_safe_redirect()` to `fdry_template_page_url('template-work.php', '/work/')`.
-- In the CMS, find and delete the stale `/works/ → ?page_id=50` rule (Yoast Premium, Redirection or `.htaccess`).
+**Decisions:**
+1. **Redirect tool:** use the 301 Redirects plugin that's already installed. Don't add Redirection. Enter the target as a URL (e.g. `/services/ecommerce-web-agency/`) rather than picking a page, so it can't fall back to `?page_id=` if that page is ever unpublished. The plugin won't add redirects when a slug changes, so add the "-new" → `/sectors/` rules by hand during the swap.
+2. **Sector pages: not ready yet.**
+   - Now: set both "-new" pages to noindex in Yoast (Advanced → "Allow search engines to show this page" → No), which also drops them from the sitemap. Point the footer items back at the `/sectors/` originals.
+   - Later, once they're finished:
+     1. Trash the legacy originals 8907 and 8905. That frees their slugs.
+     2. Give each new page the parent "Sectors" (9015) and the original slug (`retail-ecommerce`, `healthcare-wellness`).
+     3. Add the 301 from each "-new" URL to its `/sectors/` URL in the 301 Redirects plugin.
+     4. Switch Yoast back to index.
+     5. Check the footer: page-type menu items follow the new URL on their own.
+3. **Security page: keep it and rebuild later.**
+   - Now: noindex it in Yoast.
+   - When it's rebuilt under `/services/`: 301 both `/service__trashed/build__trashed/security/` and `/service/build/security/` to the new page.
+4. **Ecommerce duplicate:** in the 301 Redirects plugin, add 301s from `/service__trashed/ecommerce/` and `/service/ecommerce/` to `/services/ecommerce-web-agency/`. Then trash page 6892.
+
+**Verify when done:**
+- `page-sitemap.xml` has no `__trashed` or `-new` URLs.
+- `/service__trashed/ecommerce/` is a single 301 to `/services/ecommerce-web-agency/`.
+- The "-new" and Security pages carry `noindex`.
+- The footer links only to `/sectors/` and `/services/` URLs.
+
+### #3 `/works/` archive and page-50 links
+> **Deployed and checked, 1 Oct 2026.** `/works/`, `/works`, `/?post_type=works_post` and `/works/feed/` each take one 301 to `/work/`. `/work/category/design/` returns 200, and the case studies' "BACK TO WORK" and the category page's "Featured" link go to `/work/` with no `page_id=50`. **Breadcrumb:** Yoast had stored `/works/` in its indexables, so `fdry_works_breadcrumb()` was added. Live, the case studies' BreadcrumbList item 2 is now "Work" → `/work/`. **Plugin:** the `/works` rule is deleted from the 301 Redirects plugin. `/works/` and `/works` now carry `x-redirect-by: FDRY theme`.
+
+**What we found:**
+- Page 50, the old Work page, is unpublished. Every link to it now hits the 404 page, including "BACK TO WORK" on all 150 case studies.
+- Yoast's case-study breadcrumbs listed "Works" → `/works/`.
+- `/?post_type=works_post` rendered the legacy "Works Archive", a duplicate of `/work/`.
+- The `/works` rule isn't in the theme or WordPress core. It matches the path exactly, so it's a stored rule on the server.
+
+**Code (done):**
+- `library/function-work.php`:
+  - `fdry_works_archive_link()` filters `post_type_archive_link` to the Work page, which fixes the breadcrumbs and canonicals.
+  - `fdry_redirect_works_archive()` 301s the works archive (`/works/`, its feed and `?post_type=works_post`) to `/work/` on `template_redirect` priority 1. It skips `/work/category/{slug}/`.
+- `get_the_permalink(50)` → `fdry_template_page_url('template-work.php', '/work/')` in `single.php`, `archive-works-category.php`, `page-templates/typeform.php`, `pageservices.php`, `mainservice.php` (×2) and `parent.php`.
+- **Left for #14:** `archive-works-category.php:7` still prints page 50's content as the intro. Keep page 50 (unpublished) until #14 replaces that.
+
+**CMS:** the `/works` rule lives in the 301 Redirects plugin, now pointing at the Work page. Delete it once the code is live: it stores the target by page ID, which is how it broke when page 50 was unpublished.
+
+**Verify after deploy and deleting the rule:**
+- `/works/`, `/works`, `/?post_type=works_post` and `/works/feed/` each return a single 301 to `/work/`.
+- `/work/category/design/` returns 200.
+- On `/works/nuyu/`, the breadcrumb item 2 is `/work/`, and the page contains no `page_id=50`.
 
 ### #4 H1 on every new template (tagline stays the H1)
 Reuse the fallback in `centered-content.php` ("A page H1 must never be empty; fall back to the page title").

@@ -171,7 +171,7 @@ $pageID = $post->ID;
 				</div><!-- work-grid -->
 
 			</section><!-- section -->
-			<div class="pic"> 	<a href="<?php echo get_the_permalink(50); ?>"><div class="button"><span>MORE WORK</span></div> 	</a></div>
+			<div class="pic"> 	<a href="<?php echo esc_url(fdry_template_page_url('template-work.php', '/work/')); ?>"><div class="button"><span>MORE WORK</span></div> 	</a></div>
 		</div>
 
 
@@ -293,7 +293,7 @@ $pageID = $post->ID;
 				</div><!-- work-grid -->
 
 			</section><!-- section -->
-			<div class="pic"> 	<a href="<?php echo get_the_permalink(50); ?>"><div class="button"><span>MORE WORK</span></div> 	</a></div>
+			<div class="pic"> 	<a href="<?php echo esc_url(fdry_template_page_url('template-work.php', '/work/')); ?>"><div class="button"><span>MORE WORK</span></div> 	</a></div>
 		</div>
 
 <div class="extrahelpbanner creatyveagency we-help hidden-animate">
