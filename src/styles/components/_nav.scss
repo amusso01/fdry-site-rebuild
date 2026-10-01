@@ -177,6 +177,10 @@ body.page-template-template-home-php {
 		min-height: 0;
 	}
 
+	&__desktop {
+		height: 100%;
+	}
+
 	&__layout {
 		display: grid;
 		grid-template-columns: minmax(240px, 1fr) minmax(0, 2fr);
