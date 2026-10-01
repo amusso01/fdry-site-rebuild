@@ -30,8 +30,7 @@ $has_bg  = file_exists(get_template_directory() . $bg_path);
     </div>
 
     <a class="footer-brief__button" href="<?php echo esc_url(site_url('/brief-1/')); ?>" data-fade-up data-fade-up-delay="0.3">
-      <span aria-hidden="true"><?php esc_html_e('Start', 'foundry'); ?></span>
-      <span class="footer-brief__button-label"><?php esc_html_e('Start your brief', 'foundry'); ?></span>
+      <?php esc_html_e('Start your brief', 'foundry'); ?>
     </a>
   </div>
 </section>

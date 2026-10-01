@@ -231,7 +231,7 @@ The "Let's talk / Send your brief / START" band is [`components/footer/brief.php
 - **Layout.** Text on the left and the START circle on the right, `space-between`, stacking below `phone`. Vertical padding is 80 / 64 / 48px (desktop / below `tablet` / below `phone`).
 - **Side padding.** `content-block content-block--footer` in [`_helper.scss`](src/styles/common/_helper.scss) gives 90px on desktop, 32px below `tablet` and 25px below `phone`. Use it for the other footer sections too.
 - **Background.** A static image, `img/footer/brief-bg.jpg` (2880×720, committed). Keep it under about 300 KB: it's a grainy gradient, so export it as a progressive JPG at around quality 75, which keeps the grain (the current file is mozjpeg q75, 266 KB). It's a lazy `<img>` with `object-fit: cover`. It only renders if the file exists, so without it the band shows `$color__footerBg`.
-- **START.** A `$color__btn-yellow` circle linking to `/brief-1/`, with a box-shadow pulse (`footer-brief-pulse`) that stops on hover and focus and under reduced motion. It has no `id`. Target `.footer-brief__button`, not the old `#box`. Visible label is “Start”; `.footer-brief__button-label` adds clipped “Start your brief” for SEO and screen readers.
+- **START.** A `$color__btn-yellow` circle linking to `/brief-1/`, with a box-shadow pulse (`footer-brief-pulse`) that stops on hover and focus and under reduced motion. It has no `id`. Target `.footer-brief__button`, not the old `#box`. Link text is “Start your brief” (uppercase in the UI) so Lighthouse’s link-text audit sees descriptive `innerText`.
 - **Motion.** Each element has `data-fade-up` with a 0.1s stagger (see **Fade up / fade down**).
 
 ## Site footer
