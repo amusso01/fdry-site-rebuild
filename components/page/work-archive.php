@@ -44,7 +44,7 @@ $has_more   = $query->max_num_pages > 1;
 	<div class="content-block">
 		<div class="content-max">
 			<div class="work-archive__intro">
-				<p class="work-archive__tagline" data-fade-up><?= esc_html($tagline); ?></p>
+				<h1 class="work-archive__tagline" data-fade-up><?= esc_html($tagline); ?></h1>
 
 				<?php if ($content !== '') : ?>
 					<div class="work-archive__content" data-fade-up data-fade-up-delay="0.2">

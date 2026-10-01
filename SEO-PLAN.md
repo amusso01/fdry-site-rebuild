@@ -52,8 +52,8 @@ The site runs on the new templates: `header-new.php`, `components/`, `library/fu
 | 1 | **P0** | Every 404 returned a **301 to the homepage** (`404.php`). This caused soft-404s, hid broken URLs, and passed missing URLs' equity nowhere. | Code + CMS | M | **Code done 1 Oct**; pre-deploy redirect export pending |
 | 2 | **P0** | **Duplicate and orphaned pages are live and in the sitemap**, two of them linked from the footer. | CMS | S | **Deferred** until the footer menu build is done |
 | 3 | **P0** | `/works/` → 301 `?page_id=50` → 404, plus every link to the unpublished old Work page (ID 50), including "BACK TO WORK" on 150 case studies and the Yoast breadcrumbs. | Code + CMS | S | **Done 1 Oct** (live, checked) |
-| 4 | **P0** | **Missing H1** on `/work/` (the tagline is a `<p>`) and `/sectors/`. The Service and Service Child templates only get an H1 if an editor picks it (the ACF default is h2). | Code | S | Open |
-| 5 | **P0** | **Titles**: every page except Home ends in the 50-character slogan "Ecommerce Web Design \| WooCommerce and Shopify Agency", and the brand never appears. For example, a blog post title runs to 113 characters. | CMS | S | Partly done (Home) |
+| 4 | **P0** | **Missing H1** on `/work/` (the tagline is a `<p>`) and `/sectors/`. The Service and Service Child templates only get an H1 if an editor picks it (the ACF default is h2). | Code + CMS | S | **Done 1 Oct** (live, checked) |
+| 5 | **P0** | **Titles**: every page except Home ends in the 50-character slogan "Ecommerce Web Design \| WooCommerce and Shopify Agency", and the brand never appears. For example, a blog post title runs to 113 characters. | CMS | S | Partly done (Home); fix is the WP Site Title |
 | 6 | **P1** | Mobile nav accordion prints **three `<h2>`s before the H1** on every page (`navigation/mobile.php:74`). | Code | S | Open |
 | 7 | **P1** | **No og:image** on Home, About, Contact, Work, Services, service pages and Insights. ACF-only pages have no content or featured image for Yoast to use. | Code + CMS | S | Open |
 | 8 | **P1** | The nav overlay embeds **3 × ~2.9 MB webm with `src` + `autoplay`** on every page (`navigation/secondary.php`). | Code | S | Open |
@@ -191,6 +191,11 @@ The site runs on the new templates: `header-new.php`, `components/`, `library/fu
 - On `/works/nuyu/`, the breadcrumb item 2 is `/work/`, and the page contains no `page_id=50`.
 
 ### #4 H1 on every new template (tagline stays the H1)
+> **Status, 1 Oct.** A sitemap scan (41 pages) found only `/work/` and `/sectors/` without an H1. Every other page has exactly one.
+> - **Work: done, live.** In `work-archive.php` the tagline is now an `<h1>`, with `color: inherit` added in `_work-archive.scss` so it looks the same. The New Work group has no tag field, so this couldn't be set in the CMS. The H1 text is the ACF "Tagline" (currently "WORK").
+> - **Sectors: done, live.** The first section's "Tagline tag" is set to H1 in the CMS, so the H1 is "Sectors".
+> - **Not done (optional hardening):** the template and ACF changes below. They would stop an editor from removing an H1 by accident, but every page is correct today.
+
 Reuse the fallback in `centered-content.php` ("A page H1 must never be empty; fall back to the page title").
 - **Service templates:** in `template-service.php` and `template-service-child.php`, pass `'tagline_tag' => 'h1'` to the first `centered-content`. `template-about.php` and `template-service-inner.php` already do this.
 - **Homepage:** in `front-page.php` and `template-home.php`, pass `'tagline_tag' => 'h1'` to `intro-content`, and add the empty-H1 fallback to `intro-content.php`.
@@ -199,12 +204,20 @@ Reuse the fallback in `centered-content.php` ("A page H1 must never be empty; fa
   - Remove `h1` from the `choices` of every non-first `*_tagline_tag`: `two_column_tagline_tag` and `two_column_2_tagline_tag` in `group_6a969320685b0.json` and `group_6aa2aa6f622e4.json`, and `centered_dark_tagline_tag` in `group_6aa185527a283.json`.
   - Delete the now-overridden first-section `intro_tagline_tag` and `centered_tagline_tag` fields.
 
-### #5 Titles and brand (Yoast, no code) — partly done
+### #5 Titles and brand (CMS, no code) — partly done
+**Where the slogan comes from (checked 1 Oct).** The suffix is Yoast's `%%sitename%%`, which reads the **WordPress Site Title** (Settings → General), not Yoast's "Website name". The Site Title is "Ecommerce Web Design | WooCommerce and Shopify Agency". The same value shows up in `og:site_name` and in the header's `apple-mobile-web-app-title`. Yoast's "Website name" is a separate setting ("Ecommerce Web Design | Digital Marketing Agency"). It only feeds the WebSite schema, which Google uses for the site name shown above results. The earlier note here said that setting fixed the suffix; it doesn't.
+
 - **Done:** the homepage custom title.
-- **To do:**
-  - Set Yoast → Settings → Site basics → "Website name" to `FDRY`, the alternate name to `Foundry Digital`, and the separator to `|`. This fixes every other page's suffix in one go.
-  - Write custom titles of 60 characters or fewer for the top service pages, e.g. "Shopify Agency London | FDRY".
-  - Check that post titles fit once the suffix is short.
+- **To do (CMS):**
+  1. **Settings → General → Site Title:** `FDRY`. This fixes every title suffix, `og:site_name` and the logo `alt` at once. Side effect: emails that use the site title (WordPress notifications, Contact Form 7's `[_site_title]`) will show "FDRY" in the subject.
+  2. **Yoast → Settings → Site basics:** Website name `FDRY`, alternate name `Foundry Digital`, title separator `|` (to match the homepage).
+  3. **Yoast → Settings → Content types (Pages, Posts, Case studies) and Categories:** confirm the SEO title template is `%%title%% %%page%% %%sep%% %%sitename%%` and has no typed slogan.
+  4. **Custom SEO titles for pages that read badly with the new suffix:**
+     - About: "About FDRY | FDRY" → e.g. "About Us | FDRY".
+     - Insights: "INSIGHTS | FDRY" → "Insights | FDRY".
+     - The post "Boost Your Sales for Free: Discover FDRY's Powerful Lead Generation Tool": its custom title adds `%%sitename%%` with no separator.
+  5. **Optional:** about 20 of 86 posts are still over 60 characters with "| FDRY". The longest is 101 ("Black Friday 2024 meets Green Friday…"). Shorten their SEO titles (not the H1) where it matters, starting with posts that get traffic.
+- **Then:** write custom titles of 60 characters or fewer for the top service pages, e.g. "Shopify Agency London | FDRY".
 
 ## P1: High
 
