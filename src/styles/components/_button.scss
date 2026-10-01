@@ -11,7 +11,7 @@
 		padding: 12px 20px;
 	}
 
-	a {
+	:is(a, button) {
 		display: inline-flex;
 		align-items: center;
 		gap: 0.5rem;
@@ -25,6 +25,10 @@
 			font-size: 14px;
 			line-height: 18px;
 		}
+	}
+
+	button {
+		cursor: pointer;
 	}
 
 	svg {
@@ -60,7 +64,7 @@
 		border-color: $color__black;
 		color: $color__text;
 
-		a {
+		:is(a, button) {
 			text-transform: none;
 		}
 	}

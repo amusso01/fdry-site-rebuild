@@ -59,7 +59,7 @@ All **new dev site (2026/27)** logic goes in [`library/function-dev.php`](librar
 | Concern | Function / hook | Notes |
 |---------|-----------------|--------|
 | Block editor palette | `ea_setup()` | `after_setup_theme` |
-| Nav menu locations | `fdry_register_theme_menus()` | `mainmenu`, `footermenu_1`, `footermenu_2` |
+| Nav menu locations | `fdry_register_theme_menus()` | `mainmenu`, `secondarymenu`, `footermenu_1`, `footermenu_2`. Understrap's old `primary` location is no longer registered (removed from `inc/setup.php`). |
 | Vite assets | `fdry_get_vite_assets()`, `fdry_enqueue_assets()` | Reads `dist/.vite/manifest.json` |
 | ACF SVG helper | `acfFile_toSvg()` | Used by components (e.g. marquee logos) |
 
@@ -111,6 +111,9 @@ Legacy assets remain in [`inc/enqueue.php`](inc/enqueue.php) (`understrap-styles
   - **Gutenberg links and images.** These are overridden in `_single-insight.scss`. Links use the `wysiwyg-link` mixin (underlined, fading to grey), which beats the purple `theme.css` link. Images get 4px corners and a 20px top margin. The margin needs `!important` to beat `mainstyle.css`'s `.aligncenter img` margin.
   - **Links.** The Insights and Work links come from `fdry_template_page_url()` in `function-dev.php`, not from hard-coded page IDs.
   - **Rollback.** The old partial is still at [`content-single-insight.php`](loop-templates/content-single-insight.php). To roll back, point the include in `single.php` back at it.
+- **404.** [`404.php`](404.php) still sends a 301 to the homepage and exits before any markup, so the page never renders yet. To show it, remove the two `header()` calls and the `exit()` at the top.
+  - **Markup.** Below the redirect it's `main.error-page > .content-block > .content-max`, holding the "Oops!" `h1`, the `h2` and the homepage link. Each one fades up, 0.1 s apart.
+  - **Styles.** They're in [`_error-page.scss`](src/styles/templates/_error-page.scss). The class names avoid the old `#error-404-wrapper` / `.overlay-404`, which `theme.css` still styles with a background photo and white text.
 - **Single job.** [`single-job.php`](single-job.php) (the `job` CPT) is unchanged and still renders `content-page.php`. Its Gutenberg content gets the WYSIWYG styling from CSS alone, in [`_single-job.scss`](src/styles/templates/_single-job.scss). The selector is `.single-job .entry-content`, which uses the body class WordPress adds for the CPT.
   - It gets list bullets back (the reset strips them from `ul.wp-block-list`), block spacing, heading sizes and underlined links.
   - `p + p` is 15px.
@@ -229,14 +232,25 @@ The "Let's talk / Send your brief / START" band is [`components/footer/brief.php
 
 ## Site footer
 
-The contact block, menus, logo, social and legal links and the copyright bar are [`components/footer/site-footer.php`](components/footer/site-footer.php). `footer.php` includes it on every page, after the brief. The styles are in [`_site-footer.scss`](src/styles/components/_site-footer.scss). The mobile accordion uses [`_footer-accordion.scss`](src/styles/components/_footer-accordion.scss) and [`footerAccordion.js`](src/scripts/part/footerAccordion.js).
+The contact block, menus, logo, social and legal links and the copyright bar are [`components/footer/site-footer.php`](components/footer/site-footer.php). `footer.php` includes it on every page, after the brief. The styles are in [`_site-footer.scss`](src/styles/components/_site-footer.scss).
 
-- **Content.** The menus and contact details are arrays at the top of the component. Each one renders twice: as four columns from 768px, and inside the accordion below that. Change a link once, in the array.
+- **Layout.** One row. On the left: "Come & say hello", the address and two buttons. On the right, three columns: the contact details, then **Footer menu 1**, then **Footer menu 2**. When the row runs out of room (roughly below 1100px), the right-hand columns wrap under the contact block.
+  - **Mobile.** Below 768px everything stacks: the contact block, then the contact details, then the two menus side by side. There is no accordion.
+- **Column widths.** The contact details column is 190px, so the address breaks after "Palace" as in the design. Each menu column is at least 84px. The gap between columns is 64px.
+- **Type.** Title 34/36px, weight 500. Address 20px, weight 400. Contact details and menu links 16px, weight 500, `line-height: normal`, 12px apart. The menu type is on the `ul`, not the links, so each `li` gets a 16px line box.
+- **Menus.** Both menus are WordPress menus, assigned in Appearance → Menus to the `footermenu_1` and `footermenu_2` locations. They are printed with `wp_nav_menu()` (one level, no fallback). Each sits in its own `<nav>`, labelled with the menu's name. A location with no menu assigned prints nothing.
+- **Contact details.** The email, phone and address are the `$contact` array at the top of the component. The address prints both under the title and in the contact details column.
+- **Buttons.** Both use the BTN partial, [`components/partials/button.php`](components/partials/button.php): "Book an appointment" is `white` and "Join our newsletter" is `transparent`.
+  - **Partial args.** The partial takes a `tag` arg (`'a'` or `'button'`) and a `class` arg for an extra class on the inner element.
+  - **Footer overrides.** The footer drops BTN's uppercase and turns the transparent variant white.
+  - **Focus ring.** A focused button shows a ring on the `.btn`, because `theme.css` strips focus outlines.
+- **Newsletter.** "Join our newsletter" renders as `<button class="site-footer__newsletter">`. [`newsletterForm.js`](src/scripts/part/newsletterForm.js) finds it by that **class** and opens Klaviyo form `RdsGcP`. Keep the class if the button changes. The old `#fdryklaviyo-open-btn` id and `.fdryklaviyo-open-button` class are gone.
 - **Breakpoint.** 768px (`media('<768px')`), the old Tailwind `md:`. Side padding is `content-block content-block--footer`.
 - **Wrapper.** A `div` with `role="contentinfo"`, not a `<footer>`, because `mainstyle/linktree.css` hides every `<footer>` on the linktree template.
 - **Spacing from legacy CSS.** The contact row's desktop padding (55px / 58px) used to come from an old `.mainfooter` rule in `mainstyle.css`. `.site-footer__top` now sets it itself.
-- **Newsletter.** "Join our newsletter" is a `<button class="site-footer__newsletter">`. [`newsletterForm.js`](src/scripts/part/newsletterForm.js) uses it to open Klaviyo form `RdsGcP`. The old `#fdryklaviyo-open-btn` id and `.fdryklaviyo-open-button` class are gone.
-- **Rollback.** [`legacy-footer.php`](components/footer/legacy-footer.php) holds the old footer verbatim, including the Tailwind runtime and its inline styles. To roll back, point the include in `footer.php` at it. Delete it once the new footer is confirmed.
+- **Rollback.** [`legacy-footer.php`](components/footer/legacy-footer.php) holds the old footer verbatim, including the Tailwind runtime and its inline styles. To roll back, point the include in `footer.php` at it.
+  - **Accordion files.** It still uses the mobile accordion, so [`_footer-accordion.scss`](src/styles/components/_footer-accordion.scss) and [`footerAccordion.js`](src/scripts/part/footerAccordion.js) stay for now, although the new footer no longer uses them.
+  - **Cleanup.** Once the new footer is confirmed, delete all three.
 
 ## Tailwind (removed)
 

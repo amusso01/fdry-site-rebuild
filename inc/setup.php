@@ -44,11 +44,6 @@ if ( ! function_exists ( 'understrap_setup' ) ) {
 		 */
 		add_theme_support( 'title-tag' );
 
-		// This theme uses wp_nav_menu() in one location.
-		register_nav_menus( array(
-			'primary' => __( 'Primary Menu', 'understrap' ),
-		) );
-
 		/*
 		 * Switch default core markup for search form, comment form, and comments
 		 * to output valid HTML5.
