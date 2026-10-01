@@ -14,12 +14,9 @@ if (! defined('ABSPATH')) {
 	exit; // Exit if accessed directly.
 }
 
-
-// For now every 404 redirects to the homepage, so the markup below never renders.
-header("HTTP/1.1 301 Moved Permanently");
-header("Location: " . get_bloginfo('url'));
-exit();
-
+// WordPress has already set the 404 status, and Yoast adds noindex. Missing
+// URLs used to 301 to the homepage here, which Google treats as soft 404s.
+// Send pages that moved to their new address with a redirect rule instead.
 
 get_header('new');
 ?>
