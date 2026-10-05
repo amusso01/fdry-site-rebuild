@@ -47,11 +47,8 @@ if ($cards === array()) {
 									class="work-parallax__image"
 									src="<?= esc_url($card['image_url']); ?>"
 									alt="<?= esc_attr($card['image_alt'] !== '' ? $card['image_alt'] : $card['title']); ?>"
-									loading="eager"
+									loading="lazy"
 									decoding="async"
-									<?php if ($index === 0) : ?>
-										fetchpriority="high"
-									<?php endif; ?>
 									<?php if ($card['image_width'] > 0) : ?>
 										width="<?= esc_attr((string) $card['image_width']); ?>"
 									<?php endif; ?>

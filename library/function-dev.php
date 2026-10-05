@@ -973,37 +973,8 @@ function fdry_get_work_parallax_cards(int $post_id): array
 	return $cards;
 }
 
-/**
- * Preload work parallax card images on the homepage template.
- */
-function fdry_preload_work_parallax_images(): void
-{
-	if (! is_singular('page') || get_page_template_slug() !== 'template-home.php') {
-		return;
-	}
-
-	$post_id = (int) get_queried_object_id();
-	$cards   = fdry_get_work_parallax_cards($post_id);
-
-	if ($cards === array()) {
-		return;
-	}
-
-	foreach ($cards as $index => $card) {
-		if ($card['image_url'] === '') {
-			continue;
-		}
-
-		$fetchpriority = $index === 0 ? ' fetchpriority="high"' : '';
-
-		printf(
-			'<link rel="preload" as="image" href="%1$s"%2$s />' . "\n",
-			esc_url($card['image_url']),
-			$fetchpriority
-		);
-	}
-}
-add_action('wp_head', 'fdry_preload_work_parallax_images', 1);
+// The work parallax cards are not preloaded: they sit below the hero, and the
+// preloads competed with the hero poster, fonts and JS (SEO-PLAN.md #9).
 
 /**
  * Return SVG markup from an ACF file field (URL or path).

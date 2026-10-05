@@ -10,6 +10,8 @@
  * @param array $args {
  *     Optional. Pass to override ACF values on any page.
  *
+ *     @type string       $prefix        ACF field name prefix. Default banner.
+ *     @type string       $appearance    Visual variant: default or spaced (own padded white band). Default default.
  *     @type array|string $desktop_image ACF image array or URL.
  *     @type array|string $mobile_image  ACF image array or URL.
  *     @type int          $post_id       Post ID for ACF fallback. Default queried object.
@@ -26,16 +28,23 @@ if (! isset($args) || ! is_array($args)) {
 
 $post_id = isset($args['post_id']) ? (int) $args['post_id'] : (int) get_queried_object_id();
 
+$prefix = $args['prefix'] ?? 'banner';
+$prefix = is_string($prefix) && $prefix !== '' ? $prefix : 'banner';
+
+$allowed_appearances = array('default', 'spaced');
+$appearance          = $args['appearance'] ?? 'default';
+$appearance          = is_string($appearance) && in_array($appearance, $allowed_appearances, true) ? $appearance : 'default';
+
 $desktop_image = $args['desktop_image'] ?? null;
 
 if ($desktop_image === null && $post_id) {
-	$desktop_image = get_field('banner_desktop_image', $post_id);
+	$desktop_image = get_field($prefix . '_desktop_image', $post_id);
 }
 
 $mobile_image = $args['mobile_image'] ?? null;
 
 if ($mobile_image === null && $post_id) {
-	$mobile_image = get_field('banner_mobile_image', $post_id);
+	$mobile_image = get_field($prefix . '_mobile_image', $post_id);
 }
 
 $desktop_image = fdry_image_parts($desktop_image);
@@ -50,7 +59,7 @@ $display_image    = $desktop_image;
 $display_alt      = $desktop_image['alt'] !== '' ? $desktop_image['alt'] : $mobile_image['alt'];
 ?>
 
-<section class="inner-image-banner">
+<section class="inner-image-banner<?= $appearance === 'spaced' ? ' inner-image-banner--spaced' : ''; ?>">
 	<div class="content-block">
 		<div class="content-max">
 			<picture class="inner-image-banner__picture" data-fade-up>

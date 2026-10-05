@@ -54,10 +54,10 @@ The site runs on the new templates: `header-new.php`, `components/`, `library/fu
 | 3 | **P0** | `/works/` → 301 `?page_id=50` → 404, plus every link to the unpublished old Work page (ID 50), including "BACK TO WORK" on 150 case studies and the Yoast breadcrumbs. | Code + CMS | S | **Done 1 Oct** (live, checked) |
 | 4 | **P0** | **Missing H1** on `/work/` (the tagline is a `<p>`) and `/sectors/`. The Service and Service Child templates only get an H1 if an editor picks it (the ACF default is h2). | Code + CMS | S | **Done 1 Oct** (live, checked) |
 | 5 | **P1** | **Titles**: every page except Home ends in the 50-character slogan "Ecommerce Web Design \| WooCommerce and Shopify Agency", and the brand never appears. For example, a blog post title runs to 113 characters. | CMS | S | Partly done (Home); fix is the WP Site Title |
-| 6 | **P1** | Mobile nav accordion prints **three `<h2>`s before the H1** on every page (`navigation/mobile.php:74`). | Code | S | **Code done 1 Oct**, deploy pending |
+| 6 | **P1** | Mobile nav accordion prints **three `<h2>`s before the H1** on every page (`navigation/mobile.php:74`). | Code | S | **Done 1 Oct** (live, checked) |
 | 7 | **P1** | **No og:image** on Home, About, Contact, Work, Services, service pages and Insights. ACF-only pages have no content or featured image for Yoast to use. | Code + CMS | S | **Deferred**: default card with the designer |
-| 8 | **P1** | The nav overlay embeds **3 × ~2.9 MB webm with `src` + `autoplay`** on every page (`navigation/secondary.php`). | Code | S | **Code done 1 Oct**, deploy pending |
-| 9 | **P1** | **Homepage LCP contention**: all parallax cards are preloaded, and card 1 gets `fetchpriority="high"` alongside the hero poster. The work-row images are `eager`. | Code | S | Open |
+| 8 | **P1** | The nav overlay embeds **3 × ~2.9 MB webm with `src` + `autoplay`** on every page (`navigation/secondary.php`). | Code | S | **Done 1 Oct** (live, checked) |
+| 9 | **P1** | **Homepage LCP contention**: all parallax cards are preloaded, and card 1 gets `fetchpriority="high"` alongside the hero poster. The work-row images are `eager`. | Code + CMS | S | **Code live 1 Oct**; mobile poster swap (CMS) pending |
 | 10 | **P1** | Contact has **no meta description**. Other new pages are unchecked. | CMS | S | Open |
 | 11 | **P1** | robots.txt blocks `AdsBot` (a Yoast setting) while the Google Ads tag `AW-11543866131` runs. Verify, then turn it off if Ads land on the site. | CMS | S | Open |
 | 12 | **P2** | Organization schema has only name and logo: no address, phone, email or sameAs. | Code + CMS | S | Open |
@@ -224,7 +224,7 @@ Reuse the fallback in `centered-content.php` ("A page H1 must never be empty; fa
 - **Then:** write custom titles of 60 characters or fewer for the top service pages, e.g. "Shopify Agency London | FDRY".
 
 ### #6 Nav headings
-> **Code done (1 Oct).** The header is now a `<div>`, like the footer accordion. Live check before deploy: those three `<h2>`s were the only headings before the H1. accordion-js and `navAccordion.js` select by class, and the styles set the trigger font, size, weight and colour, so it looks the same. No build needed.
+> **Done, live (1 Oct).** On /about/ the H1 is now the first heading. The header is now a `<div>`, like the footer accordion. Live check before deploy: those three `<h2>`s were the only headings before the H1. accordion-js and `navAccordion.js` select by class, and the styles set the trigger font, size, weight and colour, so it looks the same. No build needed.
 
 In `components/navigation/mobile.php:74`, change `<h2 class="ac-header …">` to `<div class="ac-header …">`, matching the footer accordion. Check that `navAccordion.js` and accordion-js select by class, not by tag.
 
@@ -233,6 +233,14 @@ In `components/navigation/mobile.php:74`, change `<h2 class="ac-header …">` to
 > - **Code:** the page's own ACF hero/banner image. Checked live, that covers about 26 of the 34 pages with no image.
 > - **CMS:** a 1200×630 branded card as the Yoast Site image for the rest (Work, Insights, Contact, Careers, Terms, Privacy).
 > - **Not the bare logo:** at about 4:1 it crops badly in share previews.
+>
+> **Case studies:** Yoast uses the featured image as `og:image`. Once it becomes portrait 3:4, share previews (1.91:1) would show only a middle band. Prefer the new parallax image (16:9) for `works_post` when it exists.
+>
+> **Brief for the designer (default share image):**
+> - **Size and format:** 1200×630 px JPG or PNG (not WebP or SVG), sRGB, under 300 KB.
+> - **Placement:** keep the logo and any text in the central 630×630 square, at least 60px from the edges.
+> - **Text:** no smaller than about 40px.
+> - **Background:** not plain white.
 
 - **Code:** in the new `library/function-seo.php` (see "New file" below), hook `wpseo_add_opengraph_images`.
   - It applies to pages that use one of `fdry_acf_only_page_templates()` and have no featured image.
@@ -241,7 +249,7 @@ In `components/navigation/mobile.php:74`, change `<h2 class="ac-header …">` to
 - **CMS:** set Yoast → Site basics → Site image (1200×630) as the last fallback.
 
 ### #8 Nav overlay videos
-> **Code done (1 Oct), deploy pending.**
+> **Done, live (1 Oct).** Live /about/ is now **1.73 MB with no video on load**, desktop and mobile. Opening the menu on desktop loads only the active panel's 0.56 MB, and on mobile nothing.
 > - **Before:** every page downloaded all three menu videos with the menu closed, on desktop and on phones (where they are never shown). That was 6.17 MB of the About page's 8.07 MB (76%), measured in headless Chrome.
 > - **Change:**
 >   - `secondary.php` now ships `data-src` and `preload="none"`, with no `src` or `autoplay`.
@@ -255,10 +263,36 @@ In `components/navigation/mobile.php:74`, change `<h2 class="ac-header …">` to
 > - **Follow-up (optional):** the files are 1080×1080 but show at 280px. 560×560 exports would cut what desktop visitors download when they open the menu. `pnpm encode` has no size option, so ask the designer, or add one to `scripts/encode-video.mjs`.
 
 ### #9 Homepage LCP
-- In `function-dev.php` `fdry_preload_work_parallax_images()`, drop `fetchpriority="high"` from card 1 and stop preloading cards 2 onwards.
-- In `work-parallax.php`, give cards after the first `loading="lazy"`.
-- In `work-row.php`, change `loading="eager"` to `loading="lazy"`. The row is now "contained" on the homepage, but still sits below the fold.
-- Test that the sticky parallax still lines up on cold loads. Per FRONTEND.md, the ScrollTrigger refresh on body-height change should cover late images.
+> **Code live (1 Oct).** Checked live:
+> - The `<head>` has only the hero poster preloads. WP Rocket's `NUYU.jpg` preload is gone.
+> - Parallax and work-row images are `lazy`.
+> - **Mobile, slow 4G, live:**
+>   - The JS bundle finishes at **5.1 s** (was 9.2 s).
+>   - The 1.46 MB PNG poster now takes **16.1 s** (was 31.4 s). With nothing competing it is faster, but still slow until it is swapped.
+>   - Image traffic in the first 35 s is 1.81 MB (was ~5.4 MB), mostly that PNG.
+>
+> **Still to do (CMS):** CMS step 1 below.
+>
+> **Measured before** (live homepage, headless Chrome, slow 4G with 4× CPU):
+> - The mobile hero poster (`hero_poster_mobile`, a **1.46 MB PNG**) took **31.4 s**.
+> - All three parallax cards (1.3 MB) were preloaded, and card 1 was high priority.
+> - Seven eager work-row images (~2.1 MB) loaded at once.
+> - Our JS bundle only finished at 9.2 s.
+> - WP Rocket's critical-image detection adds its own high-priority preload of `NUYU.jpg` (parallax card 1) to the cached desktop page.
+>
+> **Change:**
+> - `fdry_preload_work_parallax_images()` is removed.
+> - Parallax images are `lazy`, and card 1 no longer has `fetchpriority`.
+> - Work-row images are `lazy` in stack mode (homepage). Slider mode stays eager, because Swiper clips off-screen slides, which would pop in.
+>
+> **Tested before deploy** (live page with the markup rewritten and a WebP poster):
+> - The JS bundle finishes at 4.6 s.
+> - Image traffic in the first 35 s drops from ~5.4 MB to 0.54 MB.
+> - On a full scroll, all 9 card images load, CLS is 0.0001, and the sticky stack is intact.
+>
+> **CMS steps:**
+> 1. Replace the mobile poster with `build/video/hero-home-poster-mobile.webp` (156 KB, same image), or with a designer's portrait still of 1080×1920 and ≤200 KB.
+> 2. After deploy, clear WP Rocket's priority elements, then the cache, so the `NUYU.jpg` preload goes.
 
 ### #10 / #11 CMS
 - Add a meta description to Contact, and check every new-template page for missing ones.
@@ -305,9 +339,20 @@ Hook `wpseo_schema_graph`.
 In Yoast, turn off "Show in search results" for Tags and Categories.
 
 ### #16 Responsive work images
+> **Image decisions (1 Oct, with the designer):**
+> - **Case study featured image:** becomes a portrait **3:4, 1200×1600** (JPG/WebP, ≤250 KB). It feeds the Work grid and the work rows.
+>   - On phones the Work card is 4:3, so keep the key content in the middle third of the height.
+>   - Keep the bottom third clear for the title overlay.
+> - **Homepage parallax:** will get its own field (to be created). Wide **16:9, 2400×1350**, with the key content central.
+> - **Code needed when the new images arrive:** the Work cards, work rows and parallax all request WordPress's `large` size (max 1024px). Switch them to the full image plus `srcset`/`sizes`, or the new images will look soft on retina screens.
+
+> **Seen 1 Oct:** some work-row thumbnails are PNGs of up to 780 KB at 1024×614 (Aeons, Untitled-design-6, Feature-Image@2x). Converting them to JPG/WebP matters as much as adding srcset.
+
 In `work-row.php`, `work-parallax.php` and `fdry_render_work_card()`, output images with `wp_get_attachment_image()` plus `sizes`, as `insight-archive.php` and `components/single/insight.php` already do. Parallax card 1 stays eager.
 
 ### #17 First-section fade
+> **Measured 1 Oct (homepage).** Chrome ignores the full-viewport hero poster as an LCP candidate, as it does background images. The LCP it reports is text instead: the showreel label, then the CookieYes banner text. That paints only once JS and fonts arrive, so the fade and the cookie banner script decide the homepage LCP.
+
 Run Lighthouse on About, Services, Contact and Work. If the LCP element is the fading tagline or title, remove the delay or the fade itself for `is_first` sections. The work archive intro now fades too, with delays of 0–0.6 s.
 
 ### #18 WP Rocket (CMS)

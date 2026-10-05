@@ -27,6 +27,10 @@ get_header('new');
   get_template_part('components/page/image-banner');
   get_template_part('components/page/two-column-list');
   get_template_part('components/page/image-text-alternate');
+  get_template_part('components/page/image-banner', null, array(
+    'prefix'     => 'banner_2',
+    'appearance' => 'spaced',
+  ));
   get_template_part('components/page/two-column-list', null, array(
     'prefix'     => 'two_column_gray',
     'appearance' => 'gray',

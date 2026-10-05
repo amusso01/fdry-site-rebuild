@@ -1,6 +1,19 @@
+@use '../common/variables' as *;
+@use '../common/media' as *;
+
 .inner-image-banner {
 	margin: 0 0 32px;
 	padding: 0;
+
+	&--spaced {
+		margin: 0;
+		padding-block: 40px;
+		background-color: $color__white;
+
+		@include media('>=tablet') {
+			padding-block: 72px;
+		}
+	}
 
 	&__picture {
 		display: block;

@@ -141,7 +141,8 @@ if ($cards === array()) {
 								class="work-row__image"
 								src="<?= esc_url($card['image_url']); ?>"
 								alt="<?= esc_attr($card['image_alt'] !== '' ? $card['image_alt'] : $card['title']); ?>"
-								loading="eager"
+								<?php // Lazy in stack mode (homepage, below the fold). Swiper clips off-screen slides, so lazy images there would pop in mid-drag. ?>
+								loading="<?= $enable_slider ? 'eager' : 'lazy'; ?>"
 								decoding="async"
 								<?php if ($card['image_width'] > 0) : ?>
 									width="<?= esc_attr((string) $card['image_width']); ?>"
