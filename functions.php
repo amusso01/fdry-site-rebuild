@@ -175,21 +175,6 @@ function create_posttype() {
 // Hooking up our function to theme setup
 add_action( 'init', 'create_posttype' );
 
-// 301 legacy /job/{slug}/ URLs to /careers/{slug}/
-add_action( 'template_redirect', function () {
-    if ( ! is_404() ) {
-        return;
-    }
-    $path = trim( (string) wp_parse_url( wp_unslash( $_SERVER['REQUEST_URI'] ?? '' ), PHP_URL_PATH ), '/' );
-    if ( ! preg_match( '#^job(?:/([^/]+))?$#', $path, $m ) ) {
-        return;
-    }
-    $job = ! empty( $m[1] ) ? get_page_by_path( $m[1], OBJECT, 'job' ) : null;
-    $url = ( $job && 'publish' === $job->post_status ) ? get_permalink( $job ) : home_url( '/careers/' );
-    wp_safe_redirect( $url, 301 );
-    exit;
-}, 1 );
-
 
 
 //Endpoint works
@@ -399,3 +384,4 @@ function my_load_more_posts_handler() {
 // NEW DEV SITE 2026/27 logic
 require_once get_template_directory() . '/library/function-dev.php';
 require_once get_template_directory() . '/library/function-work.php';
+require_once get_template_directory() . '/library/function-redirect.php';

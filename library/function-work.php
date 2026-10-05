@@ -293,42 +293,6 @@ function fdry_localize_work_archive(): void
 add_action('wp_enqueue_scripts', 'fdry_localize_work_archive', 12);
 
 /**
- * Send old Work URLs to their /works/ equivalents.
- *
- * The Work page moved from /work/ to /works/, and works_post has no archive
- * (see functions.php), so /works/ is the page. /work/, /work/category/{slug}/
- * and the old archive feed /works/feed/ now 404. ?post_type=works_post still
- * lists every case study, a duplicate of the Works page; requests with a
- * category_name are /works/category/{slug}/ and must keep rendering.
- * Priority 1 runs before redirect_canonical's 404 guess, so there is a
- * single 301.
- */
-function fdry_redirect_legacy_work_urls(): void
-{
-	$url = '';
-
-	if (is_404()) {
-		$path = trim((string) wp_parse_url(wp_unslash($_SERVER['REQUEST_URI'] ?? ''), PHP_URL_PATH), '/');
-
-		if (preg_match('#^work/category/([^/]+)$#', $path, $matches)) {
-			$url = home_url('/works/category/' . $matches[1] . '/');
-		} elseif ($path === 'work' || $path === 'works/feed') {
-			$url = fdry_template_page_url('template-work.php', '/works/');
-		}
-	} elseif (get_query_var('post_type') === 'works_post' && ! is_singular() && get_query_var('category_name') === '') {
-		$url = fdry_template_page_url('template-work.php', '/works/');
-	}
-
-	if ($url === '') {
-		return;
-	}
-
-	wp_safe_redirect($url, 301, 'FDRY theme');
-	exit;
-}
-add_action('template_redirect', 'fdry_redirect_legacy_work_urls', 1);
-
-/**
  * Put the Works page in the case-study breadcrumb, after Home.
  *
  * works_post has no archive, so Yoast adds no post-type crumb and would go

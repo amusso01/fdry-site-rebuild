@@ -16,7 +16,8 @@ if (! defined('ABSPATH')) {
 
 // WordPress has already set the 404 status, and Yoast adds noindex. Missing
 // URLs used to 301 to the homepage here, which Google treats as soft 404s.
-// Send pages that moved to their new address with a redirect rule instead.
+// Send pages that moved to their new address with a redirect rule instead
+// (the 301 Redirects plugin, or library/function-redirect.php for theme rules).
 
 get_header('new');
 ?>
