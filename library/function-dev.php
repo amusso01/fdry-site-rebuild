@@ -464,6 +464,75 @@ function fdry_template_page_url(string $template, string $fallback_path): string
 	return $url ? (string) $url : home_url($fallback_path);
 }
 
+/** Option value when insight post permalinks use the /insights/ prefix. */
+const FDRY_INSIGHT_PERMALINK_VERSION = '1';
+
+/**
+ * Prefix built-in post permalink structure with /insights/.
+ *
+ * Only affects post_type post (admin label Insights). CPTs use post_type_link.
+ *
+ * @param string $permalink Permalink structure before tag replacement.
+ */
+function fdry_insight_pre_post_link(string $permalink): string
+{
+	$structure = (string) get_option('permalink_structure');
+
+	if ($structure === '' || str_starts_with($structure, '/insights/')) {
+		return $permalink;
+	}
+
+	return '/insights' . $structure;
+}
+add_filter('pre_post_link', 'fdry_insight_pre_post_link');
+
+/**
+ * Duplicate post rewrite rules under insights/ so prefixed URLs resolve.
+ *
+ * Original rules stay so redirect_canonical can 301 legacy /{slug}/ URLs.
+ *
+ * @param array<string, string> $rules Post rewrite rules.
+ * @return array<string, string>
+ */
+function fdry_insight_post_rewrite_rules(array $rules): array
+{
+	$prefixed = array();
+
+	foreach ($rules as $regex => $query) {
+		$prefixed['insights/' . $regex] = $query;
+	}
+
+	return array_merge($prefixed, $rules);
+}
+add_filter('post_rewrite_rules', 'fdry_insight_post_rewrite_rules');
+
+/**
+ * Register insight-specific rewrites and flush once after deploy.
+ */
+function fdry_insight_permalink_init(): void
+{
+	add_rewrite_rule(
+		'^insights/page/([0-9]+)/?$',
+		'index.php?pagename=insights&paged=$matches[1]',
+		'top'
+	);
+}
+add_action('init', 'fdry_insight_permalink_init');
+
+/**
+ * Flush rewrite rules once so /insights/{post-name}/ routes are registered.
+ */
+function fdry_insight_permalink_maybe_flush(): void
+{
+	if (get_option('fdry_insight_permalink_version') === FDRY_INSIGHT_PERMALINK_VERSION) {
+		return;
+	}
+
+	flush_rewrite_rules(false);
+	update_option('fdry_insight_permalink_version', FDRY_INSIGHT_PERMALINK_VERSION, true);
+}
+add_action('init', 'fdry_insight_permalink_maybe_flush', 99);
+
 /**
  * Viewport width at or below which the hero shows a still instead of video.
  *

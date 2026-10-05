@@ -14,19 +14,19 @@
                     <nav class="col-md-12">
                         <ul id="category-menu" class="fadeInUp">
                             <li class="cat-item">
-                                <a href="<?php echo esc_url(fdry_template_page_url('template-work.php', '/work/')); ?>" class="<?php echo (is_category() && get_query_var('cat') == 50) ? 'active' : ''; ?>">Featured</a>
+                                <a href="<?php echo esc_url(fdry_template_page_url('template-work.php', '/works/')); ?>" class="<?php echo (is_category() && get_query_var('cat') == 50) ? 'active' : ''; ?>">Featured</a>
                             </li>
                             <li class="cat-item">
-                                <a href="/work/category/design/" class="<?php echo (is_category('design')) ? 'active' : ''; ?>">Brand &amp; Design</a>
+                                <a href="/works/category/design/" class="<?php echo (is_category('design')) ? 'active' : ''; ?>">Brand &amp; Design</a>
                             </li>
                             <li class="cat-item">
-                                <a href="/work/category/website/" class="<?php echo (is_category('website')) ? 'active' : ''; ?>">Web Development</a>
+                                <a href="/works/category/website/" class="<?php echo (is_category('website')) ? 'active' : ''; ?>">Web Development</a>
                             </li>
                             <li class="cat-item">
-                                <a href="/work/category/ecommerce/" class="<?php echo (is_category('ecommerce')) ? 'active' : ''; ?>">E-commerce Design</a>
+                                <a href="/works/category/ecommerce/" class="<?php echo (is_category('ecommerce')) ? 'active' : ''; ?>">E-commerce Design</a>
                             </li>
                             <li class="cat-item">
-                                <a href="/work/category/growth/" class="<?php echo (is_category('growth')) ? 'active' : ''; ?>">Digital Marketing</a>
+                                <a href="/works/category/growth/" class="<?php echo (is_category('growth')) ? 'active' : ''; ?>">Digital Marketing</a>
                             </li>
                         </ul>
                     </nav><!-- col-md-12 -->

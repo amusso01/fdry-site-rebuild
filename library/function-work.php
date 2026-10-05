@@ -293,62 +293,67 @@ function fdry_localize_work_archive(): void
 add_action('wp_enqueue_scripts', 'fdry_localize_work_archive', 12);
 
 /**
- * The works_post archive (/works/) duplicates the Work page, so its link is
- * the Work page. Yoast's case-study breadcrumbs and canonicals use this link.
+ * Send old Work URLs to their /works/ equivalents.
  *
- * @param string|false $link      Archive link.
- * @param string       $post_type Post type.
- * @return string|false
+ * The Work page moved from /work/ to /works/, and works_post has no archive
+ * (see functions.php), so /works/ is the page. /work/, /work/category/{slug}/
+ * and the old archive feed /works/feed/ now 404. ?post_type=works_post still
+ * lists every case study, a duplicate of the Works page; requests with a
+ * category_name are /works/category/{slug}/ and must keep rendering.
+ * Priority 1 runs before redirect_canonical's 404 guess, so there is a
+ * single 301.
  */
-function fdry_works_archive_link($link, string $post_type)
+function fdry_redirect_legacy_work_urls(): void
 {
-	return $post_type === 'works_post'
-		? fdry_template_page_url('template-work.php', '/work/')
-		: $link;
-}
-add_filter('post_type_archive_link', 'fdry_works_archive_link', 10, 2);
+	$url = '';
 
-/**
- * Send /works/, its feed and ?post_type=works_post to the Work page.
- *
- * /work/category/{slug}/ also queries works_post (the rewrite rule in
- * functions.php) and must keep rendering, so requests with a category_name
- * are left alone. Priority 1 runs before redirect_canonical and Yoast's feed
- * cleanup, so there is a single 301.
- */
-function fdry_redirect_works_archive(): void
-{
-	if (! is_post_type_archive('works_post') || get_query_var('category_name') !== '') {
+	if (is_404()) {
+		$path = trim((string) wp_parse_url(wp_unslash($_SERVER['REQUEST_URI'] ?? ''), PHP_URL_PATH), '/');
+
+		if (preg_match('#^work/category/([^/]+)$#', $path, $matches)) {
+			$url = home_url('/works/category/' . $matches[1] . '/');
+		} elseif ($path === 'work' || $path === 'works/feed') {
+			$url = fdry_template_page_url('template-work.php', '/works/');
+		}
+	} elseif (get_query_var('post_type') === 'works_post' && ! is_singular() && get_query_var('category_name') === '') {
+		$url = fdry_template_page_url('template-work.php', '/works/');
+	}
+
+	if ($url === '') {
 		return;
 	}
 
-	wp_safe_redirect(fdry_template_page_url('template-work.php', '/work/'), 301, 'FDRY theme');
+	wp_safe_redirect($url, 301, 'FDRY theme');
 	exit;
 }
-add_action('template_redirect', 'fdry_redirect_works_archive', 1);
+add_action('template_redirect', 'fdry_redirect_legacy_work_urls', 1);
 
 /**
- * Point the case-study breadcrumb at the Work page.
+ * Put the Works page in the case-study breadcrumb, after Home.
  *
- * Yoast stores each indexable's permalink, so the works_post archive crumb
- * keeps the old /works/ URL even with fdry_works_archive_link() in place.
- * Yoast's BreadcrumbList schema is built from the same crumbs.
+ * works_post has no archive, so Yoast adds no post-type crumb and would go
+ * straight from Home to the case study. Yoast's BreadcrumbList schema is
+ * built from the same crumbs.
  *
  * @param array $crumbs Yoast breadcrumb links.
  */
 function fdry_works_breadcrumb(array $crumbs): array
 {
-	foreach ($crumbs as $i => $crumb) {
-		$path     = untrailingslashit((string) wp_parse_url((string) ($crumb['url'] ?? ''), PHP_URL_PATH));
-		$is_works = ($crumb['ptarchive'] ?? '') === 'works_post' || $path === '/works';
-
-		if (! $is_works) {
-			continue;
-		}
-
-		$crumbs[$i]['url']  = fdry_template_page_url('template-work.php', '/work/');
-		$crumbs[$i]['text'] = __('Work', 'foundry');
+	if (! is_singular('works_post')) {
+		return $crumbs;
 	}
+
+	array_splice(
+		$crumbs,
+		1,
+		0,
+		array(
+			array(
+				'url'  => fdry_template_page_url('template-work.php', '/works/'),
+				'text' => __('Work', 'foundry'),
+			),
+		)
+	);
 
 	return $crumbs;
 }

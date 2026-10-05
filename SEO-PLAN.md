@@ -72,11 +72,12 @@ The site runs on the new templates: `header-new.php`, `components/`, `library/fu
 | 21 | **P3** | One-column template has no guaranteed H1. The Insights and Contact H1s vanish when the tagline is empty. | Code | S | Open |
 | 22 | **P3** | `CollectionPage` schema type for Work and Insights. | Code | S | Open |
 | 23 | **P3** | Housekeeping: the unused `jquery` dependency on `fdry-scripts`, the dead `#loading-animation` script, `<link rel="pingback">`, and the hard-coded `© 2025 FDRY`, which survived the footer rebuild. | Code | S | Open |
-| 24 | **P3** | Load more as a real `/work/page/N/` link. | Code | M | Open |
+| 24 | **P3** | Load more as a real `/works/page/N/` link. | Code | M | Open |
 | 25 | **P3** | Move the Ads tag, Hotjar, Apollo and Meta Pixel into GTM behind CookieYes. The inline pixel plus the plugin probably fire PageView twice. | CMS | M | Open |
 | 26 | **P3** | Yoast extras: "ACF Content Analysis for Yoast SEO" and llms.txt. llms.txt fits the GEO services we sell. | CMS | S | Open |
 | 27 | **P3** | Single Insight images: the URL-only hero fallback and the "Our Work" banner have no width/height, and the banner uses hard-coded absolute PNG URLs. | Code | S | **New** |
 | 28 | **P3** | Cloudflare email obfuscation turns the footer email into a `/cdn-cgi/l/email-protection#…` link, which returns 404 to crawlers. | CMS | S | **New** |
+| 29 | **P2** | **One root for Work:** the page moves from `/work/` to `/works/`, where the case studies already are. | Code + CMS | S | **Code done 5 Oct**; CMS steps pending |
 
 **Resolved since 28 September:** the footer links that redirected. The footer now uses WordPress menus, and all its links return 200 directly.
 
@@ -168,6 +169,8 @@ The site runs on the new templates: `header-new.php`, `components/`, `library/fu
 - The footer links only to `/sectors/` and `/services/` URLs.
 
 ### #3 `/works/` archive and page-50 links
+> **Superseded in part, 5 Oct 2026 (see #29).** The Work page moved to `/works/` and the CPT archive was removed, so `/works/` is now the page and returns 200. `fdry_works_archive_link()` is gone, `fdry_redirect_works_archive()` became `fdry_redirect_legacy_work_urls()`, and the checks below that expect `/work/` now expect `/works/`.
+
 > **Deployed and checked, 1 Oct 2026.** `/works/`, `/works`, `/?post_type=works_post` and `/works/feed/` each take one 301 to `/work/`. `/work/category/design/` returns 200, and the case studies' "BACK TO WORK" and the category page's "Featured" link go to `/work/` with no `page_id=50`. **Breadcrumb:** Yoast had stored `/works/` in its indexables, so `fdry_works_breadcrumb()` was added. Live, the case studies' BreadcrumbList item 2 is now "Work" → `/work/`. **Plugin:** the `/works` rule is deleted from the 301 Redirects plugin. `/works/` and `/works` now carry `x-redirect-by: FDRY theme`.
 
 **What we found:**
@@ -326,10 +329,10 @@ Hook `wpseo_schema_graph`.
 - Set the WebPage node's `mainEntity` to that node.
 
 ### #14 Crawlable work archive
-- **Filters as links:** in `work-archive.php`, render each filter as `<a class="work-archive__filter" href="/work/category/{slug}/" data-category="…">` instead of a `<button>`. "Featured" links to `/work/`.
+- **Filters as links:** in `work-archive.php`, render each filter as `<a class="work-archive__filter" href="/works/category/{slug}/" data-category="…">` instead of a `<button>`. "Featured" links to `/works/`.
 - **JS:** in `workArchive.js`, prevent the default click, keep the current AJAX swap, and `history.pushState` the category URL. Use `aria-current` instead of `aria-pressed`.
 - **Category argument:** `work-archive.php` accepts an optional `category` arg, passes it to `fdry_work_query()` (which already supports slugs), and pre-selects that filter.
-- **Category landing pages:** rebuild `archive-works-category.php`. It is already routed by `functions.php:178-199`, and still links "Featured" to page 50.
+- **Category landing pages:** rebuild `archive-works-category.php`. It is already routed by the `/works/category/{slug}/` rule in `functions.php`.
   1. Move the legacy body to `components/page/legacy-works-category.php` for rollback.
   2. The new body is `get_header('new')`, then `<main>` containing `work-archive` with `category => get_query_var('category_name')`.
   3. The H1 is "{Category name} work".
@@ -371,6 +374,35 @@ In `components/single/insight.php`:
 - **Related links:** before the "Our Work" banner, add two or three related insights (same category, via `get_posts()`) and, where the category maps to one, a link to the matching service page.
 - **Question for the meeting:** several posts date from 2019. Do we show "Published", "Updated", or both?
 
+### #29 One root for Work: `/works/` — new
+> **Code done 5 Oct 2026, not deployed.** The CMS steps below are pending.
+
+The Work page was `/work/` and the case studies `/works/{slug}/`. Now the page is `/works/` too, so the 150 case-study URLs keep their addresses and only the page moves.
+
+**Code:**
+- `functions.php`: `works_post` has `has_archive => false`. An archive adds a `works/?$` rule that WordPress checks before page rules, so it would replace the page. The category rule moved to `^works/category/([^/]+)/?$`.
+- `library/function-work.php`:
+  - `fdry_redirect_legacy_work_urls()` 301s `/work/`, `/work/category/{slug}/` (to `/works/category/{slug}/`), `/works/feed/` and `?post_type=works_post` on `template_redirect` priority 1.
+  - `fdry_works_breadcrumb()` inserts "Work" → `/works/` after Home, because Yoast adds no post-type crumb without an archive.
+  - `fdry_works_archive_link()` is removed. It can't run without an archive.
+- Hard-coded `site_url('/work/')` links in `header.php`, `work-row.php` and `content-home.php` now use `fdry_template_page_url('template-work.php', '/works/')`. The fallback path in every other call is `/works/`, and the legacy category links point to `/works/category/…`.
+- Not changed: the `is_page('work')` checks in `inc/enqueue.php`. After the rename they stop loading the legacy TweenMax, `filterCategory.js` and `my_ajax_object` on the page, none of which the new Work page uses.
+
+**CMS, in this order:**
+1. Check that the slug `works` is free: `wp post list --post_type=any --post_status=any --name=works`. If unpublished page 50 holds it, rename page 50's slug first, or WordPress saves `works-2`. Check that the Work page has no child pages: the case-study rule would catch them.
+2. Deploy the code.
+3. Change the Work page slug to `works`. If Yoast Premium offers a `/work/` redirect, skip it; the theme handles it.
+4. Flush rewrite rules: `wp rewrite flush`, or Settings → Permalinks → Save.
+5. Check the 301 Redirects plugin and the nav menus for `/work` or `/works` rules and links.
+6. Purge WP Rocket and Cloudflare.
+
+**Verify:**
+- `wp rewrite list --match=/works/` → `pagename`, not `post_type=works_post`. `--match=/works/category/design/` → the category rule.
+- `/works/` → 200. Filters and Load more work, and the console has no errors.
+- `/works/nuyu/` → 200. Breadcrumb item 2 is "Work" → `/works/`, in markup and BreadcrumbList schema.
+- `/work/`, `/works/feed/` and `/?post_type=works_post` → a single 301 to `/works/`. `/work/category/design/` → a single 301 to `/works/category/design/`, which returns 200.
+- The nav "WORK", "BACK TO WORK" and "MORE WORK" links go to `/works/` with no redirect hop. `page-sitemap.xml` lists `/works/`.
+
 ## P3: Optional
 
 - **#21 H1 fallbacks:**
@@ -381,7 +413,7 @@ In `components/single/insight.php`:
   - Drop `jquery` from the `fdry-scripts` dependencies in `fdry_enqueue_assets()` (`library/function-dev.php`). `src/` does not use jQuery.
   - In `header-new.php`, remove the `#loading-animation` inline script (the element only exists in `legacy-home.php`) and `<link rel="pingback">`.
   - In `components/footer/site-footer.php:94`, replace `© 2025 FDRY` with `wp_date('Y')`.
-- **#24 Load more as a link:** make "Load more" an `<a href="…/page/2/">` that JS intercepts, and have `work-archive.php` honour `get_query_var('paged')`.
+- **#24 Load more as a link:** make "Load more" an `<a href="…/page/2/">` that JS intercepts, and have `work-archive.php` honour `get_query_var('paged')`. Since #29, `/works/page/N/` matches the `works_post` single rule first, so add `works/page/([0-9]+)/?$` → `pagename=works&paged=$matches[1]` with `add_rewrite_rule(..., 'top')` on `init`, like the category rule.
 - **#25 Tags into GTM:** move the Google Ads tag, Hotjar, Apollo and Meta Pixel from `header-new.php` into GTM, triggered by CookieYes consent.
 - **#26 Yoast extras:** install "ACF Content Analysis for Yoast SEO", and turn on Yoast's llms.txt feature.
 - **#27 Single Insight images (new):**

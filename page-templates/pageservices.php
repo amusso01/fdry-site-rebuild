@@ -166,7 +166,7 @@ $container = get_theme_mod( 'understrap_container_type' );
 	</div><!-- work-grid -->
 
 </section><!-- section -->
-<div class="pic"> 	<a href="<?php echo esc_url(fdry_template_page_url('template-work.php', '/work/')); ?>"><div class="button"><span>MORE WORK</span></div> 	</a></div>
+<div class="pic"> 	<a href="<?php echo esc_url(fdry_template_page_url('template-work.php', '/works/')); ?>"><div class="button"><span>MORE WORK</span></div> 	</a></div>
 		</div>
 
 </div>

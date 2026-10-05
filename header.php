@@ -230,7 +230,7 @@ $container = get_theme_mod('understrap_container_type');
 					<div class="row">
 						<div class="col-6">
 							<ul>
-								<li><a href="<?php echo site_url('/work/') ?>" class="nav-link">WORK</a></li>
+								<li><a href="<?php echo esc_url(fdry_template_page_url('template-work.php', '/works/')); ?>" class="nav-link">WORK</a></li>
 								<li class="mainitem"><a href="<?php echo site_url('/services/') ?>" aria-haspopup="true" aria-expanded="false">SERVICES</a></li>
 								<li><a href="<?php echo site_url('/about/') ?>" class="nav-link">ABOUT</a></li>
 								<li><a class="nav-link " href="<?php echo site_url('/insights/') ?>">INSIGHTS</a></li>
@@ -282,7 +282,7 @@ $container = get_theme_mod('understrap_container_type');
 			<div class="internalcontentmenu mobilmenu">
 				<div class="container">
 					<ul>
-						<li><a href="<?php echo site_url('/work/') ?>" class="nav-link">WORK</a></li>
+						<li><a href="<?php echo esc_url(fdry_template_page_url('template-work.php', '/works/')); ?>" class="nav-link">WORK</a></li>
 						<li class="openhamburgermenu"><a href="<?php echo site_url('/services/') ?>" aria-haspopup="true" aria-expanded="false">SERVICES</a></li>
 
 						<div class="mainservicemobil">

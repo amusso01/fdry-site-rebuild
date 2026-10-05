@@ -71,7 +71,7 @@ $promoteWorks = get_field('promote_works');
 			        <?php echo get_field('content_headline'); ?>
 
 			        <div class="pic blackbutton">
-			            <a href="<?php echo site_url('/work/') ?>">
+			            <a href="<?php echo esc_url(fdry_template_page_url('template-work.php', '/works/')); ?>">
 			                <div class="button"><span>WORK</span></div>
 			            </a>
 			        </div>
@@ -129,7 +129,7 @@ $promoteWorks = get_field('promote_works');
 			</div>
 
 			<div class="pic">
-				<a href="<?php echo site_url('/work/') ?>">
+				<a href="<?php echo esc_url(fdry_template_page_url('template-work.php', '/works/')); ?>">
 			  		<div class="button"><span>MORE WORK</span></div>
 				</a>
 			</div>
@@ -294,7 +294,7 @@ $promoteWorks = get_field('promote_works');
 			<?php endforeach; ?>
 			</div>
 			<div class="pic">
-				<a href="<?php echo site_url('/work/') ?>">
+				<a href="<?php echo esc_url(fdry_template_page_url('template-work.php', '/works/')); ?>">
 			  		<div class="button"><span>MORE WORK</span></div>
 				</a>
 			</div>
@@ -407,7 +407,7 @@ $promoteWorks = get_field('promote_works');
 				</div>
 
 				<div class="pic">
-					<a href="<?php echo site_url('/work/') ?>">
+					<a href="<?php echo esc_url(fdry_template_page_url('template-work.php', '/works/')); ?>">
 				  		<div class="button"><span>MORE WORK</span></div>
 					</a>
 				</div>

@@ -26,7 +26,7 @@ if (! defined('ABSPATH')) {
 $title        = get_the_title();
 $permalink    = (string) get_permalink();
 $insights_url = fdry_template_page_url('template-insight.php', '/insights/');
-$work_url     = fdry_template_page_url('template-work.php', '/work/');
+$work_url     = fdry_template_page_url('template-work.php', '/works/');
 
 $category = '';
 

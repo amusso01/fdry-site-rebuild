@@ -201,7 +201,7 @@ if ($cards === array()) {
 				array(
 					'variant' => 'transparent',
 					'label'   => __('More work', 'foundry'),
-					'url'     => site_url('/work/'),
+					'url'     => fdry_template_page_url('template-work.php', '/works/'),
 				)
 			);
 			?>

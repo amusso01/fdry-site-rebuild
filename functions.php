@@ -82,7 +82,8 @@ foreach ( $understrap_includes as $file ) {
                       'menu_position'       => 5,
                       'menu_icon'           => 'dashicons-portfolio',
                       'can_export'          => true,
-                      'has_archive'         => true,
+                      // No archive: /works/ is the Work page, an archive rule would hijack it
+                      'has_archive'         => false,
                       'exclude_from_search' => false,
                       'show_in_graphql' => true,
                       'graphql_single_name' => 'work',
@@ -163,8 +164,10 @@ function create_posttype() {
               'singular_name' => __( 'Job' )
           ),
           'public' => true,
-          'has_archive' => true,
+          // No archive: /careers/ is the Careers page, an archive rule would hijack it
+          'has_archive' => false,
           'show_in_rest' => true,
+          'rewrite' => array( 'slug' => 'careers', 'with_front' => false ),
 
       )
   );
@@ -172,13 +175,29 @@ function create_posttype() {
 // Hooking up our function to theme setup
 add_action( 'init', 'create_posttype' );
 
+// 301 legacy /job/{slug}/ URLs to /careers/{slug}/
+add_action( 'template_redirect', function () {
+    if ( ! is_404() ) {
+        return;
+    }
+    $path = trim( (string) wp_parse_url( wp_unslash( $_SERVER['REQUEST_URI'] ?? '' ), PHP_URL_PATH ), '/' );
+    if ( ! preg_match( '#^job(?:/([^/]+))?$#', $path, $m ) ) {
+        return;
+    }
+    $job = ! empty( $m[1] ) ? get_page_by_path( $m[1], OBJECT, 'job' ) : null;
+    $url = ( $job && 'publish' === $job->post_status ) ? get_permalink( $job ) : home_url( '/careers/' );
+    wp_safe_redirect( $url, 301 );
+    exit;
+}, 1 );
+
 
 
 //Endpoint works
 add_action('init', function () {
-    // Añadir una regla de reescritura para /work/category/{slug}
+    // Añadir una regla de reescritura para /works/category/{slug}
+    // Added on init, so it lands before the works_post rules that would read it as an attachment
     add_rewrite_rule(
-        '^work/category/([^/]+)/?$',
+        '^works/category/([^/]+)/?$',
         'index.php?post_type=works_post&category_name=$matches[1]',
         'top'
     );
@@ -192,7 +211,7 @@ add_filter('query_vars', function ($vars) {
 
 add_action('template_include', function ($template) {
     if (get_query_var('post_type') === 'works_post' && get_query_var('category_name')) {
-        // Usa un template específico si es /work/category/{slug}
+        // Usa un template específico si es /works/category/{slug}
         return locate_template('archive-works-category.php') ?: $template;
     }
     return $template;
