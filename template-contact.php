@@ -79,7 +79,7 @@ $contact_row_index = 0;
 						<img
 							class="contact-main__card-thumb"
 							src="<?= esc_url($thumbnail['url']); ?>"
-							alt=""
+							alt="Get in touch"
 							<?php if ($thumbnail['width'] > 0) : ?>
 								width="<?= (int) $thumbnail['width']; ?>"
 							<?php endif; ?>

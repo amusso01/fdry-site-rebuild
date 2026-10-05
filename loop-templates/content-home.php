@@ -77,7 +77,7 @@ $promoteWorks = get_field('promote_works');
 			        </div>
 
 			        <div class="pic blackbutton">
-			            <a href="<?php echo site_url('/service/') ?>">
+			            <a href="<?php echo site_url('/services/') ?>">
 			                <div class="button"><span>SERVICES</span></div>
 			            </a>
 			        </div>
@@ -145,7 +145,7 @@ $promoteWorks = get_field('promote_works');
 							<div class="righttext">
 								<p><?php echo $createExcept ?></p>
 								<div class="pic">
-										<a href="<?php echo get_the_permalink(6801); ?>">
+										<a href="<?php echo get_the_permalink(15799); ?>">
 									  		<div class="button"><span>OVERVIEW</span></div>
 										</a>
 								</div>
@@ -311,7 +311,7 @@ $promoteWorks = get_field('promote_works');
 							<div class="righttext">
 								<p><?php echo $promoteExcept ?></p>
 								<div class="pic">
-										<a href="<?php echo get_the_permalink(6821); ?>">
+										<a href="<?php echo get_the_permalink(14776); ?>">
 									  		<div class="button"><span>OVERVIEW</span></div>
 										</a>
 								</div>
@@ -424,7 +424,7 @@ $promoteWorks = get_field('promote_works');
 					<?php echo get_field('content_secondgreybanner'); ?>
 
 					<div class="pic blackbutton">
-						<a href="<?php echo get_the_permalink(16); ?>">
+						<a href="<?php echo get_the_permalink(15445); ?>">
 					  		<div class="button"><span>ABOUT</span></div>
 						</a>
 					</div>
@@ -452,7 +452,7 @@ $promoteWorks = get_field('promote_works');
 <img src="https://www.fdry.com/wp-content/uploads/2023/08/blank.png" alt="FDRY Foundry Digital" title="FDRY Foundry Digital" width="80" height="80">
 
 			<?php echo get_field('growth_acceleration'); ?>
-			<center><div class="linksbannergrey"><a href="<?php echo get_the_permalink(7020); ?>" >WooCommerce Agency</a>|<a href="<?php echo get_the_permalink(7042); ?>">Shopify Agency</a>|<a href="<?php echo get_the_permalink(7634); ?>">Social Media Marketing Agency</a>|<a href="<?php echo get_the_permalink(6929); ?>">Ecommerce SEO Agency</a></div></center>
+			<center><div class="linksbannergrey"><a href="<?php echo get_the_permalink(15050); ?>" >WooCommerce Agency</a>|<a href="<?php echo get_the_permalink(15031); ?>">Shopify Agency</a>|<a href="<?php echo get_the_permalink(15134); ?>">Social Media Marketing Agency</a>|<a href="<?php echo get_the_permalink(15206); ?>">Ecommerce SEO Agency</a></div></center>
 		</div>
 	</div>
 

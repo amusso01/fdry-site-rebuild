@@ -60,7 +60,7 @@ foreach (['footermenu_1', 'footermenu_2', 'footermenu_3', 'footermenu_4'] as $lo
           get_template_part('components/partials/button', null, [
             'variant' => 'white',
             'label'   => __('Book an appointment', 'foundry'),
-            'url'     => '/brief-1/',
+            'url'     => 'https://www.fdry.com/brief/',
           ]);
 
           get_template_part('components/partials/button', null, [
@@ -74,7 +74,7 @@ foreach (['footermenu_1', 'footermenu_2', 'footermenu_3', 'footermenu_4'] as $lo
       </div>
 
       <address class="site-footer__info" data-fade-up data-fade-up-delay="0.3">
-        <p><a class="site-footer__info-link" href="mailto:<?php echo esc_attr($contact['email']); ?>"><?php echo esc_html($contact['email']); ?></a></p>
+		<p><a class="site-footer__info-link" href="mailto:<?php echo esc_attr($contact['email']); ?>"><?php echo esc_html($contact['email']); ?></a></p>
         <p><a class="site-footer__info-link" href="tel:<?php echo esc_attr($contact['tel']); ?>"><?php echo esc_html($contact['phone']); ?></a></p>
         <p><?php echo esc_html($contact['address']); ?></p>
       </address>
@@ -116,14 +116,14 @@ foreach (['footermenu_1', 'footermenu_2', 'footermenu_3', 'footermenu_4'] as $lo
       <div class="site-footer__legal">
         <a class="site-footer__meta-link" href="/terms-and-conditions/"><?php esc_html_e('Terms', 'foundry'); ?></a>
         <a class="site-footer__meta-link" href="/privacy-policy/"><?php esc_html_e('Privacy Policy', 'foundry'); ?></a>
-        <span class="site-footer__meta-text">© 2025 FDRY</span>
+        <span class="site-footer__meta-text">&#169; <?php echo esc_html(wp_date('Y')); ?> FDRY</span>
       </div>
     </div>
   </div>
 
   <div class="site-footer__bottom">
     <div class="site-footer__bottom-inner content-block content-block--footer">
-      <p class="site-footer__copyright">COPYRIGHT &#169; <?php echo esc_html(wp_date('Y')); ?> <br> FDRY Digital Marketing Agency - WordPress, WooCommerce and Shopify Web Design Agency.</p>
+      <p class="site-footer__copyright">&#169; <?php echo esc_html(wp_date('Y')); ?> <br> FDRY Ecommerce Agency - Adobe, WordPress, Woo and Shopify Web Design Agency.</p>
       <p class="site-footer__copyright">FDRY is a trading name of Foundry Digital Limited</p>
     </div>
   </div>

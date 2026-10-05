@@ -154,7 +154,7 @@ if (! defined('FDRY_USING_NEW_HEADER')) {
     fbq('track', 'PageView');
   </script>
   <noscript><img height="1" width="1" style="display:none"
-      src="https://www.facebook.com/tr?id=1558785528625318&ev=PageView&noscript=1" /></noscript>
+      src="https://www.facebook.com/tr?id=1558785528625318&ev=PageView&noscript=1" alt="pixel" /></noscript>
   <!-- End Meta Pixel Code -->
 
 
@@ -163,7 +163,7 @@ if (! defined('FDRY_USING_NEW_HEADER')) {
 
 <body <?php body_class(); ?>>
 
-  <noscript><img alt="" src="https://secure.office-insightdetails.com/788650.png" style="display:none;" /></noscript>
+  <noscript><img alt="FDRY Agency 788650" src="https://secure.office-insightdetails.com/788650.png" style="display:none;" /></noscript>
 
   <!-- Google Tag Manager (noscript) -->
   <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5D5B7P"

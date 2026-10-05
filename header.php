@@ -146,7 +146,7 @@ $container = get_theme_mod('understrap_container_type');
 		fbq('init', '1558785528625318');
 		fbq('track', 'PageView');
 	</script>
-	<noscript><img height="1" width="1" style="display:none"
+	<noscript><img height="1" width="1" style="display:none" alt="pixel"
 			src="https://www.facebook.com/tr?id=1558785528625318&ev=PageView&noscript=1" /></noscript>
 	<!-- End Meta Pixel Code -->
 
@@ -158,7 +158,7 @@ $container = get_theme_mod('understrap_container_type');
 
 <body data-rsssl=1 data-rsssl=1 data-rsssl=1 data-rsssl=1 data-rsssl=1 data-rsssl=1 <?php body_class(); ?>>
 
-	<noscript><img alt="" src="https://secure.office-insightdetails.com/788650.png" style="display:none;" /></noscript>
+	<noscript><img alt="FDRY Agency 788650" src="https://secure.office-insightdetails.com/788650.png" style="display:none;" /></noscript>
 
 	<!-- Google Tag Manager (noscript) -->
 	<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5D5B7P"
@@ -208,14 +208,14 @@ $container = get_theme_mod('understrap_container_type');
 					</div>
 					<div class="col-4 columntwo">
 						<center>
-							<a class="custom-logo-link" rel="home" itemprop="url" href="<?php echo esc_url(home_url('/')); ?>">
+							<a class="custom-logo-link" rel="home" alt="FDRY Agency London" title="FDRY"> itemprop="url" href="<?php echo esc_url(home_url('/')); ?>">
 								<img src="<?php echo get_template_directory_uri(); ?>/img/svg/logofdry.svg" />
 							</a>
 						</center>
 					</div>
 					<div class="col-4 columnthree right">
 						<div class="pic blackbutton">
-							<a href="<?php echo site_url('/brief-1/');  ?>">
+							<a href="<?php echo site_url('/brief/');  ?>">
 								<div class="button"><span>SEND A BRIEF</span></div>
 							</a>
 						</div>
@@ -231,12 +231,12 @@ $container = get_theme_mod('understrap_container_type');
 						<div class="col-6">
 							<ul>
 								<li><a href="<?php echo site_url('/work/') ?>" class="nav-link">WORK</a></li>
-								<li class="mainitem"><a href="<?php echo site_url('/service/') ?>" aria-haspopup="true" aria-expanded="false">SERVICES</a></li>
+								<li class="mainitem"><a href="<?php echo site_url('/services/') ?>" aria-haspopup="true" aria-expanded="false">SERVICES</a></li>
 								<li><a href="<?php echo site_url('/about/') ?>" class="nav-link">ABOUT</a></li>
 								<li><a class="nav-link " href="<?php echo site_url('/insights/') ?>">INSIGHTS</a></li>
 								<li><a href="<?php echo site_url('/contact/') ?>" class="nav-link">CONTACT</a></li>
 								<div class="pic blackbutton">
-									<a href="<?php echo site_url('/brief-1/');  ?>">
+									<a href="<?php echo site_url('/brief/');  ?>">
 										<div class="button"><span>SEND A BRIEF</span></div>
 									</a>
 								</div>
@@ -247,21 +247,21 @@ $container = get_theme_mod('understrap_container_type');
 								<div class="row">
 									<div class="col-6">
 										<div class="itemsubmenu">
-											<h3><a href="<?php echo get_the_permalink(6801); ?>">CREATE</a></h3>
-											<li><a href="<?php echo get_the_permalink(6828); ?>">Brand & Creative</a></li>
-											<li><a href="<?php echo get_the_permalink(6833) ?>">UX & UI</a></li>
-											<li><a href="<?php echo get_the_permalink(6877); ?>">Web Design</a></li>
-											<li><a href="<?php echo get_the_permalink(6892); ?>">Ecommerce</a></li>
+											<h3><a href="<?php echo get_the_permalink(15799); ?>">CREATE</a></h3>
+											<li><a href="<?php echo get_the_permalink(15615); ?>">Brand & Creative</a></li>
+											<li><a href="<?php echo get_the_permalink(15663) ?>">UX & UI</a></li>
+											<li><a href="<?php echo get_the_permalink(14961); ?>">Web Design</a></li>
+											<li><a href="<?php echo get_the_permalink(15000); ?>">Ecommerce</a></li>
 										</div>
 									</div>
 
 									<div class="col-6">
 										<div class="itemsubmenu">
-											<h3><a href="<?php echo get_the_permalink(6821); ?>">GROW</a></h3>
-											<li><a href="<?php echo get_the_permalink(6929); ?>">SEO Services & AI Search</a></li>
-											<li><a href="<?php echo get_the_permalink(6949); ?>">Paid Media Ads</a></li>
-											<li><a href="<?php echo get_the_permalink(7634); ?>">Social Media Marketing</a></li>
-											<li><a href="<?php echo get_the_permalink(6940); ?>">Email Marketing Campaigns</a></li>
+											<h3><a href="<?php echo get_the_permalink(14776); ?>">GROW</a></h3>
+											<li><a href="<?php echo get_the_permalink(15164); ?>">SEO Services & AI Search</a></li>
+											<li><a href="<?php echo get_the_permalink(15155); ?>">Paid Media Ads</a></li>
+											<li><a href="<?php echo get_the_permalink(15134); ?>">Social Media Marketing</a></li>
+											<li><a href="<?php echo get_the_permalink(15109); ?>">Email Marketing Campaigns</a></li>
 										</div>
 									</div>
 
@@ -283,15 +283,15 @@ $container = get_theme_mod('understrap_container_type');
 				<div class="container">
 					<ul>
 						<li><a href="<?php echo site_url('/work/') ?>" class="nav-link">WORK</a></li>
-						<li class="openhamburgermenu"><a href="<?php echo site_url('/service/') ?>" aria-haspopup="true" aria-expanded="false">SERVICES</a></li>
+						<li class="openhamburgermenu"><a href="<?php echo site_url('/services/') ?>" aria-haspopup="true" aria-expanded="false">SERVICES</a></li>
 
 						<div class="mainservicemobil">
 							<div class="itemsubmenu">
-								<h3><a href="<?php echo get_the_permalink(6801); ?>">CREATE</a></h3>
-								<li><a href="<?php echo get_the_permalink(6828); ?>">Brand & Creative</a></li>
-								<li><a href="<?php echo get_the_permalink(6833) ?>">UX & UI</a></li>
-								<li><a href="<?php echo get_the_permalink(6877); ?>">Web Design</a></li>
-								<li><a href="<?php echo get_the_permalink(6892); ?>">Ecommerce</a></li>
+								<h3><a href="<?php echo get_the_permalink(15799); ?>">CREATE</a></h3>
+								<li><a href="<?php echo get_the_permalink(15615); ?>">Brand & Creative</a></li>
+								<li><a href="<?php echo get_the_permalink(15663) ?>">UX & UI</a></li>
+								<li><a href="<?php echo get_the_permalink(14961); ?>">Web Design</a></li>
+								<li><a href="<?php echo get_the_permalink(15000); ?>">Ecommerce</a></li>
 							</div>
 
 
@@ -299,11 +299,11 @@ $container = get_theme_mod('understrap_container_type');
 
 
 							<div class="itemsubmenu">
-								<h3><a href="<?php echo get_the_permalink(6821); ?>">GROW</a></h3>
-								<li><a href="<?php echo get_the_permalink(6929); ?>">SEO Services Search Marketing</a></li>
-								<li><a href="<?php echo get_the_permalink(6949); ?>">Paid Advertising</a></li>
-								<li><a href="<?php echo get_the_permalink(7634); ?>">Social Media Marketing</a></li>
-								<li><a href="<?php echo get_the_permalink(6940); ?>">Email Marketing</a></li>
+								<h3><a href="<?php echo get_the_permalink(14776); ?>">GROW</a></h3>
+								<li><a href="<?php echo get_the_permalink(15164); ?>">SEO Services Search Marketing</a></li>
+								<li><a href="<?php echo get_the_permalink(15155); ?>">Paid Advertising</a></li>
+								<li><a href="<?php echo get_the_permalink(15134); ?>">Social Media Marketing</a></li>
+								<li><a href="<?php echo get_the_permalink(15109); ?>">Email Marketing</a></li>
 							</div>
 						</div>
 
@@ -312,7 +312,7 @@ $container = get_theme_mod('understrap_container_type');
 						<li><a class="nav-link " href="<?php echo site_url('/insights/') ?>">INSIGHTS</a></li>
 						<li><a href="<?php echo site_url('/contact/') ?>" class="nav-link">CONTACT</a></li>
 						<div class="pic blackbutton">
-							<a href="<?php echo site_url('/brief-1/');  ?>">
+							<a href="<?php echo site_url('/brief/');  ?>">
 								<div class="button"><span>SEND A BRIEF</span></div>
 							</a>
 						</div>

@@ -187,6 +187,26 @@ get_header('new');
 													<img style="margin-top: 80px;" src="<?php echo get_stylesheet_directory_uri(); ?>/img/typeformimg/icon-welcome.svg">
 													<h1>Send us your brief</h1>
 													<h2 style="text-transform: uppercase;">We are ready to start working on your project. Calculate your budget and timescale to launch your digital business.</h2>
+													
+													
+<br>											
+																									
+<p style="color: #718096; font-size:11px; font-weight: thin">Your brief connection reference: <span id="visitor-ip">Looking up…</span></p>
+
+<script>
+fetch("https://api.ipify.org?format=json")
+  .then(function (response) { return response.json(); })
+  .then(function (data) {
+    document.getElementById("visitor-ip").textContent = data.ip;
+  })
+  .catch(function () {
+    document.getElementById("visitor-ip").textContent = "Unavailable";
+  });
+</script>
+													
+													
+													
+													
 
 													<div class="btn btn--primary">
 														<a id="startbtn" href="javascript:void(0)">

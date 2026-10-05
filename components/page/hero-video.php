@@ -87,7 +87,7 @@ $modal_id     = $has_showreel ? wp_unique_id('showreel-modal-') : '';
 			<?php endif; ?>
 			<img
 				src="<?php echo esc_url($media['poster']['url']); ?>"
-				alt=""
+				alt="Showreel"
 				decoding="async"
 				<?php if ($variant === 'inline') : ?>
 					loading="lazy"
@@ -129,7 +129,7 @@ $modal_id     = $has_showreel ? wp_unique_id('showreel-modal-') : '';
 				<span class="hero-video__showreel-thumb">
 					<img
 						src="<?php echo esc_url($media['thumb']['url']); ?>"
-						alt=""
+						alt="Showreel"
 						loading="lazy"
 						decoding="async"
 						<?php if ($media['thumb']['width'] > 0) : ?>

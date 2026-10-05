@@ -10,8 +10,8 @@
 ?>
 
 <figure class="site-header__logo">
-  <a href="<?php echo esc_url(home_url('/')); ?>" class="link-invisible">
-
+  <a href="<?php echo esc_url(home_url('/')); ?>" class="link-invisible" title="FDRY" aria-label="FDRY Agency London">
+  <span class="screen-reader-text">FDRY Agency London</span>
     <?php if (has_custom_logo()) : ?>
       <?php
       $custom_logo_id  = get_theme_mod('custom_logo');
@@ -24,7 +24,7 @@
         echo file_get_contents($logo_path); // @codingStandardsIgnoreLine
       else :
       ?>
-        <img src="<?php echo esc_url($logo_url[0]); ?>" alt="<?php echo esc_attr(get_bloginfo('name')); ?>">
+        <img src="<?php echo esc_url($logo_url[0]); ?>" alt="FDRY Agency London">
       <?php endif; ?>
     <?php else : ?>
       <p class="site-header__title"><?php echo esc_html(get_bloginfo('name')); ?></p>

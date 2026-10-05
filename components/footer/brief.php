@@ -19,7 +19,7 @@ $has_bg  = file_exists(get_template_directory() . $bg_path);
 
 <section class="footer-brief" aria-labelledby="footer-brief-title">
   <?php if ($has_bg) : ?>
-    <img class="footer-brief__bg" src="<?php echo esc_url(get_template_directory_uri() . $bg_path); ?>" alt="" width="2880" height="720" loading="lazy" decoding="async">
+    <img class="footer-brief__bg" src="<?php echo esc_url(get_template_directory_uri() . $bg_path); ?>" alt="FDRY Briefs" width="2880" height="720" loading="lazy" decoding="async">
   <?php endif; ?>
 
   <div class="footer-brief__inner content-block content-block--footer">
@@ -29,7 +29,7 @@ $has_bg  = file_exists(get_template_directory() . $bg_path);
       <p class="footer-brief__lead" data-fade-up data-fade-up-delay="0.2"><?php esc_html_e('and calculate your budget and timescale', 'foundry'); ?></p>
     </div>
 
-    <a class="footer-brief__button" href="<?php echo esc_url(site_url('/brief-1/')); ?>" data-fade-up data-fade-up-delay="0.3">
+    <a class="footer-brief__button" href="<?php echo esc_url(site_url('/brief/')); ?>" data-fade-up data-fade-up-delay="0.3">
       <?php esc_html_e('Start your brief', 'foundry'); ?>
     </a>
   </div>

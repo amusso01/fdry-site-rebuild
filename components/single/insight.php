@@ -75,18 +75,7 @@ if ($image_id) {
 }
 
 $share = array(
-	'linkedin'  => array(
-		'url'   => 'https://www.linkedin.com/sharing/share-offsite/?url=' . rawurlencode($permalink),
-		'label' => __('Share on LinkedIn', 'foundry'),
-	),
-	'instagram' => array(
-		'url'   => 'https://www.instagram.com/FDRY_digital/',
-		'label' => __('FDRY on Instagram', 'foundry'),
-	),
-	'x'         => array(
-		'url'   => 'https://x.com/intent/tweet?url=' . rawurlencode($permalink) . '&text=' . rawurlencode(wp_strip_all_tags(html_entity_decode($title, ENT_QUOTES, 'UTF-8'))),
-		'label' => __('Share on X', 'foundry'),
-	),
+	
 );
 ?>
 
