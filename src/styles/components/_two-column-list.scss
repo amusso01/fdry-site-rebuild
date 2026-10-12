@@ -169,3 +169,7 @@
 		max-width: 54ch;
 	}
 }
+
+.service-inner-main .two-column-list__body:not(.two-column-list__body--bigger-font) {
+	max-width: 70ch;
+}

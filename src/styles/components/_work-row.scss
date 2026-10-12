@@ -280,6 +280,11 @@
 	}
 }
 
+// Service inner: same portrait cards as the homepage work row.
+.service-inner-main .work-row--inner .work-row__slider {
+	height: 680px;
+}
+
 @media (prefers-reduced-motion: reduce) {
 	.work-row__card,
 	.work-row__image,
