@@ -385,3 +385,4 @@ function my_load_more_posts_handler() {
 require_once get_template_directory() . '/library/function-dev.php';
 require_once get_template_directory() . '/library/function-work.php';
 require_once get_template_directory() . '/library/function-redirect.php';
+require_once get_template_directory() . '/library/function-security-headers.php';
