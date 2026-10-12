@@ -459,7 +459,7 @@
 			"name": "work_parallax",
 			"aria-label": "",
 			"type": "repeater",
-			"instructions": "Pick up to three featured works. Each card uses the work featured image and category tags.",
+			"instructions": "Pick up to three featured works. Each card uses the work's featured image, or the Card image when one is set, plus its category tags.",
 			"required": 0,
 			"conditional_logic": 0,
 			"wrapper": {
@@ -497,6 +497,33 @@
 					"allow_null": 0,
 					"ui": 1,
 					"bidirectional_target": [],
+					"parent_repeater": "field_6a971work0002"
+				},
+				{
+					"key": "field_6a971work0006",
+					"label": "Card image (optional)",
+					"name": "work_image",
+					"aria-label": "",
+					"type": "image",
+					"instructions": "Optional. Shown on the card instead of the work's featured image. Leave empty to use the featured image.",
+					"required": 0,
+					"conditional_logic": 0,
+					"wrapper": {
+						"width": "",
+						"class": "",
+						"id": ""
+					},
+					"return_format": "id",
+					"preview_size": "medium",
+					"library": "all",
+					"min_width": "",
+					"min_height": "",
+					"min_size": "",
+					"max_width": "",
+					"max_height": "",
+					"max_size": "",
+					"mime_types": "",
+					"allow_in_bindings": 0,
 					"parent_repeater": "field_6a971work0002"
 				},
 				{
@@ -1254,5 +1281,5 @@
 	"display_title": "",
 	"allow_ai_access": false,
 	"ai_description": "",
-	"modified": 1791797647
+	"modified": 1791819552
 }

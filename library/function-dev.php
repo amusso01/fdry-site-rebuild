@@ -998,12 +998,18 @@ function fdry_get_work_parallax_cards(int $post_id): array
 
 		$work_id = (int) $work->ID;
 
-		if (! has_post_thumbnail($work_id)) {
+		// The optional card image replaces the work's featured image.
+		$image_id = (int) get_sub_field('work_image');
+
+		if ($image_id <= 0) {
+			$image_id = (int) get_post_thumbnail_id($work_id);
+		}
+
+		if ($image_id <= 0) {
 			continue;
 		}
 
-		$thumbnail_id = (int) get_post_thumbnail_id($work_id);
-		$image        = wp_get_attachment_image_src($thumbnail_id, 'large');
+		$image = wp_get_attachment_image_src($image_id, 'large');
 
 		if (! is_array($image) || empty($image[0])) {
 			continue;
@@ -1033,7 +1039,7 @@ function fdry_get_work_parallax_cards(int $post_id): array
 			'image_url'    => $image[0],
 			'image_width'  => isset($image[1]) ? (int) $image[1] : 0,
 			'image_height' => isset($image[2]) ? (int) $image[2] : 0,
-			'image_alt'    => (string) get_post_meta($thumbnail_id, '_wp_attachment_image_alt', true),
+			'image_alt'    => (string) get_post_meta($image_id, '_wp_attachment_image_alt', true),
 			'tagline'      => $tagline,
 			'categories'   => $categories,
 		);
