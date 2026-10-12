@@ -318,7 +318,10 @@ From the theme root:
 pnpm install   # first time, or after package.json changes
 pnpm dev       # watch mode — rebuilds dist/ on save
 pnpm build     # one-off production build
+pnpm perf      # measure the live site (PERFORMANCE-PLAN.md #0); see below
 ```
+
+`pnpm perf [mobile|desktop|both] [paths…]` loads pages in headless Chrome over the DevTools protocol, on the throttling the plan's baseline used, and writes `build/perf/<date>-<label>-<device>.json`. Without paths it measures the plan's 8 verification pages. Add `--runs 3` for before/after numbers, `--profile` for JS time by script, `--legacy-css` for the legacy rules each page uses, and `--screenshots` for first-screen and full-page PNGs. The options are listed in the header of [`scripts/perf-measure.mjs`](scripts/perf-measure.mjs). WP Rocket keeps a separate page cache for phones, so the script requests each page once before measuring it, to measure the cached page.
 
 `pnpm dev` runs `vite build --watch`. There is no Vite dev server; WordPress serves the built files from `dist/`.
 

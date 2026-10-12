@@ -1,6 +1,6 @@
 # Performance plan: new (2026/27) templates
 
-> **Status:** first recorded 12 October 2026. In progress: #1 live (12 Oct), LCP re-measure pending. #2 live (About, Works and Insights still to measure once their WP Rocket cache is purged). Measured against the live site (www.fdry.com) and the code on `main` (74c3662).
+> **Status:** first recorded 12 October 2026. #0 done: `pnpm perf`. In progress: #1 done (12 Oct): service-page mobile LCP 11.3 s → 1.7 s. #2 done (12 Oct): mobile FCP 1.55–1.91 s on all 8 verification pages (`build/perf/2026-10-12-2305-after-2-mobile.json`). Measured against the live site (www.fdry.com) and the code on `main` (74c3662).
 > Overlaps with `SEO-PLAN.md` are marked **(SEO #n)**. Where this plan re-ranks an SEO item, this plan wins, because it has the measurements.
 
 ## Context
@@ -87,9 +87,9 @@ Parse and compile time is on top of this (about 2.5 s of unattributed "program" 
 
 | # | Priority | Issue | Type | Effort | Status |
 |---|---|---|---|---|---|
-| 0 | — | Write and commit a measurement script, so each item can be measured before and after. It doesn't exist yet: the baseline was taken with throwaway tools. | Code | S | Open |
-| 1 | **P0** | **Oversized uploads are the LCP image.** The service-page slide is a 551 KB PNG (11.3 s LCP). The banner is a 1376×600 JPG of 899 KB. Nothing converts uploads to WebP/AVIF. | Code + CLI | M | Live 12 Oct: library converted (3.2 GB → 628 MB in the main run); LCP re-measure pending |
-| 2 | **P0** | **The first screen is hidden until our JS runs.** The header (`data-fade-down`) and the first section fade in from `opacity: 0`, so FCP waits for the bundle: 5.8 s on service pages. (SEO #17, was P2) | Code | S | Live 12 Oct. Service inner mobile FCP 5.8 → 1.87 s, LCP 11.3 → 1.87 s (with #1) |
+| 0 | — | Write and commit a measurement script, so each item can be measured before and after. The baseline was taken with throwaway tools. | Code | S | Done (12 Oct): `pnpm perf` |
+| 1 | **P0** | **Oversized uploads are the LCP image.** The service-page slide is a 551 KB PNG (11.3 s LCP). The banner is a 1376×600 JPG of 899 KB. Nothing converts uploads to WebP/AVIF. | Code + CLI | M | Done 12 Oct: library converted (3.2 GB → 628 MB in the main run); service mobile LCP 11.3 s → 1.7 s |
+| 2 | **P0** | **The first screen is hidden until our JS runs.** The header (`data-fade-down`) and the first section fade in from `opacity: 0`, so FCP waits for the bundle: 5.8 s on service pages. (SEO #17, was P2) | Code | S | Done 12 Oct. Mobile FCP 1.55–1.91 s on all 8 pages. Service inner FCP 5.8 → 1.76 s, LCP 11.3 → 1.76 s (with #1) |
 | 3 | **P0** | **Homepage LCP is the cookie banner (7.3 s).** CookieYes waits for DOMContentLoaded, which waits for our bundle, which is starved of bandwidth by the tags, fonts and legacy CSS. | Code + CMS | S (+ #4–#6) | Open |
 | 4 | **P1** | **Legacy CSS/JS on new templates**: `theme.min.css`, `mainstyle.css`, `typeformstyle.css`, jQuery in `<head>`, `theme.min.js`, `lozad`, `footer.js`, plus TweenMax 2 and `js/about.js` on /about/. (SEO #18, #23) | Code | L | Open |
 | 5 | **P1** | **Marketing tags: ~1 MB and ~0.5 s of main thread per page.** The Ads tag loads twice, there are two GA4 IDs, the dead Universal Analytics `analytics.js` still loads, and Hotjar, Apollo and Meta are hard-coded. (SEO #25, was P3) | GTM + Code | M | Open |
@@ -114,15 +114,38 @@ Parse and compile time is on top of this (about 2.5 s of unattributed "program" 
 
 ## #0 Measurement script
 
-The baseline was measured with three throwaway tools that were never committed, so there is no script yet. Write `scripts/perf-measure.mjs` to the spec below, and add `"perf": "node scripts/perf-measure.mjs"` to `package.json`.
+**Status: done (12 Oct 2026).** [`scripts/perf-measure.mjs`](scripts/perf-measure.mjs), run as `pnpm perf`. Its header lists every option.
 
-- **Modes:**
-  - **Default:** FCP, LCP and the LCP element, CLS, approximate TBT, the render-blocking list, the 15 largest requests, and CSS coverage per stylesheet.
-  - `--profile`: main-thread JS time by script.
-  - `--legacy-css`: the legacy rules each page uses (Appendix A).
-- **Input:** a URL list and `mobile|desktop`.
-- **Runs on:** the local Chrome, through the DevTools protocol, using Node 22's built-in WebSocket and no npm dependencies. It writes JSON to `build/perf/`, which is already gitignored.
-- **Before/after:** run it before and after every item below, and record the numbers in that item's status line.
+```bash
+pnpm perf                                   # mobile, the 8 verification pages
+pnpm perf both --runs 3 --label before-4    # mobile and desktop, median of 3 loads
+pnpm perf desktop /about/ /works/ --legacy-css --screenshots
+```
+
+- **Output.** A summary table in the terminal, and `build/perf/<date>-<label>-<device>.json`. `build/` is gitignored.
+- **Default.** Each page gets:
+  - FCP, LCP and the LCP element, CLS, approximate TBT, TTFB, DOMContentLoaded and load;
+  - the render-blocking resources (from `renderBlockingStatus`) and the synchronous scripts;
+  - the 15 largest requests, the full request list, and page weight split first party / third party and by type;
+  - CSS coverage per stylesheet.
+- **Element tags.** The LCP element is tagged `[fade-first]` or `[gsap fade]` when it sits inside a fade.
+- **`--profile`.** Main-thread JS self time by script, from load to the reading. Each `gtag/js?id=` is a separate row. It costs a little: FCP about 0.1 s later, TBT about 20 ms higher.
+- **`--legacy-css`.** The used rules of `theme.min.css`, `mainstyle.css` and `typeformstyle.css`, each with its `@media` condition. The JSON's `legacyCssSummary` lists every rule with the pages that use it, i.e. Appendix A.
+- **`--screenshots`.** A first-screen PNG, plus a full-page PNG taken after the scroll, for #4's visual diff.
+  - The full page is stitched from viewport tiles. Chrome's own full-page capture never returns on the homepage once it has been scrolled.
+  - Fixed elements (the header and the cookie banner) only appear at the top of the full-page image.
+- **How it loads.** Same settings as the baseline: a cold first visit in a fresh headless Chrome profile, so the cookie banner shows.
+  - **Mobile:** 412×823 at DPR 1.75, slow 4G (150 ms, 1.6 Mbps) and 4× CPU.
+  - **Desktop:** 1440×900, 10 Mbps, 40 ms.
+- **Mobile user agent.** It is a phone user agent that keeps "HeadlessChrome", so analytics can filter the visits out.
+- **Warm page cache.** Before each load the script requests the page once from Node, with the same user agent. `--no-warm` skips this.
+  - **Why.** WP Rocket keeps a **separate cache for phones**, and nothing fills it after a purge until a phone visits. A cold page added 0.7–1.7 s of TTFB in testing.
+  - **Baseline caveat.** The baseline used Chrome's desktop user agent, so it always hit the desktop cache.
+- **CSS coverage.** It starts only after the metrics are read, then the page is scrolled to the bottom, unthrottled.
+  - **Why.** Tracking rule usage during the load made TBT about 5× higher (0.25 → 1.2 s on the service page) and FCP about 0.1 s later.
+  - **Side effect.** Rules used only while the page loads aren't counted, so our own CSS reads about 2 points lower. The legacy sheets are unaffected.
+- **Runs on.** The local Chrome (or `CHROME_PATH`), over the DevTools protocol, with Node 22's built-in WebSocket and `zlib`. No npm dependencies.
+- **Before/after:** run it before and after every item below, and record the numbers in that item's status line. Use `--runs 3` for those: single mobile loads vary by about ±0.1–0.2 s.
 
 ## P0: Critical
 
@@ -180,7 +203,25 @@ The baseline was measured with three throwaway tools that were never committed, 
 - **Found during rollout:**
   - **WP Rocket Priority Elements.** WP Rocket kept preloading the old PNG (`data-rocket-preload`) until its Priority Elements were cleared, which is separate from clearing the cache.
   - **Site icons.** These were swapped too, so `get_site_icon_url` now keeps them PNG.
-- **Still to do:** the LCP re-measure (PageSpeed Insights or #0).
+- **Re-measure (12 Oct 2026, evening).** Headless Chrome 153, cold cache, the same conditions as the baseline: mobile slow 4G with 4× CPU, desktop 10 Mbps.
+  - **Integrity.** All 329 unique WebP copies referenced on 10 pages return `200 image/webp` with a valid header.
+  - **Broken images.** After scrolling every page, there's one, and it isn't from this item: a deleted attachment (14079, `2026/03/image-3-edited.png`) is still in the content of "Inside our UI toolkit". Re-insert it in the editor.
+
+  | Page | Mobile LCP (before → after) | LCP element | Images on first load (was → now) |
+  |---|---|---|---|
+  | `/services/shopify-agency/` | 11.3 s → **1.7 s** (FCP 5.8 → 1.6 s, #2 also live) | the slide, `calling-by-fdry.png.webp` | 669 → 114 KB (mobile), 1,567 → 178 KB (desktop) |
+  | `/services/adobe-commerce-agency/` | — → 2.3 s | title (desktop: work-row image, 1.4 s) | 739 → 141 KB (desktop) |
+  | `/works/` | 3.9 s → 4.1 s | first work card, 53 KB WebP | 1,368 → 255 KB |
+  | `/` | 7.3 s → 6.4 s | CookieYes banner text (#3) | 651 → 367 KB |
+  | `/about/` | 3.3 s → 2.4 s | title | 511 → 391 KB |
+  | `/insights/` | 2.7 s → 1.6 s | intro text | 587 → 146 KB (whole page 13 MB → 2.9 MB) |
+  | A single insight | 3.8 s → 1.9 s | paragraph (desktop: hero WebP, 0.5 s) | 536 → 252 KB |
+  | A case study (`/works/nikki-makeup/`, legacy) | — → 2.6 s | heading | 5.7 MB → 1.1 MB |
+
+  - **"Was" numbers.** They're the original JPG/PNG sizes of the same files the browser downloaded.
+  - **Remaining LCP problems aren't image weight:**
+    - **Homepage:** the cookie banner, #3.
+    - **Works:** the cards wait for the JS fade on `.work-archive__results`, which is #2's territory, and #7 for srcset.
 
 **Regression found on live (12 Oct), fixed in code, deploy pending.**
 - **What happened.** `hero_image` on single insights is a URL-format ACF field, so the swap hands `components/single/insight.php` the `.webp` URL. `attachment_url_to_postid()` can't resolve that URL, so the hero fell back to a bare `<img>` with no srcset, and phones downloaded the 611 KB full-size `-scaled.jpg.webp`. Mobile LCP went from 3.8 s to 9.6 s.
@@ -251,7 +292,22 @@ So the keyframes start at `opacity: 0.01`, which looks the same. Any future CSS 
   - With reduced motion: no CSS fade, and nothing transparent.
   - Scroll fades below the fold: 47–104 per page start hidden, and all play, with none stuck (service inner, Home, About).
   - Works filter: dims to 0.65, swaps the cards and leaves no inline opacity.
-- **Still to do.** About, Works and Insights were still served from a WP Rocket cache rebuilt mid-upload, with the old markup. Purge, then measure them.
+
+**Re-measured with `pnpm perf` (#0), after the purge.** 12 Oct, `pnpm perf mobile --runs 3 --label after-2`, median of 3 loads, warm page cache:
+
+| Page | FCP (baseline) | LCP (baseline) | LCP element | TBT |
+|---|---|---|---|---|
+| Home | 1.91 s (2.1) | 6.08 s (7.3) | cookie banner (#3) | 150 ms |
+| About | 1.75 s (2.8) | 1.75 s (3.3) | centred-content title (fade-first) | 195 ms |
+| Services | 1.70 s | 1.70 s | showreel poster | 151 ms |
+| Service inner | 1.76 s (5.8) | 1.76 s (11.3) | work-row slide (fade-first) | 165 ms |
+| Works | 1.87 s (2.7) | 1.87 s (3.9) | first work card (fade-first) | 155 ms |
+| Insights | 1.55 s (2.7) | 1.55 s (2.7) | intro text (fade-first) | 144 ms |
+| Single insight | 1.78 s (2.1) | 9.60 s (3.8) | hero image (the #1 regression; fix not deployed yet) | 130 ms |
+| Contact | 1.60 s (2.0) | 1.60 s (2.7) | title (fade-first) | 165 ms |
+
+- **What's left on the first screen.** Every first-screen LCP now paints with the CSS. What still holds FCP at about 1.6–1.9 s is the 8 render-blocking files: `theme.min.css` finishes last, after our own CSS. That's #4.
+- **TBT isn't comparable with the baseline.** The baseline's 0.8–1.5 s was probably inflated by CSS coverage tracking during the load. The baseline included coverage, and tracking it during the load measured 0.9–1.4 s while building #0. Compare TBT only between `pnpm perf` runs.
 
 **Verify:**
 - Mobile FCP on a service page is about the CSS arrival time (≤ 2 s now, ≤ 1.3 s after #4).
@@ -448,6 +504,11 @@ Chrome doesn't count the full-viewport hero poster, so for a first visit the ban
 - **Delay JavaScript execution: on**, only for whatever third parties remain outside GTM (Klaviyo onsite, and Hotjar if still inline).
 - **Remove Unused CSS:** not needed on new templates after #4. Only consider it for the legacy brief and case study pages.
 - **Clear Priority Elements and the cache** after each deploy that changes the hero (SEO #9 step 2).
+- **"Separate cache files for mobile devices": turn it off (found 12 Oct while building #0).**
+  - **The problem.** Phones get their own cache, and preload doesn't fill it. After a purge, the first phone on each page waits for WordPress to render it: TTFB 0.8–1.9 s, against 0.1 s cached.
+  - **Why it's safe.** The theme never serves different HTML to phones: there's no `wp_is_mobile()` or user-agent check anywhere.
+  - **Check first** that no plugin needs it.
+  - **Verify.** After a purge and preload, `curl -A "<Android UA>"` on a page returns the `cached@` comment on the first request.
 
 ### #12 Image upload guard
 
