@@ -49,18 +49,15 @@ if (! defined('FDRY_USING_NEW_HEADER')) {
   <link rel="profile" href="http://gmpg.org/xfn/11">
   <link rel="pingback" href="<?php bloginfo('pingback_url'); ?>">
 
-  <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=AW-11543866131">
-  </script>
+  <!-- gtag() stub only. Ads (AW-11543866131) loads from GTM; the inline
+       gtag.js copy downloaded it twice and fired before consent
+       (PERFORMANCE-PLAN.md #3, #5). mainjs/footer.js still calls gtag(). -->
   <script>
     window.dataLayer = window.dataLayer || [];
 
     function gtag() {
       dataLayer.push(arguments);
     }
-    gtag('js', new Date());
-
-    gtag('config', 'AW-11543866131');
   </script>
 
   <!-- Google Tag Manager -->

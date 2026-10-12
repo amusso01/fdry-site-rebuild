@@ -90,10 +90,10 @@ Parse and compile time is on top of this (about 2.5 s of unattributed "program" 
 | 0 | — | Write and commit a measurement script, so each item can be measured before and after. The baseline was taken with throwaway tools. | Code | S | Done (12 Oct): `pnpm perf` |
 | 1 | **P0** | **Oversized uploads are the LCP image.** The service-page slide is a 551 KB PNG (11.3 s LCP). The banner is a 1376×600 JPG of 899 KB. Nothing converts uploads to WebP/AVIF. | Code + CLI | M | Done 12 Oct: library converted (3.2 GB → 628 MB in the main run); service mobile LCP 11.3 s → 1.7 s |
 | 2 | **P0** | **The first screen is hidden until our JS runs.** The header (`data-fade-down`) and the first section fade in from `opacity: 0`, so FCP waits for the bundle: 5.8 s on service pages. (SEO #17, was P2) | Code | S | Done 12 Oct. Mobile FCP 1.55–1.91 s on all 8 pages. Service inner FCP 5.8 → 1.76 s, LCP 11.3 → 1.76 s (with #1) |
-| 3 | **P0** | **Homepage LCP is the cookie banner (7.3 s).** CookieYes waits for DOMContentLoaded, which waits for our bundle, which is starved of bandwidth by the tags, fonts and legacy CSS. | Code + CMS | S (+ #4–#6) | Open |
+| 3 | **P0** | **Homepage LCP is the cookie banner (7.3 s).** CookieYes waits for DOMContentLoaded, which waits for our bundle, which is starved of bandwidth by the tags, fonts and legacy CSS. | Code + CMS | S (result depends on #4, #5) | Code ready 12 Oct (preconnects, inline Ads tag out); deploy and `after-3` measure pending |
 | 4 | **P1** | **Legacy CSS/JS on new templates**: `theme.min.css`, `mainstyle.css`, `typeformstyle.css`, jQuery in `<head>`, `theme.min.js`, `lozad`, `footer.js`, plus TweenMax 2 and `js/about.js` on /about/. (SEO #18, #23) | Code | L | Open |
-| 5 | **P1** | **Marketing tags: ~1 MB and ~0.5 s of main thread per page.** The Ads tag loads twice, there are two GA4 IDs, the dead Universal Analytics `analytics.js` still loads, and Hotjar, Apollo and Meta are hard-coded. (SEO #25, was P3) | GTM + Code | M | Open |
-| 6 | **P1** | **Fonts.** The kit has 7 weights (100 and 800 unused). `font-display: auto` hides text. `theme.min.css` adds its own old Proxima Nova faces, so 400 downloads twice and 400 italic once more. There is no preconnect. | Adobe + Code | S | Open |
+| 5 | **P1** | **Marketing tags: ~1 MB and ~0.5 s of main thread per page.** The Ads tag loads twice, there are two GA4 IDs, the dead Universal Analytics `analytics.js` still loads, and Hotjar, Apollo and Meta are hard-coded. (SEO #25, was P3) | GTM + Code | M | Step 1 in code (12 Oct, with #3), deploy pending |
+| 6 | **P1** | **Fonts.** `theme.min.css` adds its own old Proxima Nova faces, so 400 downloads twice and 400 italic once more. There was no preconnect. (`font-display` is already `swap` on live via WP Rocket; the kit's unused weights cost no bytes.) | Adobe + Code | S | Step 3 (preconnect) in code (12 Oct, with #3); the old faces go with #4 step 3 |
 | 7 | **P1** | **No srcset on work images.** The work row, work cards and parallax request `large` with no srcset. Parallax card 1 (`NUYU.jpg`, 315 KB) loads at 2.4 s on phones. (SEO #16, was P2) | Code | M | Open |
 | 8 | **P2** | **Showreel modal poster.** The modal's `<video poster>` downloads the desktop poster (55 KB) on every page with a showreel, phones included, with the modal closed. | Code | S | Open |
 | 9 | **P2** | **Marquee SVGs are 116 KB of the 240 KB homepage HTML.** The 9 logos are printed twice and not optimised. | Code | S | Open |
@@ -325,14 +325,53 @@ So the keyframes start at `opacity: 0.01`, which looks the same. Any future CSS 
 
 Chrome doesn't count the full-viewport hero poster, so for a first visit the banner paragraph is the largest element. Returning visitors (consent given) get the showreel label at about 2.4 s.
 
-**Fix:**
-1. The bandwidth fixes do most of the work: #5 (remove the inline Ads tag), #6 (fonts) and #4 (legacy CSS/JS), so the bundle and DOMContentLoaded land around 2 s.
-2. Add `<link rel="preconnect">` for `cdn-cookieyes.com`, and `use.typekit.net` with `crossorigin`.
-   - Do it with `wp_resource_hints` in `function-dev.php` (new `fdry_resource_hints()`).
-   - Drop the stale `dns-prefetch` for `ajax.googleapis.com` once #4 is done, since jQuery is served from the WP Rocket cache.
-3. **Optional (decision):** use a more compact CookieYes layout on mobile (e.g. "box" or a shorter text) so the banner isn't the LCP element. This is a CookieYes dashboard setting, not code.
+**Why the effort is "S, result depends on #4 and #5"** (checked 12 Oct): #3 has no cause of its own.
+- **The banner waits for DOMContentLoaded.** CookieYes's `banner.js` does nothing until DOMContentLoaded. It then fetches 4 JSON files from `cdn-cookieyes.com` **one after another**: the ruleset, the config, the translations and the audit table.
+- **DOMContentLoaded waits for the bundle.** It waits for the 5 synchronous scripts at the end of `<body>`, and our bundle is the last big one.
+- **So the banner paints at DOMContentLoaded plus 4 round trips.** It only moves when bytes before the bundle go away: the tags (#5) and the legacy CSS/JS with their old font faces (#4).
+- **#6 saves almost no bytes.** Fonts are already `swap` on live, and unused kit weights aren't downloaded (see #6).
 
-**Verify:** homepage mobile LCP < 4 s after #5 and #6, and < 3 s after #4. Check that the LCP element is either the hero label or the banner, and that it paints before about 3 s.
+**Found along the way:**
+- **WP Rocket self-hosts several third parties.** It serves the CookieYes loader, the Typekit kit CSS and jQuery from its minify cache (`/wp-content/cache/min/1/…`). So:
+  - `use.typekit.net` (font files) and `p.typekit.net` (the kit's `@import`) are first contacted late, on cold connections.
+  - Nothing loads from `ajax.googleapis.com`, which makes its dns-prefetch stale already.
+- **The CookieYes preconnect needs `crossorigin`.** `banner.js` loads its JSON with `fetch()` without credentials, which uses a different connection from the one `banner.js` itself came on.
+
+**Fix:**
+1. **Done in code (12 Oct):** `fdry_resource_hints()` in `function-dev.php` (`wp_resource_hints`, new header only).
+   - **Preconnect:** to `use.typekit.net` (crossorigin), `p.typekit.net` and `cdn-cookieyes.com` (crossorigin).
+   - **dns-prefetch:** drops core's `ajax.googleapis.com` entry.
+   - **CMS:** also remove `ajax.googleapis.com` from WP Rocket → Preload → Prefetch DNS Requests.
+2. **Done in code (12 Oct):** #5 step 1, the inline Ads tag out of `header-new.php`. This removes 197 KB that started at 0.22 s.
+3. **The rest is #4 step 3 and #5 step 2.** They remove the legacy CSS, the old font faces and the extra `gtag/js` loads.
+4. **Fallback, only if the banner is still over 3 s after those:** load the bundle `async`, with a `readyState` check in `main.js`, so it stops holding back DOMContentLoaded. This overlaps #10.
+5. **Compact CookieYes layout on mobile.** Decided 12 Oct: not now. It fixes the metric, not what visitors see. Revisit after #4 and #5.
+
+**Verify:**
+- **Before/after:** `pnpm perf mobile / --runs 3 --label before-3`, then `after-3` once deployed (and desktop).
+- **Homepage mobile LCP targets:** < 4 s after #5 steps 1–2, and < 3 s after #4 step 3. The LCP element is either the hero label or the banner.
+- **Markup:** the homepage HTML has the 3 preconnects (2 with `crossorigin`), no `ajax.googleapis.com` dns-prefetch, and no inline `gtag/js?id=AW-11543866131` request.
+
+**Status: code ready (12 Oct), deploy pending.**
+
+**Before, measured on live with the current code** (`build/perf/2026-10-12-2316-before-3-mobile.json`, median of 3, cold first visit):
+
+| Home, mobile | Time |
+|---|---|
+| FCP | 2.02 s |
+| Bundle end | 5.11 s |
+| DOMContentLoaded | 5.17 s |
+| CookieYes JSON chain (ruleset → config → translations → audit table) | 5.35 → 5.97 s |
+| LCP: the banner, `p` in `div.cky-notice-des` | **6.05 s** |
+| Inline Ads `gtag/js` (196 KB, Low priority) ends | 6.63 s |
+| `gtm.js` (175 KB) ends | 6.43 s |
+
+- **Desktop** (`2026-10-12-2317-before-3-desktop.json`): FCP 0.43 s, DOMContentLoaded 0.74 s, LCP 1.00 s. The banner is the LCP there too, but well inside "good".
+- **The banner lands about 0.9 s after DOMContentLoaded.** For LCP < 3 s, DOMContentLoaded has to land by about 2.1 s.
+- **The CookieYes connection was already warm.** Each JSON took about one round trip (about 200 ms), so the `cdn-cookieyes.com` preconnect may gain little. `after-3` will show it.
+- **Found along the way:**
+  - `btn-circle.svg` is 92 KB and ends at 5.4 s.
+  - Phones also download the desktop hero poster (54 KB, the showreel modal `poster`). That's #8.
 
 ## P1: High
 
@@ -392,22 +431,53 @@ Chrome doesn't count the full-viewport hero poster, so for a first visit the ban
 |---|---|---|
 | Google Ads `AW-11543866131` | Inline in `header-new.php` **and** again from GTM | 197 KB × 2 |
 | GA4 `G-37MNQT14EJ` | GTM | 176 KB |
-| GA4 `G-7TCWMDF3MD` | A second GA4 destination (seen in the collect hits) | — |
+| GA4 `G-7TCWMDF3MD` | Not in the container. It rides on the Ads Google tag `AW-11543866131` (a destination linked in that tag's settings in Google Ads), so it loads with whichever Ads `gtag/js` runs | — |
 | Universal Analytics `analytics.js` | GTM. UA stopped processing data in July 2024 | 20 KB |
 | GTM container `GTM-5D5B7P` | Inline | 176 KB |
-| Meta CAPI param builder (`capi-automation…/clientParamBuilder.bundle.js`) | Loads before consent; source to confirm (probably GTM) | 56 KB |
-| Meta Pixel `fbevents.js`, Hotjar | Inline, but CookieYes blocks them until consent, so they only add weight after "Accept" (not measured) | — |
+| Meta CAPI param builder (`capi-automation…/clientParamBuilder.bundle.js`) | GTM Custom HTML on DOM Ready, before consent | 56 KB |
+| Meta Pixel `fbevents.js`, Hotjar | Inline, but CookieYes blocks them until consent, so they only add weight after "Accept" (not measured). The Pixel is **also** a GTM Custom HTML tag (DOM Ready), so it's set up twice | — |
+| LinkedIn Insight | GTM (`__bzi`), All Pages | — |
 | Apollo | Inline, loads **before** consent, with a random `?nocache=` on every load, so it is never cached | small |
 | Klaviyo | Plugin | small |
 
 - In total, about 1 MB of third-party transfer per page.
 - On slow 4G the first `gtag/js` starts before our CSS finishes and holds the connection for 7 s.
 
+**GTM container `GTM-5D5B7P`** (read from the public `gtm.js`, 12 Oct; no GTM login needed):
+
+| Tag | Trigger |
+|---|---|
+| Google tag `AW-11543866131` | Initialization, All Pages |
+| Conversion Linker | All Pages |
+| Ads conversion `11543866131` / `5vTcCJm50JYaEJPWxYAr` | Custom event `ec_form_submit` |
+| Google tag `G-37MNQT14EJ`, plus a GA4 event tag that forwards every custom event | DOM Ready / every non-`gtm.` event |
+| Universal Analytics `UA-9590086-32` | All Pages, plus link-click and form-submit tags |
+| LinkedIn Insight | All Pages |
+| Meta Pixel base, Meta event forwarder, CAPI param builder (Custom HTML) | DOM Ready / every non-`gtm.` event |
+
+- **How the Ads script reuses itself.** When the inline Ads `gtag/js` has loaded, GTM's Ads tag reuses it, and an unthrottled load fetches it once. On slow 4G GTM gets there first and fetches its own copy (`cx=c`): the second 196 KB in the #3 mobile run.
+
 **Fix:**
-1. **Code (S):** delete the inline Ads `gtag.js` block from `header-new.php`. GTM already loads `AW-11543866131`. Confirm in GTM Preview that the Ads tag and its conversion linker fire from the container first.
+1. **Code (S):** delete the inline Ads `gtag.js` block from `header-new.php`. GTM already loads `AW-11543866131`.
+   - **Done in code (12 Oct, with #3). Deploy pending.**
+   - **Checked without GTM access.** The container fires the Ads Google tag on Initialization (All Pages) and the Conversion Linker on All Pages (table above).
+   - **Baseline.** A one-off headless check on live (`build/perf/2026-10-12-gtm-check-before.txt`):
+     - **Page load:** a `ccm/collect` page view for `AW-11543866131` and `G-7TCWMDF3MD` hits.
+     - **After Accept:** remarketing hits.
+     - **On a `mailto:` mousedown:** an `AW-790752334` conversion.
+     - **Conversion Linker:** `_gcl_aw` holds the test `gclid`.
+     - No JS errors.
+   - **After deploy, the same check should show:**
+     - one Ads `gtag/js`, with `cx=c` (loaded by GTM);
+     - the same Ads, GA4 and remarketing hits;
+     - `_gcl_aw` and `_gcl_au` still set;
+     - no `gtag is not defined` error.
+     - **Watch the `mailto:` conversion to `AW-790752334`.** It now runs through the stub and GTM's Ads script. If it stops, that's the #4 step 5 question (is the old account still used?), not a regression in the new account.
+   - **Stub kept.** A `gtag()` stub (the `dataLayer` push only) stays, because `mainjs/footer.js` calls `gtag()` for the old `AW-790752334` conversions (#4 step 5). Without the stub those calls would throw. Remove it with `footer.js`.
+   - **Legacy header.** `header.php` (legacy) still has the inline tag.
 2. **GTM (CMS, S):**
-   - Delete the Universal Analytics tag.
-   - Find out why there are two GA4 IDs (`G-37MNQT14EJ` and `G-7TCWMDF3MD`), and keep one.
+   - Delete the Universal Analytics tags (the page view and the link-click and form-submit events).
+   - Two GA4 IDs: `G-37MNQT14EJ` is the container's GA4 tag (it also goes to a server-side tagging endpoint). `G-7TCWMDF3MD` comes from the Ads Google tag's linked destinations (in Google Ads, not GTM). Ask marketing which property is live, and unlink or remove the other.
    - Check that the Ads and GA4 tags use the same Google tag, so `gtag/js` loads once, not three times.
 3. **Move into GTM behind CookieYes consent (M):** Hotjar, Apollo (without the `nocache` cache-buster) and the Meta Pixel. Remove their inline blocks from `header-new.php`. Fire Hotjar and Apollo on "Window Loaded" or after consent, never in `<head>`.
 4. **Consent check.** The inline Ads tag currently runs **before** CookieYes in `<head>`, so it fires before consent. Moving it into GTM with Consent Mode fixes that too.
@@ -417,22 +487,25 @@ Chrome doesn't count the full-viewport hero poster, so for a first visit the ban
 **Verify:**
 - Exactly one `gtag/js` per destination. No `analytics.js`.
 - Third-party transfer under about 500 KB per page before consent.
-- GTM Preview shows the conversions still firing.
+- The conversions still fire: GTM Preview, or the headless check in step 1.
 - Mobile JS time from Google tags under about 250 ms in the profile.
 
 ### #6 Fonts
 
 **Evidence:**
 - **The kit** (`use.typekit.net/rdq4arx.css`, enqueued as `foundry-typekit`) serves Proxima Nova in 100, 300, 400, 500, 600, 700 and 800, with `font-display: auto`.
+- **Already `swap` on live (checked 12 Oct).** WP Rocket self-hosts the kit CSS and `theme.min.css` in its minify cache, and rewrites every `@font-face` there to `font-display: swap`. So text isn't hidden today. It would be again if WP Rocket's CSS minify were turned off.
 - **`src/` uses** 300, 400, 500, 600 and 700.
-- **Old faces in `theme.min.css`.** Its own `@font-face` rules point at an older kit: 300, 400, 400 italic, 700 and 900. So the 400 file downloads twice (`d7ff92` and `4838bd`), and an italic (`6aec08`, 33 KB) arrives at 7.3 s.
+- **Unused weights cost no bytes.** A browser only downloads a face that text on the page uses, so 100 and 800 in the kit add no font requests.
+- **800 is still needed.** `mainstyle.css` uses it 13 times, in rules for legacy templates: case-study `.work-single-intro`, `.darkbluebanner`, `.lastsectionservice`, `.greybanner` and `.bluedesign`. 900 comes from `theme.min.css`'s old faces.
+- **Old faces in `theme.min.css`.** Its own `@font-face` rules point at an older kit: 300, 400, 400 italic, 700 and 900. So the 400 file downloads twice (`d7ff92` and `4838bd`), and an italic (`6aec08`, 33 KB) arrives at 7.3 s. **These are the font bytes worth removing.**
 - Pages download 5–7 font files, 154–216 KB, at VeryHigh priority, which competes with the bundle.
 - The kit CSS `@import`s `p.typekit.net/p.css`: a chained, render-blocking request.
 
 **Fix:**
-1. **Adobe Fonts web project** (CMS, S): remove weights 100 and 800, and set **Font display → swap**. Check first that no legacy template needs 800: grep `theme.css` and `mainstyle.css` for `font-weight: 800`/`900`.
+1. **Adobe Fonts web project** (CMS, S, hygiene). Set **Font display → swap**, so nothing depends on WP Rocket's rewrite, and remove weight 100. **Keep 800** (legacy templates).
 2. **Old faces:** they go away with #4 step 3 on legacy-free pages. Don't edit `theme.css`.
-3. **Preconnect:** to `use.typekit.net` (crossorigin) and `p.typekit.net`, in the same `fdry_resource_hints()` as #3.
+3. **Preconnect:** to `use.typekit.net` (crossorigin) and `p.typekit.net`, in the same `fdry_resource_hints()` as #3. **Done in code (12 Oct, with #3).**
 4. **Optional:** ask Adobe support or check the kit settings for turning off the `p.typekit.net` tracking import. Some kits allow it, others don't.
 
 **Verify:** at most 4–5 font requests on Home, all from `rdq4arx`, and text paints before the fonts arrive.
@@ -563,8 +636,8 @@ Re-run the coverage with the #0 script (`--legacy-css` mode) after porting. It s
 1. #0 (tooling), then a field-data check in Search Console.
 2. **P0:**
    - #1 (WebP rollout on live) and #2, the biggest LCP/FCP gains.
-   - Then #5 step 1 and #6 step 1, which are mostly settings and unblock #3.
-   - Re-measure #3.
+   - Then #3 with #5 step 1 and the #6 preconnects (code ready 12 Oct), and re-measure.
+   - #3 reaches its target only with #4 step 3 and #5 step 2.
 3. **P1:**
    - #4 steps 1–3, then 4–5.
    - #5 steps 2–4 with marketing.

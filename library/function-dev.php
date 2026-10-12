@@ -728,6 +728,49 @@ function fdry_preload_hero_poster(): void
 add_action('wp_head', 'fdry_preload_hero_poster', 1);
 
 /**
+ * Open the third-party connections the first screen waits on.
+ *
+ * WP Rocket self-hosts the Typekit kit CSS and the CookieYes loader, so
+ * these hosts are first contacted late, on a cold connection:
+ * - use.typekit.net: the font files (CORS, hence crossorigin).
+ * - p.typekit.net: the kit's chained @import, which holds the stylesheet
+ *   and every script after it.
+ * - cdn-cookieyes.com: banner.js waits for DOMContentLoaded, then fetches
+ *   four JSON files in a row. fetch() without credentials uses its own
+ *   connection, so the preconnect needs crossorigin too.
+ *
+ * Drops core's dns-prefetch for ajax.googleapis.com: WP Rocket serves
+ * jQuery from its own cache, so nothing is fetched from that host.
+ * New header only; legacy templates keep the default hints.
+ */
+function fdry_resource_hints(array $urls, string $relation_type): array
+{
+	if (! defined('FDRY_USING_NEW_HEADER') || ! FDRY_USING_NEW_HEADER) {
+		return $urls;
+	}
+
+	if ('preconnect' === $relation_type) {
+		$urls[] = array('href' => 'https://use.typekit.net', 'crossorigin' => 'anonymous');
+		$urls[] = 'https://p.typekit.net';
+		$urls[] = array('href' => 'https://cdn-cookieyes.com', 'crossorigin' => 'anonymous');
+	}
+
+	if ('dns-prefetch' === $relation_type) {
+		$urls = array_filter(
+			$urls,
+			static function ($url): bool {
+				$href = is_array($url) ? ($url['href'] ?? '') : (string) $url;
+
+				return ! str_contains($href, 'ajax.googleapis.com');
+			}
+		);
+	}
+
+	return $urls;
+}
+add_filter('wp_resource_hints', 'fdry_resource_hints', 10, 2);
+
+/**
  * Upload guard thresholds for background video fields.
  *
  * A muted looping hero has no business above roughly 5 Mbps; the ceiling is

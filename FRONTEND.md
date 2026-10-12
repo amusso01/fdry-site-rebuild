@@ -90,6 +90,22 @@ If the manifest is missing (no build yet), assets are not enqueued and the site 
 
 Legacy assets remain in [`inc/enqueue.php`](inc/enqueue.php) (`understrap-styles`, `understrap-scripts`, page-specific old JS).
 
+### Resource hints
+
+`fdry_resource_hints()` (`wp_resource_hints`, new header only) preconnects to the third-party hosts the first screen waits on (PERFORMANCE-PLAN.md #3):
+
+| Host | Why | `crossorigin` |
+|------|-----|---------------|
+| `use.typekit.net` | Font files | Yes: fonts are CORS requests |
+| `p.typekit.net` | The kit CSS `@import`s `p.css`, which holds the stylesheet and every script after it | No |
+| `cdn-cookieyes.com` | `banner.js` waits for DOMContentLoaded, then fetches 4 JSON files in a row | Yes: `fetch()` without credentials uses a separate connection from the script's |
+
+- **Why these hosts start cold.** WP Rocket self-hosts the kit CSS, the CookieYes loader and jQuery in its minify cache (`/wp-content/cache/min/1/…`), so the browser only reaches these hosts late, for the files those reference.
+- **The stale hint.** The same function drops core's dns-prefetch for `ajax.googleapis.com`, since nothing loads from it any more.
+- **Keep the list short.** Every preconnect opens a connection early and competes for bandwidth. Add a host only if it's on the first screen's critical path.
+
+**`gtag()` stub.** `header-new.php` defines `gtag()` (a `dataLayer` push) but no longer loads `gtag.js`: Google Ads comes from GTM. The stub is there for `mainjs/footer.js`'s old conversion calls. Remove it together with `footer.js` (PERFORMANCE-PLAN.md #4 step 5).
+
 ### Templates and headers
 
 - New pages: `get_header( 'new' )` loads [`header-new.php`](header-new.php) (same legacy `<head>`, new header/components).
