@@ -15,6 +15,7 @@
  *     @type string $variant        Visual variant: default or inner. Default default.
  *     @type bool   $slider         When false, stack cards on mobile instead of Swiper. Default true.
  *     @type bool   $contained      Wrap the cards in .content-block with a gap and rounded corners. Default false. Always on for the inner variant.
+ *     @type bool   $is_first       The row is in the first viewport (inner variant only): fades in from first paint. Default false.
  *     @type int    $post_id        Post ID for ACF fallback. Default queried object.
  * }
  */
@@ -38,6 +39,7 @@ $allowed_variants = array('default', 'inner');
 $variant          = $args['variant'] ?? 'default';
 $variant          = is_string($variant) && in_array($variant, $allowed_variants, true) ? $variant : 'default';
 $is_inner         = $variant === 'inner';
+$is_first         = ! empty($args['is_first']);
 $enable_slider    = ! array_key_exists('slider', $args) || (bool) $args['slider'];
 
 // The inner variant already sits in centered-content's .content-block, so it
@@ -120,7 +122,7 @@ if ($cards === array()) {
 }
 ?>
 
-<section class="work-row<?= $is_inner ? ' work-row--inner' : ''; ?><?= $enable_slider ? '' : ' work-row--stack'; ?><?= $is_contained ? ' work-row--contained' : ''; ?>"<?= $is_inner ? ' data-fade-up' : ''; ?> aria-label="<?php esc_attr_e('Featured work', 'foundry'); ?>">
+<section class="work-row<?= $is_inner ? ' work-row--inner' : ''; ?><?= $enable_slider ? '' : ' work-row--stack'; ?><?= $is_contained ? ' work-row--contained' : ''; ?>"<?= $is_inner ? fdry_fade_attrs($is_first) : ''; ?> aria-label="<?php esc_attr_e('Featured work', 'foundry'); ?>">
 	<?php if ($wrap_content_block) : ?>
 		<div class="content-block">
 			<div class="content-max">

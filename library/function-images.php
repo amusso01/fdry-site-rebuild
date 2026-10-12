@@ -572,20 +572,23 @@ function fdry_webp_content_img_tag($image)
 add_filter('wp_content_img_tag', 'fdry_webp_content_img_tag', 20);
 
 /**
- * Keep Yoast's social preview images on the JPG/PNG.
+ * Keep the URLs that other software reads on the JPG/PNG.
  *
- * A safety net: Yoast mostly stores og images when a post is saved in
- * wp-admin, where nothing is swapped.
+ * - **Site icons.** The apple-touch-icon (iPhone home screen), the Windows
+ *   tile and Google's search favicon expect PNG, and the files are a few KB.
+ * - **Yoast's social previews.** A safety net: Yoast mostly stores og images
+ *   when a post is saved in wp-admin, where nothing is swapped.
  *
  * @param mixed $url Image URL.
  * @return mixed
  */
-function fdry_webp_social_image($url)
+function fdry_webp_original_url($url)
 {
 	return is_string($url) ? (string) preg_replace('/(\.(?:jpe?g|png))\.webp$/i', '$1', $url) : $url;
 }
-add_filter('wpseo_opengraph_image', 'fdry_webp_social_image', 20);
-add_filter('wpseo_twitter_image', 'fdry_webp_social_image', 20);
+add_filter('get_site_icon_url', 'fdry_webp_original_url', 20);
+add_filter('wpseo_opengraph_image', 'fdry_webp_original_url', 20);
+add_filter('wpseo_twitter_image', 'fdry_webp_original_url', 20);
 
 /**
  * SQL condition for the JPG/PNG attachments the CLI goes through.

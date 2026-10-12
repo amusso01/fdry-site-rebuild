@@ -44,16 +44,16 @@ $has_more   = $query->max_num_pages > 1;
 	<div class="content-block">
 		<div class="content-max">
 			<div class="work-archive__intro">
-				<h1 class="work-archive__tagline" data-fade-up><?= esc_html($tagline); ?></h1>
+				<h1 class="work-archive__tagline"<?= fdry_fade_attrs(true); ?>><?= esc_html($tagline); ?></h1>
 
 				<?php if ($content !== '') : ?>
-					<div class="work-archive__content" data-fade-up data-fade-up-delay="0.2">
+					<div class="work-archive__content"<?= fdry_fade_attrs(true, 0.2); ?>>
 						<?= wp_kses_post($content); ?>
 					</div>
 				<?php endif; ?>
 			</div>
 
-			<nav class="work-archive__nav" aria-label="<?php esc_attr_e('Work categories', 'foundry'); ?>" data-fade-up data-fade-up-delay="0.4">
+			<nav class="work-archive__nav" aria-label="<?php esc_attr_e('Work categories', 'foundry'); ?>"<?= fdry_fade_attrs(true, 0.4); ?>>
 				<ul class="work-archive__filters">
 					<li>
 						<button
@@ -80,10 +80,10 @@ $has_more   = $query->max_num_pages > 1;
 
 			<?php
 			// The fade sits on this wrapper, not the grid: workArchive.js swaps the
-			// grid's cards after gsapFade.js has run, and the grid's own opacity is
-			// the is-loading dim, which the tween's inline opacity would override.
+			// grid's cards, and the grid's own opacity is the is-loading dim, which
+			// the fade's opacity would override while it runs.
 			?>
-			<div class="work-archive__results" data-fade-up data-fade-up-delay="0.6">
+			<div class="work-archive__results"<?= fdry_fade_attrs(true, 0.6); ?>>
 				<div class="work-archive__grid" aria-live="polite">
 					<?= $cards_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- cards are escaped in fdry_render_work_card() ?>
 				</div>

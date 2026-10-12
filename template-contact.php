@@ -43,15 +43,15 @@ $contact_row_index = 0;
 <main class="main contact-main" role="main">
 	<div class="contact-main__col contact-main__col--left">
 		<?php if ($tagline !== '') : ?>
-			<h1 class="contact-main__tagline" data-fade-up><?= esc_html($tagline); ?></h1>
+			<h1 class="contact-main__tagline"<?= fdry_fade_attrs(true); ?>><?= esc_html($tagline); ?></h1>
 		<?php endif; ?>
 
 		<?php if ($title !== '') : ?>
-			<p class="contact-main__title" data-fade-up data-fade-up-delay="0.5"><?= esc_html($title); ?></p>
+			<p class="contact-main__title"<?= fdry_fade_attrs(true, 0.5); ?>><?= esc_html($title); ?></p>
 		<?php endif; ?>
 
 		<?php if ($content !== '') : ?>
-			<div class="contact-main__body wysiwyg" data-fade-up>
+			<div class="contact-main__body wysiwyg"<?= fdry_fade_attrs(true); ?>>
 				<?= wp_kses_post($content); ?>
 			</div>
 		<?php endif; ?>
@@ -59,7 +59,7 @@ $contact_row_index = 0;
 		<?php if ($has_card_link) : ?>
 			<a
 				class="contact-main__card"
-				data-fade-up
+				<?= fdry_fade_attrs(true); ?>
 				href="<?= esc_url($button_parts['url']); ?>"
 				<?php if ($button_parts['target'] !== '') : ?>
 					target="<?= esc_attr($button_parts['target']); ?>"
@@ -69,7 +69,7 @@ $contact_row_index = 0;
 				<?php endif; ?>
 			>
 		<?php else : ?>
-			<div class="contact-main__card" data-fade-up>
+			<div class="contact-main__card"<?= fdry_fade_attrs(true); ?>>
 		<?php endif; ?>
 				<p class="contact-main__card-tagline"><?= esc_html__('LETS TALK', 'foundry'); ?></p>
 				<p class="contact-main__card-title"><?= esc_html__('Send your brief', 'foundry'); ?></p>
@@ -108,7 +108,7 @@ $contact_row_index = 0;
 			$row_fade_delay = $contact_row_index * 0.15;
 			$contact_row_index++;
 			?>
-			<a class="contact-main__row" href="<?= esc_attr($phone_href); ?>" data-fade-up<?= $row_fade_delay > 0 ? ' data-fade-up-delay="' . esc_attr(number_format($row_fade_delay, 2)) . '"' : ''; ?>>
+			<a class="contact-main__row" href="<?= esc_attr($phone_href); ?>"<?= fdry_fade_attrs(true, $row_fade_delay); ?>>
 				<span class="contact-main__row-text"><?= esc_html($phone); ?></span>
 				<span class="contact-main__row-arrow" aria-hidden="true">
 					<?php get_template_part('svg-template/svg-arrow'); ?>
@@ -121,7 +121,7 @@ $contact_row_index = 0;
 			$row_fade_delay = $contact_row_index * 0.15;
 			$contact_row_index++;
 			?>
-			<a class="contact-main__row" href="<?= esc_url('mailto:' . antispambot($email)); ?>" data-fade-up<?= $row_fade_delay > 0 ? ' data-fade-up-delay="' . esc_attr(number_format($row_fade_delay, 2)) . '"' : ''; ?>>
+			<a class="contact-main__row" href="<?= esc_url('mailto:' . antispambot($email)); ?>"<?= fdry_fade_attrs(true, $row_fade_delay); ?>>
 				<span class="contact-main__row-text"><?= esc_html($email); ?></span>
 				<span class="contact-main__row-arrow" aria-hidden="true">
 					<?php get_template_part('svg-template/svg-arrow'); ?>
@@ -139,7 +139,7 @@ $contact_row_index = 0;
 				href="<?= esc_url($address_url); ?>"
 				target="_blank"
 				rel="noopener noreferrer"
-				data-fade-up<?= $row_fade_delay > 0 ? ' data-fade-up-delay="' . esc_attr(number_format($row_fade_delay, 2)) . '"' : ''; ?>
+				<?= fdry_fade_attrs(true, $row_fade_delay); ?>
 			>
 				<span class="contact-main__row-stack">
 					<?php if ($address_eyebrow !== '') : ?>

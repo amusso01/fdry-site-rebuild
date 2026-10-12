@@ -26,9 +26,9 @@ get_header('new');
 	<div class="content-block">
 		<div class="content-max">
 			<div class="error-page__inner">
-				<h1 class="error-page__title" data-fade-up>Oops!</h1>
-				<h2 class="error-page__subtitle" data-fade-up data-fade-up-delay="0.1">Page not found (404)</h2>
-				<p class="error-page__text" data-fade-up data-fade-up-delay="0.2">Go back to our <a class="error-page__link" href="<?php echo esc_url(home_url('/')); ?>">homepage</a>.</p>
+				<h1 class="error-page__title"<?= fdry_fade_attrs(true); ?>>Oops!</h1>
+				<h2 class="error-page__subtitle"<?= fdry_fade_attrs(true, 0.1); ?>>Page not found (404)</h2>
+				<p class="error-page__text"<?= fdry_fade_attrs(true, 0.2); ?>>Go back to our <a class="error-page__link" href="<?php echo esc_url(home_url('/')); ?>">homepage</a>.</p>
 			</div>
 		</div>
 	</div>

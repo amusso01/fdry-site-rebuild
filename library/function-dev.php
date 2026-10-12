@@ -350,6 +350,31 @@ function fdry_fade_gate(): void
 add_action('wp_head', 'fdry_fade_gate', 1);
 
 /**
+ * Fade attributes for an element, leading space included.
+ *
+ * Elements in the first viewport (the header and the page's first section) get
+ * data-fade-first: a CSS animation in _helper.scss that starts at first paint.
+ * Gated by gsapFade.js they would stay hidden until the bundle has downloaded
+ * and run, which holds back FCP and LCP. Everything else gets the usual
+ * data-fade-up / data-fade-down. To roll back, return the second branch always.
+ *
+ * @param bool   $first     True when the element can be in the first viewport.
+ * @param float  $delay     Seconds before the fade starts.
+ * @param string $direction up or down.
+ */
+function fdry_fade_attrs(bool $first, float $delay = 0.0, string $direction = 'up'): string
+{
+	$direction = $direction === 'down' ? 'down' : 'up';
+	$delay     = $delay > 0 ? number_format($delay, 2) : '';
+
+	if ($first) {
+		return ' data-fade-first="' . $direction . '"' . ($delay !== '' ? ' style="--fade-delay: ' . $delay . 's"' : '');
+	}
+
+	return ' data-fade-' . $direction . ($delay !== '' ? ' data-fade-' . $direction . '-delay="' . $delay . '"' : '');
+}
+
+/**
  * Normalise an ACF link field to url + target parts.
  *
  * @param array|string|false|null $link ACF link field value.

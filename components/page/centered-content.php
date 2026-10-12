@@ -18,7 +18,7 @@
  *     @type string       $content     WYSIWYG body content.
  *     @type array        $button_1    ACF link array for primary button.
  *     @type array        $button_2    ACF link array for white button.
- *     @type bool         $is_first    When true, adds top spacing below the fixed header.
+ *     @type bool         $is_first    When true, adds top spacing below the fixed header, and the section fades in from first paint (fdry_fade_attrs()).
  *     @type int          $post_id     Post ID for ACF fallback. Default queried object.
  * }
  */
@@ -118,21 +118,21 @@ if ($tagline === '' && $title === '' && $content === '' && ! $has_button_1 && ! 
 		<div class="content-max">
 			<div class="centered-content__inner">
 				<?php if ($tagline !== '') : ?>
-					<<?= esc_attr($tagline_tag); ?> class="centered-content__tagline" data-fade-up><?= esc_html($tagline); ?></<?= esc_attr($tagline_tag); ?>>
+					<<?= esc_attr($tagline_tag); ?> class="centered-content__tagline"<?= fdry_fade_attrs($is_first); ?>><?= esc_html($tagline); ?></<?= esc_attr($tagline_tag); ?>>
 				<?php endif; ?>
 
 				<?php if ($title !== '') : ?>
-					<p class="centered-content__title" data-fade-up data-fade-up-delay="0.5"><?= esc_html($title); ?></p>
+					<p class="centered-content__title"<?= fdry_fade_attrs($is_first, 0.5); ?>><?= esc_html($title); ?></p>
 				<?php endif; ?>
 
 				<?php if ($content !== '') : ?>
-					<div class="centered-content__body wysiwyg" data-fade-up>
+					<div class="centered-content__body wysiwyg"<?= fdry_fade_attrs($is_first); ?>>
 						<?= wp_kses_post($content); ?>
 					</div>
 				<?php endif; ?>
 
 				<?php if ($has_button_1 || $has_button_2) : ?>
-					<div class="centered-content__actions" data-fade-up>
+					<div class="centered-content__actions"<?= fdry_fade_attrs($is_first); ?>>
 						<?php if ($has_button_1) : ?>
 							<?php
 							get_template_part(
@@ -171,9 +171,10 @@ if ($tagline === '' && $title === '' && $content === '' && ! $has_button_1 && ! 
 				'components/page/work-row',
 				null,
 				array(
-					'field'   => $work_row_field,
-					'post_id' => $post_id,
-					'variant' => 'inner',
+					'field'    => $work_row_field,
+					'post_id'  => $post_id,
+					'variant'  => 'inner',
+					'is_first' => $is_first,
 				)
 			);
 			?>

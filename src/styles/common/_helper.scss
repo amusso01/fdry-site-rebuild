@@ -59,6 +59,39 @@
 	opacity: 0;
 }
 
+// The first screen (data-fade-first, from fdry_fade_attrs()) fades in CSS from
+// first paint instead: waiting for gsapFade.js would keep it hidden, and hold
+// back FCP and LCP, until the bundle has run. Same motion as the GSAP fade:
+// 50px over 2s, power3.out (easeOutQuart). The hide rule above doesn't match
+// it, so with reduced motion it just shows. `translate` leaves a component's
+// own transforms alone, and `backwards` leaves nothing behind once it ends.
+// It starts at 0.01, not 0: Chrome runs the animation on the compositor and
+// doesn't count content under opacity 0 as painted until it ends, so from 0
+// FCP and LCP would land 2s (plus the delay) late. Looks the same.
+@keyframes fdry-fade-first-up {
+	from {
+		opacity: 0.01;
+		translate: 0 50px;
+	}
+}
+
+@keyframes fdry-fade-first-down {
+	from {
+		opacity: 0.01;
+		translate: 0 -50px;
+	}
+}
+
+@media (prefers-reduced-motion: no-preference) {
+	[data-fade-first] {
+		animation: fdry-fade-first-up 2s cubic-bezier(0.25, 1, 0.5, 1) var(--fade-delay, 0s) backwards;
+	}
+
+	[data-fade-first='down'] {
+		animation-name: fdry-fade-first-down;
+	}
+}
+
 .parallax-clip {
 	overflow: hidden;
 }

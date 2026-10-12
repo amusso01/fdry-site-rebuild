@@ -203,17 +203,41 @@ A new overlay that locks the page should send the same kind of event and be adde
 | `data-fade-up-duration` / `data-fade-down-duration` | Seconds **added to** the 2 s base, so `".2"` is 2.2 s | `0` |
 | `data-fade-up-distance` / `data-fade-down-distance` | Travel in px | `50` |
 | `data-fade-up-group` | Put on a wrapper: its direct `p`, `h1`–`h6`, `ul`, `ol`, `img`, `figure`, `blockquote` and `hr` children each fade up. A value (e.g. `"0.1"`) staggers them. | no stagger |
+| `data-fade-first="up\|down"` | First screen only: the same fade in CSS, from first paint. Print it with `fdry_fade_attrs()`, never by hand (see **First screen**) | — |
 
 The duration attribute works like lionandmason's. Consecutive items with `.2`, `.4`, `.6`… start together and land one after another, which gives a cascade (their logo strip). Use `-delay` to make them start one after another instead.
 
-Elements already past `top 90%` on load play straight away, and so do elements above the viewport (e.g. after a reload lower down). That covers the header and the page heading, e.g. `data-fade-up data-fade-up-delay="0.5"`.
+Elements already past `top 90%` on load play straight away, and so do elements above the viewport (e.g. after a reload lower down).
+
+- **First screen.** Anything that can be in the first viewport, meaning the header and the page's first section, must not wait for `gsapFade.js`. Behind the gate it stays at `opacity: 0` until the bundle has downloaded and run, and nothing above the fold paints before that. On slow 4G that held FCP on service pages at 5.8 s (PERFORMANCE-PLAN.md #2).
+  - **How.** Print the attributes with `fdry_fade_attrs($first, $delay, $direction)` from [`function-dev.php`](library/function-dev.php). With `$first` true it prints `data-fade-first` and the delay as an inline `--fade-delay`. With `$first` false it prints the usual `data-fade-up` / `-delay`. A component that can be first or not passes its flag: `centered-content.php` passes `is_first`, and hands it on to its inner work row (the LCP slide on service pages).
+  - **Motion.** The `fdry-fade-first-up` / `-down` keyframes in `_helper.scss` copy the GSAP fade: 50px, 2 s, `cubic-bezier(0.25, 1, 0.5, 1)` (`power3.out`). They run from first paint, with no JS. They animate the `translate` property, so a component's own `transform` is left alone, and `backwards` fill leaves no inline opacity behind.
+  - **Opacity 0.01, never 0.** Chrome runs CSS opacity animations on the compositor, and it doesn't count content under opacity 0 as painted until the animation ends. Measured in Chrome 153 (12 Oct 2026):
+
+    | Start | FCP and LCP |
+    |---|---|
+    | No fade | first paint |
+    | Opacity 0 | after the full 2 s (plus the delay) |
+    | Opacity 0.01 | first paint |
+
+    The same applies to any CSS fade on an LCP element.
+  - **What the metric means.** At 0.01 the metrics fire on the first frame, a little before the text is readable. With the power3.out curve, an element is about half visible 0.3 s in. A delayed element, such as the centred-content title at 0.5 s, is read about 0.5 s later than the metric says.
+  - **Fallbacks.** The hide rule doesn't match `data-fade-first`. With reduced motion, no JS or a failed bundle, the first screen simply shows.
+  - **Groups.** There is no CSS group. A first-screen `data-fade-up-group` becomes one wrapper fade, as on `template-one-column.php` and the insight archive intro.
+  - **Where it's used.**
+    - `header-new.php` (down);
+    - the first `centered-content` (About, Services, Service child, Service inner);
+    - the intros of `work-archive.php` and `insight-archive.php`, including the work results;
+    - `template-contact.php`, `template-one-column.php`, `404.php` and the single insight header.
+    - Not the homepage `intro-content`: the hero is `100vh`, so it is always below the fold.
+  - **Rollback.** Make `fdry_fade_attrs()` return its `$first = false` branch for every call.
 
 - **Why not ScrollTrigger.** Fades used to be ScrollTriggers. On cold, logged-in loads from wp-admin they sometimes stopped firing, and everything below the fold stayed at `opacity: 0`: a white page. ScrollTrigger works from positions it stores, which can go stale or stop updating. IntersectionObserver checks each element's real box on every scroll and reflow, whatever does the scrolling, so an element on screen can't stay at its start state.
 - **Hiding before JS.** `_helper.scss` sets `opacity: 0` on these elements and on group children, but only under `html.fdry-fade`. `fdry_fade_gate()` in [`function-dev.php`](library/function-dev.php) adds that class from an inline script in `<head>`, so nothing flashes. `gsapFade.js` adds `fdry-fade-ready` once it is set up. If that has not happened by the window `load` event (bundle failed, blocked or delayed by WP Rocket), the gate comes off and the content shows without the fade. With `prefers-reduced-motion` the class is never set, and `gsap.js` skips the tweens.
 - **Layout shifts.** Only parallax still uses ScrollTrigger, which measures on load and on window resize. On a cold cache the layout keeps changing after `load` (late fonts, images without dimensions). `gsap.js` refreshes ScrollTrigger once fonts are ready and, debounced, whenever the body height changes, on pages that have ScrollTriggers.
 - **Transforms.** GSAP animates the inline `transform` and clears it when the tween ends, leaving `opacity: 1`. An element with its own CSS transform only conflicts during the tween itself. Never fade a `.swiper-wrapper`: Swiper moves it with an inline `transform`, which the tween clears. Fade the `.swiper` container instead, as `work-row.php` does in slider mode.
 - **Content swapped by JS.** `gsapFade.js` only scans the page once. Put the fade on a container that stays, not on items that are replaced or appended later, or they stay hidden. Don't fade an element whose own `opacity` a state class changes either: the tween leaves inline `opacity: 1`, which beats the class. The Work archive fades `.work-archive__results` for both reasons: the AJAX cards, and the `is-loading` dim on `.work-archive__grid`.
-- **Header.** Put `data-fade-down` on `.site-header__inner`, **not** `.site-header`. The header's hide-on-scroll animates `transform` with a CSS transition, which would fight GSAP during the fade.
+- **Header.** The fade is on `.site-header__inner` (`fdry_fade_attrs(true, 0, 'down')`), **not** `.site-header`. The header's hide-on-scroll animates `.site-header`'s `transform` with a CSS transition, so a fade on the same element would fight it.
 
 ## Tech banner grid
 
@@ -376,7 +400,8 @@ Hero posters are already WebP, so they and their preload stay the same.
 - **Where it runs.** The swap runs on the front end and in its two AJAX actions, `fdry_load_more_works` and `load_more_posts` (`fdry_webp_ajax_actions()`).
   - **Where it never runs:** wp-admin, any other admin-ajax call, REST (the block editor), feeds and WP-CLI.
   - **Why the AJAX allowlist.** Other admin-ajax calls include the media modal, which could save a swapped URL into post content. A new front-end AJAX action that prints images must be added to the list.
-- **Social previews** stay on the JPG/PNG: `wpseo_opengraph_image` and `wpseo_twitter_image` strip the `.webp`.
+- **Looking up an attachment from a URL.** A URL-format ACF image field returns the `.webp` URL, which matches no attachment. Pass it through `fdry_webp_original_url()` before `attachment_url_to_postid()`. The single insight hero missed this at first: with no ID it fell back to a bare `<img>` with no srcset, and phones downloaded the 611 KB full-size copy, which took LCP from 3.8 s to 9.6 s.
+- **Site icons and social previews** stay on the JPG/PNG. `fdry_webp_original_url()` strips the `.webp` on `get_site_icon_url`, `wpseo_opengraph_image` and `wpseo_twitter_image`. The apple-touch-icon (iPhone home screen), the Windows tile and Google's search favicon expect PNG, and the icon files are only a few KB.
 - **WebP only, no `<picture>` fallback.** Every browser since Safari 14 (2020) reads WebP. The markup and CSS stay the same, and Cloudflare caches one file per URL without needing `Vary: Accept`.
 - **Not covered.** URLs hard-coded in legacy templates or CSS.
 

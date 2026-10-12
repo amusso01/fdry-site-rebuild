@@ -20,7 +20,7 @@ $post_id = (int) get_queried_object_id();
 <main class="main one-column" role="main">
 	<?php if (trim((string) get_post_field('post_content', $post_id)) !== '') : ?>
 		<div class="one-column__inner content-block content-narrow">
-			<div class="wysiwyg" data-fade-up-group>
+			<div class="wysiwyg"<?= fdry_fade_attrs(true); ?>>
 				<?php the_content(); ?>
 			</div>
 		</div>

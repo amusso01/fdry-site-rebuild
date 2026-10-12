@@ -173,7 +173,7 @@ if (! defined('FDRY_USING_NEW_HEADER')) {
   <div id="page" class="site">
     <a class="skip-link screen-reader-text" href="#content"><?php esc_html_e('Skip to content', 'foundry'); ?></a>
     <header class="site-header">
-      <div class="site-header__inner content-block" data-fade-down>
+      <div class="site-header__inner content-block"<?= fdry_fade_attrs(true, 0, 'down'); ?>>
         <div class="site-header__brand">
           <?php get_template_part('components/header/logo'); ?>
           <?php get_template_part('components/header/hamburger'); ?>

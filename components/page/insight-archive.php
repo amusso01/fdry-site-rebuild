@@ -59,17 +59,17 @@ $insights = new WP_Query(
 					<?php if ($tagline !== '' || $title !== '') : ?>
 						<div class="insight-archive__header">
 							<?php if ($tagline !== '') : ?>
-								<h1 class="insight-archive__tagline" data-fade-up><?= esc_html($tagline); ?></h1>
+								<h1 class="insight-archive__tagline"<?= fdry_fade_attrs(true); ?>><?= esc_html($tagline); ?></h1>
 							<?php endif; ?>
 
 							<?php if ($title !== '') : ?>
-								<p class="insight-archive__title" data-fade-up data-fade-up-delay="0.2"><?= esc_html($title); ?></p>
+								<p class="insight-archive__title"<?= fdry_fade_attrs(true, 0.2); ?>><?= esc_html($title); ?></p>
 							<?php endif; ?>
 						</div>
 					<?php endif; ?>
 
 					<?php if ($content !== '') : ?>
-						<div class="insight-archive__body wysiwyg" data-fade-up-group>
+						<div class="insight-archive__body wysiwyg"<?= fdry_fade_attrs(true); ?>>
 							<?= wp_kses_post($content); ?>
 						</div>
 					<?php endif; ?>

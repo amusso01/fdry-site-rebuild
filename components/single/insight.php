@@ -38,9 +38,12 @@ foreach (get_the_category() as $term) {
 }
 
 // ACF hero_image (returns a URL) first, then the featured image, as before.
+// The WebP swap has already turned the URL into the .webp copy, which matches
+// no attachment, so look up the original. Without the ID there is no srcset,
+// and phones download the full-size file.
 $hero_url = get_field('hero_image');
 $hero_url = is_string($hero_url) ? trim($hero_url) : '';
-$image_id = $hero_url !== '' ? attachment_url_to_postid($hero_url) : 0;
+$image_id = $hero_url !== '' ? attachment_url_to_postid(fdry_webp_original_url($hero_url)) : 0;
 
 if ($hero_url === '') {
 	$image_id = (int) get_post_thumbnail_id();
@@ -82,13 +85,13 @@ $share = array(
 <main class="single-insight">
 	<article id="post-<?php the_ID(); ?>" <?php post_class('single-insight__article'); ?>>
 		<header class="single-insight__header content-block">
-			<p class="single-insight__eyebrow" data-fade-up>
+			<p class="single-insight__eyebrow"<?= fdry_fade_attrs(true); ?>>
 				<a class="single-insight__eyebrow-link" href="<?= esc_url($insights_url); ?>"><?= esc_html__('Insights', 'foundry'); ?></a>
 			</p>
 
-			<h1 class="single-insight__title" data-fade-up data-fade-up-delay="0.1"><?= esc_html($title); ?></h1>
+			<h1 class="single-insight__title"<?= fdry_fade_attrs(true, 0.1); ?>><?= esc_html($title); ?></h1>
 
-			<ul class="single-insight__share" aria-label="<?= esc_attr__('Share this article', 'foundry'); ?>" data-fade-up data-fade-up-delay="0.2">
+			<ul class="single-insight__share" aria-label="<?= esc_attr__('Share this article', 'foundry'); ?>"<?= fdry_fade_attrs(true, 0.2); ?>>
 				<?php foreach ($share as $network => $link) : ?>
 					<li>
 						<a
