@@ -59,7 +59,10 @@
 		list-style: none;
 		align-self: start;
 
+		// Sticky so the links follow a long body text down the page.
 		@include media('>=tablet') {
+			position: sticky;
+			top: 45px;
 			margin-top: 40px;
 			padding-right: 200px !important;
 		}

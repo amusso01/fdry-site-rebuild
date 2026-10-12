@@ -173,3 +173,11 @@
 .service-inner-main .two-column-list__body:not(.two-column-list__body--bigger-font) {
 	max-width: 70ch;
 }
+
+// Keep the image in view while a long right column scrolls past.
+.service-inner-main .two-column-list__left {
+	@include media('>=tablet') {
+		position: sticky;
+		top: 45px;
+	}
+}

@@ -39,7 +39,11 @@ get_header('new');
   ?>
   <?php get_template_part('components/page/work-row', null, array('field' => 'work_row_2', 'slider' => false, 'contained' => true));
   ?>
+  <?php get_template_part('components/page/four-column-grid');
+  ?>
   <?php get_template_part('components/page/two-column-content', null, array('prefix' => 'two_column_2'));
+  ?>
+  <?php get_template_part('components/page/work-row', null, array('field' => 'work_row_3', 'slider' => false, 'contained' => true));
   ?>
 </main>
 

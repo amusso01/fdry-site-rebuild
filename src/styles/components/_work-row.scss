@@ -295,6 +295,11 @@
 	padding-top: 72px;
 }
 
+// Homepage: the last work row sits on the footer, so it needs space below.
+.homepage-main > .work-row--stack:last-child {
+	padding-bottom: clamp(3rem, 6vw, 5rem);
+}
+
 @media (prefers-reduced-motion: reduce) {
 	.work-row__card,
 	.work-row__image,

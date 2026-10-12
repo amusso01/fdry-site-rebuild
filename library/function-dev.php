@@ -550,7 +550,7 @@ const FDRY_HERO_MOBILE_MAX_PX = 768;
  * Give a new reel a new name rather than overwriting the files, so no
  * browser or CDN cache can serve the old one.
  */
-const FDRY_SHOWREEL_BASENAME = 'media/showreel-2026';
+const FDRY_SHOWREEL_BASENAME = 'media/showreel-2026-v2';
 
 /**
  * Resolve the full showreel files to URLs.
