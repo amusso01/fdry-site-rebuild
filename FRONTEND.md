@@ -25,6 +25,7 @@ Safer than rewriting the 15k-line theme CSS. New work stays isolated and easy to
 library/
   function-dev.php   # New dev site PHP (see below)
   function-redirect.php  # Every theme 301 redirect, in fdry_redirect_moved_urls()
+  function-images.php    # WebP copies of uploads and the front-end URL swap (see Images (WebP))
 src/
   scripts/
     main.js          # JS entry — imports SCSS + part modules
@@ -322,6 +323,68 @@ Commit `pnpm-lock.yaml` so installs stay reproducible.
 [Vite](https://vite.dev/) with the `sass` package. Config: [`vite.config.js`](vite.config.js).
 
 Build output is hashed `fdry.[hash].js`, `fdry.[hash].css`, and `dist/.vite/manifest.json`. WordPress reads the manifest to enqueue the current filenames — no query-string cache busting, so CDN and WP Rocket pick up new assets automatically.
+
+## Images (WebP)
+
+[`function-images.php`](library/function-images.php) gives every JPG/PNG upload a WebP copy and serves that copy on the front end. It fixes oversized uploads across the whole library and never touches the originals (PERFORMANCE-PLAN.md #1).
+
+**Why the originals were the problem.** WordPress re-compresses the sizes it makes at upload, but it serves the uploaded file byte for byte. A page gets that file in two cases:
+- **The file is smaller than the size asked for.** The first service-page slide is a 640px PNG requested as `large`.
+- **It's the largest srcset candidate.** That happens on wide screens.
+
+Templates can only choose between files that exist, so the fix has to be in the files. Tested on the live files:
+
+| File | Original | WebP copy |
+|---|---|---|
+| `calling-by-fdry.png` (service-page slide, the LCP) | 564 KB | 45 KB |
+| `hero-banner.jpg` (service inner banner) | 920 KB | 65 KB |
+
+**Naming.** The copy sits next to its file as `{file}.{ext}.webp`, so `calling-by-fdry.png` becomes `calling-by-fdry.png.webp`. Keeping the extension stops `photo.jpg` and `photo.png` from clashing, and taking `.webp` off gives back the original URL.
+
+**Quality.** `FDRY_WEBP_QUALITY` is 80.
+- **No-gain files.** A copy that isn't smaller than its source is deleted, so that file keeps being served as it is.
+- **Pinning the quality.** The editor resets the quality to the WebP default (86) when it changes format at save time, so `set_quality()` alone doesn't hold. `fdry_webp_editor_quality()` pins it through `wp_editor_set_quality` during each conversion.
+
+**Conversion.**
+- **New uploads.** On `wp_update_attachment_metadata`, `fdry_webp_on_metadata_update()` converts every file in the metadata that has no copy yet. Core saves the metadata after each size it makes, after Regenerate Thumbnails and after a media-library edit, so that one hook covers them all. A failure never breaks the upload.
+- **Deletes.** `fdry_webp_delete_copy()` (`wp_delete_file`) deletes the copy along with its file. That covers deleted attachments, regenerated sizes and restored edits.
+- **Existing library.** Run `wp fdry webp` (WP-CLI).
+  - It goes through JPG/PNG attachments in ID order, 200 per query.
+  - It marks each finished attachment with `_fdry_webp`, so you can stop it and run it again.
+  - An attachment with a failed file isn't marked, so the next run tries it again.
+  - Flags:
+
+    | Flag | Effect |
+    |---|---|
+    | `--ids=1,2` | Only these attachments |
+    | `--dry-run` | Count the work without writing anything |
+    | `--limit=100` | Stop after 100 attachments and print the command for the next chunk (with `--after`). Use it in Plesk's WP-CLI panel, which runs over a web request and can time out |
+    | `--force` | Make existing copies again (e.g. after a quality change) |
+    | `--delete` | Remove every copy and marker |
+  - **Plesk WP-CLI panel.** WP Toolkit → WP-CLI runs as the site's user, which is what you want: a run as root would leave copies WordPress can't delete. Type commands without the `wp` prefix (`fdry webp --limit=100`).
+  - **Cut-off runs are safe.** Each copy is written as `{file}.{ext}.tmp.webp` and renamed once complete, so a timeout never leaves a half-written copy that would be served. A leftover temp file is never served, and the next conversion of that file overwrites it.
+  - When it finishes, clear the WP Rocket cache.
+
+**URL swap.** `fdry_webp_url()` returns the copy's URL when the copy exists on disk. Otherwise it returns the URL unchanged. It runs on:
+- `wp_get_attachment_image_src`, for the work row, work cards and parallax (one `large` URL each);
+- `wp_calculate_image_srcset`, for every srcset;
+- ACF `image` and `gallery` values, for `fdry_image_parts()` and every component that reads `url`;
+- Gutenberg `<img>` tags (`wp_content_img_tag`).
+
+Hero posters are already WebP, so they and their preload stay the same.
+
+- **Where it runs.** The swap runs on the front end and in its two AJAX actions, `fdry_load_more_works` and `load_more_posts` (`fdry_webp_ajax_actions()`).
+  - **Where it never runs:** wp-admin, any other admin-ajax call, REST (the block editor), feeds and WP-CLI.
+  - **Why the AJAX allowlist.** Other admin-ajax calls include the media modal, which could save a swapped URL into post content. A new front-end AJAX action that prints images must be added to the list.
+- **Social previews** stay on the JPG/PNG: `wpseo_opengraph_image` and `wpseo_twitter_image` strip the `.webp`.
+- **WebP only, no `<picture>` fallback.** Every browser since Safari 14 (2020) reads WebP. The markup and CSS stay the same, and Cloudflare caches one file per URL without needing `Vary: Accept`.
+- **Not covered.** URLs hard-coded in legacy templates or CSS.
+
+**Off switch.** Put `define('FDRY_WEBP', false);` in `wp-config.php` to stop both the conversion and the swap, then clear the WP Rocket cache. The copies stay on disk until `wp fdry webp --delete` removes them.
+
+**Requirements.** The server's Imagick or GD must be able to write WebP. Check under Tools → Site Health → Info → Media handling. Without that support the CLI stops with an error, and uploads carry on as before without copies. Copies add roughly 25–35% to the size of the JPG/PNG files on disk.
+
+**Why not a service.** Cloudflare is on the Free plan. Polish is Pro-only, and Image Transformations' 5,000 a month is too few for a library of more than 5,000 images. WP Rocket can't convert images itself, and Imagify would add a plugin and a monthly fee.
 
 ## Hero / showreel video
 
