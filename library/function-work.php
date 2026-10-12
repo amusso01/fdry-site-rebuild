@@ -17,7 +17,7 @@ if (! defined('ABSPATH')) {
  * @param int    $paged    1-based page number.
  * @param int    $per_page Posts per page.
  */
-function fdry_work_query(string $category, int $paged, int $per_page = 9): WP_Query
+function fdry_work_query(string $category, int $paged, int $per_page = 18): WP_Query
 {
 	$paged    = max(1, $paged);
 	$per_page = max(1, $per_page);

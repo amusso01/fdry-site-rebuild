@@ -38,9 +38,18 @@ get_header('new');
   get_template_part('components/page/two-column-list', null, array(
     'prefix' => 'two_column_2',
   ));
+  get_template_part('components/page/work-row', null, array(
+    'slider'    => false,
+    'contained' => true,
+  ));
   get_template_part('components/page/two-column-list', null, array(
     'prefix'     => 'two_column_gray_2',
     'appearance' => 'gray',
+  ));
+  get_template_part('components/page/work-row', null, array(
+    'field'     => 'work_row_2',
+    'slider'    => false,
+    'contained' => true,
   ));
   ?>
 

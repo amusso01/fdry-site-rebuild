@@ -15,10 +15,10 @@
 $logos = array(
   'shopify'        => 'Shopify',
   'woocommerce'    => 'WooCommerce',
+  'automattic'     => 'Automattic',
   'meta'           => 'Meta',
   'google-partner' => 'Google Partner',
-  'big-commerce'   => 'BigCommerce',
-  'square'         => 'Square',
+  'klaviyo'        => 'Klaviyo',
 );
 
 $cols      = 8;

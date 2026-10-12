@@ -285,6 +285,16 @@
 	height: 680px;
 }
 
+// Service inner: the standalone work rows sit next to gray sections and the
+// footer, so they need their own white space around the cards.
+.service-inner-main > .work-row--stack {
+	padding-bottom: 72px;
+}
+
+.service-inner-main > .two-column-list--gray + .work-row--stack {
+	padding-top: 72px;
+}
+
 @media (prefers-reduced-motion: reduce) {
 	.work-row__card,
 	.work-row__image,

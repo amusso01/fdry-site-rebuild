@@ -1206,6 +1206,75 @@
             "ui_off_text": ""
         },
         {
+            "key": "field_6acca35b7d943",
+            "label": "Work Row",
+            "name": "",
+            "aria-label": "",
+            "type": "tab",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "placement": "top",
+            "endpoint": 0,
+            "selected": 0
+        },
+        {
+            "key": "field_6acca35b873e9",
+            "label": "Work Row",
+            "name": "work_row",
+            "aria-label": "",
+            "type": "repeater",
+            "instructions": "Pick up to three featured works for the full-width hover row.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "layout": "block",
+            "pagination": 0,
+            "min": 0,
+            "max": 3,
+            "collapsed": "field_6acca35b90928",
+            "button_label": "Add work",
+            "rows_per_page": 20,
+            "sub_fields": [
+                {
+                    "key": "field_6acca35b90928",
+                    "label": "Work",
+                    "name": "work",
+                    "aria-label": "",
+                    "type": "post_object",
+                    "instructions": "",
+                    "required": 1,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "post_type": [
+                        "works_post"
+                    ],
+                    "post_status": "",
+                    "taxonomy": "",
+                    "return_format": "object",
+                    "multiple": 0,
+                    "allow_null": 0,
+                    "allow_in_bindings": 0,
+                    "ui": 1,
+                    "bidirectional_target": [],
+                    "parent_repeater": "field_6acca35b873e9"
+                }
+            ]
+        },
+        {
             "key": "field_6aa860b2719a3",
             "label": "Two Column Content Gray 2",
             "name": "",
@@ -1423,6 +1492,75 @@
             "ui": 1,
             "ui_on_text": "",
             "ui_off_text": ""
+        },
+        {
+            "key": "field_6acca35b99b3c",
+            "label": "Work Row 2",
+            "name": "",
+            "aria-label": "",
+            "type": "tab",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "placement": "top",
+            "endpoint": 0,
+            "selected": 0
+        },
+        {
+            "key": "field_6acca35ba3092",
+            "label": "Work Row 2",
+            "name": "work_row_2",
+            "aria-label": "",
+            "type": "repeater",
+            "instructions": "Pick up to three featured works for the full-width hover row.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "layout": "block",
+            "pagination": 0,
+            "min": 0,
+            "max": 3,
+            "collapsed": "field_6acca35bac7e1",
+            "button_label": "Add work",
+            "rows_per_page": 20,
+            "sub_fields": [
+                {
+                    "key": "field_6acca35bac7e1",
+                    "label": "Work",
+                    "name": "work",
+                    "aria-label": "",
+                    "type": "post_object",
+                    "instructions": "",
+                    "required": 1,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "post_type": [
+                        "works_post"
+                    ],
+                    "post_status": "",
+                    "taxonomy": "",
+                    "return_format": "object",
+                    "multiple": 0,
+                    "allow_null": 0,
+                    "allow_in_bindings": 0,
+                    "ui": 1,
+                    "bidirectional_target": [],
+                    "parent_repeater": "field_6acca35ba3092"
+                }
+            ]
         }
     ],
     "location": [
@@ -1446,5 +1584,5 @@
     "display_title": "",
     "allow_ai_access": false,
     "ai_description": "",
-    "modified": 1790862055
+    "modified": 1791796070
 }
