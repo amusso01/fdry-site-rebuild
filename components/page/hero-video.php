@@ -11,9 +11,10 @@
  * download it. See src/scripts/part/heroVideo.js.
  *
  * The showreel button opens a <dialog> with the full reel. It renders only
- * when the reel file is deployed, and its <video> also ships without a src:
- * showreelModal.js attaches one on hover/focus or click, so the page itself
- * downloads none of it. See src/scripts/part/showreelModal.js.
+ * when the reel file is deployed, and its <video> also ships without a src
+ * or a poster (data-poster): showreelModal.js attaches both on hover/focus or
+ * click, so the page itself downloads none of it. A poster attribute would be
+ * fetched at once, closed dialog or not. See src/scripts/part/showreelModal.js.
  *
  * @author Andrea Musso
  *
@@ -85,14 +86,18 @@ $modal_id     = $has_showreel ? wp_unique_id('showreel-modal-') : '';
 					media="(max-width: <?php echo esc_attr((string) FDRY_HERO_MOBILE_MAX_PX); ?>px)"
 					srcset="<?php echo esc_url($media['poster_mobile']['url']); ?>">
 			<?php endif; ?>
+			<?php
+			// Never lazy: the inline showreel sits right under the first section
+			// on /services/ and is its mobile LCP element. Lazy held it to 3.5 s
+			// once the modal stopped fetching the same file (PERFORMANCE-PLAN.md #8).
+			// Only the hero needs fetchpriority: the inline one paints with the CSS.
+			?>
 			<img
 				src="<?php echo esc_url($media['poster']['url']); ?>"
 				alt="Showreel"
 				decoding="async"
-				<?php if ($variant === 'inline') : ?>
-					loading="lazy"
-				<?php else : ?>
-					loading="eager"
+				loading="eager"
+				<?php if ($variant !== 'inline') : ?>
 					fetchpriority="high"
 				<?php endif; ?>
 				<?php if ($media['poster']['width'] > 0) : ?>
@@ -165,7 +170,7 @@ $modal_id     = $has_showreel ? wp_unique_id('showreel-modal-') : '';
 					data-src="<?php echo esc_url($media['full_video']); ?>"
 					data-src-sd="<?php echo esc_url($media['full_video_sd']); ?>"
 					<?php if ($media['poster']['url'] !== '') : ?>
-						poster="<?php echo esc_url($media['poster']['url']); ?>"
+						data-poster="<?php echo esc_url($media['poster']['url']); ?>"
 					<?php endif; ?>
 					controls
 					playsinline

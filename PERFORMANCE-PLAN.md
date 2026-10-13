@@ -90,12 +90,12 @@ Parse and compile time is on top of this (about 2.5 s of unattributed "program" 
 | 0 | — | Write and commit a measurement script, so each item can be measured before and after. The baseline was taken with throwaway tools. | Code | S | Done (12 Oct): `pnpm perf` |
 | 1 | **P0** | **Oversized uploads are the LCP image.** The service-page slide is a 551 KB PNG (11.3 s LCP). The banner is a 1376×600 JPG of 899 KB. Nothing converts uploads to WebP/AVIF. | Code + CLI | M | Done 12 Oct: library converted (3.2 GB → 628 MB in the main run); service mobile LCP 11.3 s → 1.7 s |
 | 2 | **P0** | **The first screen is hidden until our JS runs.** The header (`data-fade-down`) and the first section fade in from `opacity: 0`, so FCP waits for the bundle: 5.8 s on service pages. (SEO #17, was P2) | Code | S | Done 12 Oct. Mobile FCP 1.55–1.91 s on all 8 pages. Service inner FCP 5.8 → 1.76 s, LCP 11.3 → 1.76 s (with #1) |
-| 3 | **P0** | **Homepage LCP is the cookie banner (7.3 s).** CookieYes waits for DOMContentLoaded, which waits for our bundle, which is starved of bandwidth by the tags, fonts and legacy CSS. | Code + CMS | S (result depends on #4, #5) | Code ready 12 Oct (preconnects, inline Ads tag out); deploy and `after-3` measure pending |
+| 3 | **P0** | **Homepage LCP is the cookie banner (7.3 s).** CookieYes waits for DOMContentLoaded, which waits for our bundle, which is starved of bandwidth by the tags, fonts and legacy CSS. | Code + CMS | S (result depends on #4, #5) | Live 12 Oct (preconnects, inline Ads tag out). Home mobile LCP 6.05 → 5.72 s, DOMContentLoaded 5.17 → 4.78 s. Still the banner: needs #4 step 3 and the `btn-circle.svg` fix |
 | 4 | **P1** | **Legacy CSS/JS on new templates**: `theme.min.css`, `mainstyle.css`, `typeformstyle.css`, jQuery in `<head>`, `theme.min.js`, `lozad`, `footer.js`, plus TweenMax 2 and `js/about.js` on /about/. (SEO #18, #23) | Code | L | Open |
-| 5 | **P1** | **Marketing tags: ~1 MB and ~0.5 s of main thread per page.** The Ads tag loads twice, there are two GA4 IDs, the dead Universal Analytics `analytics.js` still loads, and Hotjar, Apollo and Meta are hard-coded. (SEO #25, was P3) | GTM + Code | M | Step 1 in code (12 Oct, with #3), deploy pending |
+| 5 | **P1** | **Marketing tags: ~1 MB and ~0.5 s of main thread per page.** The Ads tag loads twice, there are two GA4 IDs, the dead Universal Analytics `analytics.js` still loads, and Hotjar, Apollo and Meta are hard-coded. (SEO #25, was P3) | GTM + Code | M | Step 1 live (12 Oct, with #3): one Ads `gtag/js`, −197 KB third-party; Ads hits and conversions checked |
 | 6 | **P1** | **Fonts.** `theme.min.css` adds its own old Proxima Nova faces, so 400 downloads twice and 400 italic once more. There was no preconnect. (`font-display` is already `swap` on live via WP Rocket; the kit's unused weights cost no bytes.) | Adobe + Code | S | Step 3 (preconnect) in code (12 Oct, with #3); the old faces go with #4 step 3 |
 | 7 | **P1** | **No srcset on work images.** The work row, work cards and parallax request `large` with no srcset. Parallax card 1 (`NUYU.jpg`, 315 KB) loads at 2.4 s on phones. (SEO #16, was P2) | Code | M | Open |
-| 8 | **P2** | **Showreel modal poster.** The modal's `<video poster>` downloads the desktop poster (55 KB) on every page with a showreel, phones included, with the modal closed. | Code | S | Open |
+| 8 | **P2** | **Showreel modal poster.** The modal's `<video poster>` downloads the desktop poster (55 KB) on every page with a showreel, phones included, with the modal closed. | Code | S | Done 12 Oct: Home mobile LCP 5.75 → 4.5–4.9 s, DOMContentLoaded 4.81 → 3.5–3.9 s. The lazy Services showreel poster it exposed is fixed (Services mobile LCP 1.72 s) |
 | 9 | **P2** | **Marquee SVGs are 116 KB of the 240 KB homepage HTML.** The 9 logos are printed twice and not optimised. | Code | S | Open |
 | 10 | **P2** | **One 248 KB bundle on every page.** Swiper, the showreel, the work archive and the tech grid load everywhere. `smoothscroll-polyfill` is obsolete. | Code | M | Open |
 | 11 | **P2** | **WP Rocket.** Turn on "Load JS deferred" and "Delay JS" for non-essential tags, after #4 and #5. Clear priority elements. (SEO #18) | CMS | S | Open |
@@ -352,7 +352,7 @@ Chrome doesn't count the full-viewport hero poster, so for a first visit the ban
 - **Homepage mobile LCP targets:** < 4 s after #5 steps 1–2, and < 3 s after #4 step 3. The LCP element is either the hero label or the banner.
 - **Markup:** the homepage HTML has the 3 preconnects (2 with `crossorigin`), no `ajax.googleapis.com` dns-prefetch, and no inline `gtag/js?id=AW-11543866131` request.
 
-**Status: code ready (12 Oct), deploy pending.**
+**Status: live (12 Oct).** Steps 1–2 deployed. The WP Rocket cache was cleared after the deploy: the cached page kept the old markup until then.
 
 **Before, measured on live with the current code** (`build/perf/2026-10-12-2316-before-3-mobile.json`, median of 3, cold first visit):
 
@@ -367,10 +367,43 @@ Chrome doesn't count the full-viewport hero poster, so for a first visit the ban
 | `gtm.js` (175 KB) ends | 6.43 s |
 
 - **Desktop** (`2026-10-12-2317-before-3-desktop.json`): FCP 0.43 s, DOMContentLoaded 0.74 s, LCP 1.00 s. The banner is the LCP there too, but well inside "good".
+
+**After, measured on live once deployed and the cache cleared** (`build/perf/2026-10-12-2329-after-3-mobile.json`, median of 3; the 3 runs agree to within 0.07 s):
+
+| Home, mobile | Before | After |
+|---|---|---|
+| FCP | 2.02 s | 1.90 s |
+| First font file | 3.90 s | 3.56 s |
+| Bundle end | 5.11 s | 4.76 s |
+| DOMContentLoaded | 5.17 s | 4.78 s |
+| CookieYes JSON chain | 5.35 → 5.97 s | 4.97 → 5.66 s |
+| **LCP (still the banner)** | **6.05 s** | **5.72 s** |
+| Ads `gtag/js` loads | 2 (6.6 s, 8.9 s) | 1 (8.0 s, from GTM) |
+| Third-party bytes | 1,063 KB | 866 KB |
+| Page weight | 1,714 KB | 1,516 KB |
+
+- **Desktop:** FCP 0.43 s, LCP 1.02 s, DOMContentLoaded 0.76 s. That's unchanged, within noise.
+- **What worked:**
+  - Removing the inline Ads tag took 197 KB out of the load. DOMContentLoaded and LCP moved about 0.35 s.
+  - The fonts arrive about 0.35 s sooner (the Typekit preconnects).
+- **What didn't:** the CookieYes preconnect. The first JSON still starts about 0.19 s after DOMContentLoaded, the same as before. It costs one early connection, so drop it if a preconnect is ever needed elsewhere.
+- **Not at the target yet.** About 1 MB still downloads before the banner. Ranked by size:
+
+  | What | Size | Fixed by |
+  |---|---|---|
+  | `gtm.js` | 175 KB | #5 step 2 |
+  | Mobile hero poster | 157 KB | needed |
+  | `btn-circle.svg` | 92 KB | content fix above |
+  | The bundle | 80 KB | #10 |
+  | `theme.min.css` and the old 400 face | 57 + 32 KB (the italic, 33 KB, comes later) | #4 step 3 |
+  | Desktop poster | 54 KB | #8 |
+  | jQuery and `theme.min.js` | 48 KB | #4 step 5 |
+
+- **Next for #3:** `btn-circle.svg` and #8 are small and save 146 KB. Then #4 step 3. Re-measure with `--label after-3b`.
 - **The banner lands about 0.9 s after DOMContentLoaded.** For LCP < 3 s, DOMContentLoaded has to land by about 2.1 s.
 - **The CookieYes connection was already warm.** Each JSON took about one round trip (about 200 ms), so the `cdn-cookieyes.com` preconnect may gain little. `after-3` will show it.
 - **Found along the way:**
-  - `btn-circle.svg` is 92 KB and ends at 5.4 s.
+  - `btn-circle.svg` (92 KB, ends at 4.9–5.4 s) is a 40×40 arrow icon in the homepage WYSIWYG content (3 links: About, Works, Services, all the same file). It carries a hidden 2816×746 PNG, placed outside the viewBox by the Illustrator export. **Fix (content, S):** re-export it without that layer, or delete the `<image>` element. Then replace the file in the media library. It should come out under 1 KB.
   - Phones also download the desktop hero poster (54 KB, the showreel modal `poster`). That's #8.
 
 ## P1: High
@@ -459,7 +492,12 @@ Chrome doesn't count the full-viewport hero poster, so for a first visit the ban
 
 **Fix:**
 1. **Code (S):** delete the inline Ads `gtag.js` block from `header-new.php`. GTM already loads `AW-11543866131`.
-   - **Done in code (12 Oct, with #3). Deploy pending.**
+   - **Live (12 Oct, with #3).** The after-deploy check (`build/perf/2026-10-12-gtm-check-after.txt`) matches the baseline:
+     - one Ads `gtag/js`, loaded by GTM (`cx=c`);
+     - the same Ads page-view, remarketing and `G-7TCWMDF3MD` hits;
+     - the `AW-790752334` email-click conversion still fires through the stub;
+     - `_gcl_aw` and `_gcl_au` are set;
+     - no JS errors.
    - **Checked without GTM access.** The container fires the Ads Google tag on Initialization (All Pages) and the Conversion Linker on All Pages (table above).
    - **Baseline.** A one-off headless check on live (`build/perf/2026-10-12-gtm-check-before.txt`):
      - **Page load:** a `ccm/collect` page view for `AW-11543866131` and `G-7TCWMDF3MD` hits.
@@ -540,6 +578,36 @@ Chrome doesn't count the full-viewport hero poster, so for a first visit the ban
   - Output `data-poster` instead.
   - In `showreelModal.js`, copy it to `poster` in the same place `src` is primed (pointerenter, focus or click).
 - **Verify:** a phone homepage load requests only `hero-home-poster-mobile.webp`.
+- **Status: done (12 Oct), including the Services follow-up fix.**
+  - **Code.** `hero-video.php` prints `data-poster`. `attach()` in `showreelModal.js` copies it to `poster` the first time it runs (pointerenter, focus or click), and close leaves it in place.
+  - **Tested** in headless Chrome on a local copy of the live homepage with the new bundle:
+    - At 412px the page load requests only `hero-home-poster-mobile.webp`, and `hero-home-poster.webp` arrives on `pointerenter`.
+    - Open, close and reopen all work, with the poster kept and `src` dropped and re-attached.
+    - At 1440px there's still one poster request: the hero's, which the modal reuses.
+  - **Before** (`build/perf/2026-10-12-2336-before-8-mobile.json`, median of 3):
+    - **Home, mobile:** FCP 1.96 s, DOMContentLoaded 4.81 s, LCP 5.75 s (the banner). The desktop poster is 54 KB, ending at 1.75 s, in the same window as the CSS, the fonts and the mobile poster (156 KB, ends 4.48 s).
+    - **`/services/`, mobile:** LCP 1.69 s. That's the showreel `<picture>`, which uses the same poster, so no change is expected there.
+  - **After** (`build/perf/2026-10-12-2341-after-8-mobile.json`, median of 3):
+
+    | Mobile | Before | After |
+    |---|---|---|
+    | Home, bundle end | 4.75 s | 3.69 s |
+    | Home, DOMContentLoaded | 4.81 s | 3.49 s |
+    | **Home, LCP (the banner)** | **5.75 s** | **4.54 s** (runs 4.54–4.74) |
+    | `/services/`, LCP | 1.69 s | **3.54 s** (regression, see below) |
+
+    - **Why Home gained more than 54 KB would suggest.** The poster was a Medium-priority request discovered early by the parser, so it sat ahead of the bundle (also Medium, at the end of `<body>`) on the same connection. Without it the bundle lands about 1 s sooner, and DOMContentLoaded and the banner follow.
+  - **Regression on `/services/`, fixed and live (12 Oct).**
+    - **Cause.** The Services showreel (the inline variant, right under the first section) had `loading="lazy"` on its poster `<img>`, yet it is that page's mobile LCP element. Before #8 the modal's `poster` attribute fetched the same file early, which hid the problem. Now the lazy image starts only after layout, at Low priority.
+    - **Fix.** The `<img>` in `hero-video.php` is now always `loading="eager"`. The hero keeps `fetchpriority="high"`, and the inline variant doesn't need it.
+    - **Tested** on local copies of `/services/` (3 runs each, slow 4G and 4× CPU): lazy gives LCP 4.26–4.39 s; eager gives **1.44–1.51 s**, equal to FCP.
+    - **After the fix** (`build/perf/2026-10-12-2349-after-8b-mobile.json`): `/services/` mobile LCP is **1.72 s** (runs 1.65–1.85), back to its pre-#8 1.69 s. Desktop `/services/` LCP is 0.44 s.
+  - **Run-to-run spread on Home.** after-8 gave LCP 4.54–4.74 s, and after-8b, with no Home change in between, gave 4.86–4.88 s. Compare sessions as ranges: Home's gain from #8 is about 0.9–1.2 s.
+  - **Found along the way: the desktop hero loops are heavy and have WebM files.**
+    - **Sizes.** The homepage loop is `home-short.webm` at 9.6 MB (MP4 9.9 MB). The Services loop is `hero-home.webm` at 5.9 MB (MP4 7.8 MB, 6 MB of the 7.2 MB desktop Services load).
+    - **Against the guide.** `video-encode.md` says to leave the WebM fields empty and serve MP4 only.
+    - **Impact.** They're desktop-only and load at Low priority after the LCP, so they don't touch Core Web Vitals, but they cost a lot of bandwidth.
+    - **Not an item yet.** Candidate for a P3 alongside #14: re-encode shorter or lighter, and decide WebM or MP4.
 
 ### #9 Marquee HTML weight
 

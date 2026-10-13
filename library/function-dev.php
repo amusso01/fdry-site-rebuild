@@ -687,8 +687,9 @@ function fdry_hero_media(int $post_id, string $prefix = 'hero', array $args = ar
 /**
  * Preload the homepage hero poster so it paints as the LCP element.
  *
- * Homepage only: the service showreel sits below the fold, where a
- * high priority preload would compete with that page's real LCP element.
+ * Homepage only. On /services/ the inline showreel poster is the mobile LCP
+ * element too, but its <img> is eager and already paints with the CSS, so a
+ * high priority preload would only take bandwidth from the fonts.
  */
 function fdry_preload_hero_poster(): void
 {

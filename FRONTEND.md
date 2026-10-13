@@ -436,7 +436,7 @@ The hero and service showreel play a **self-hosted, muted, looping MP4** behind 
 
 ### How it loads
 
-1. The still renders as a separate `<picture class="hero-video__poster">` and is preloaded in `wp_head` (`fdry_preload_hero_poster()`, homepage only), so it paints as the LCP element.
+1. The still renders as a separate `<picture class="hero-video__poster">` and is preloaded in `wp_head` (`fdry_preload_hero_poster()`, homepage only), so it paints as the LCP element. Its `<img>` is never lazy, in either variant. The Services showreel (the inline variant) sits right under the first section and is that page's mobile LCP element: lazy, it painted at 4.3 s on slow 4G, and eager it paints with the CSS (about 1.5 s). It isn't preloaded, because eager is already enough.
 2. The `<video>` ships with `preload="none"`, **no `src`** and **no `autoplay`** — only `data-src-mp4` / `data-src-webm`.
 3. [`heroVideo.js`](src/scripts/part/heroVideo.js) decides whether to fetch at all, then attaches `<source>` elements and calls `play()`. On `loadeddata` the video fades in **over** the still.
 
@@ -476,8 +476,8 @@ It is a single faststart MP4, not HLS. For a 1–3 minute reel, HLS's only real 
 
 How [`showreelModal.js`](src/scripts/part/showreelModal.js) loads it:
 
-1. The modal's `<video>` ships with `preload="none"` and **no `src`**. Page load downloads nothing.
-2. On `pointerenter` or `focus` of the button, it sets `src` with `preload="metadata"`. Chrome fetches about 0.3 MB (the index and a fraction of a second of video), then stops.
+1. The modal's `<video>` ships with `preload="none"`, **no `src` and no `poster`**: the poster URL is in `data-poster`. Page load downloads nothing. Browsers fetch a `poster` attribute as soon as the element exists, whatever `preload` says and even inside a closed `<dialog>`, so it can't be in the markup. It used to be, and every phone downloaded the 54 KB desktop poster for a modal it never opened (PERFORMANCE-PLAN.md #8).
+2. On `pointerenter` or `focus` of the button, it sets the poster from `data-poster` and the `src` with `preload="metadata"`. The modal keeps the 16:9 desktop poster on phones too, because it matches the reel's frame. On desktop it is already cached from the hero. Chrome fetches about 0.3 MB (the index and a fraction of a second of video), then stops.
 3. On click it opens the dialog and the overlay grows out of the button: a GSAP `clip-path` tween from the button's pill to the full viewport, about 0.6 s. The reel then fades in and starts 0.1 s after it is fully visible (`PLAY_DELAY`), and the hero loop pauses once the overlay covers it. iOS only allows sound from within the user gesture, so the click handler calls `play()` and pauses straight away, which unlocks the element for the later `play()`. The download starts at the click, so the reel buffers while the overlay grows. Measured in headless Chrome, playback could start about 30 ms after the click when primed, and about 290 ms when not (20 Mbps link, 40 ms latency), so the reel is normally ready before the animation ends. With reduced motion there is no animation and it plays at once.
 4. On close (button, Esc or backdrop) the reel fades out and the overlay collapses back into the button. Then it removes `src` and calls `load()`, which aborts the download. A paused video would keep buffering otherwise. Reopening starts the reel from the beginning, and the hero loop resumes. Esc skips the collapse when Chrome won't let the dialog's `cancel` event be cancelled (it needs a user activation since the last one).
 

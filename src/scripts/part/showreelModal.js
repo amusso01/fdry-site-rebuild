@@ -111,9 +111,15 @@ function initShowreel(button) {
 		resumeLoop = false
 	}
 
-	// The markup ships no src, so nothing downloads until this runs.
+	// The markup ships no src and no poster (browsers fetch a poster at once,
+	// closed dialog or not), so nothing downloads until this runs. The poster
+	// stays after close, so a reopened modal shows it straight away.
 	const attach = (preload) => {
 		video.preload = preload
+
+		if (!video.getAttribute('poster') && video.dataset.poster) {
+			video.poster = video.dataset.poster
+		}
 
 		if (!video.getAttribute('src')) {
 			video.src = pickSource(root, video)
