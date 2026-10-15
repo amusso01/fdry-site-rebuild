@@ -7,10 +7,10 @@
  * Rendered from single.php for the `post` type. The old partial is kept in
  * loop-templates/content-single-insight.php as a rollback.
  *
- * The Gutenberg output keeps the legacy .insight-content / .entry-content
- * wrappers: its typography (heading sizes, bullets, link colours) still comes
- * from theme.css and mainstyle.css. The spacing between blocks, and
- * everything around them (new markup), is styled in _single-insight.scss.
+ * Posts are legacy-free (PERFORMANCE-PLAN.md #16): no theme.css or mainstyle.css.
+ * The Gutenberg output, its typography and spacing, and everything around it
+ * are styled in _single-insight.scss. The old .insight-content / .entry-content
+ * wrappers stay as hooks: with __content they outrank WordPress's block CSS.
  *
  * @author Andrea Musso
  *
@@ -108,7 +108,7 @@ if ($image_id) {
 					<p class="single-insight__category"><?= esc_html($category); ?></p>
 				<?php endif; ?>
 
-				<!-- Legacy hooks: the Gutenberg typography in theme.css / mainstyle.css hangs on .insight-content .entry-content. Drop them with theme.css. -->
+				<?php // .insight-content .entry-content: kept as hooks, see the docblock. ?>
 				<div class="single-insight__content insight-content">
 					<div class="entry-content">
 						<?php the_content(); ?>

@@ -91,7 +91,7 @@ Parse and compile time is on top of this (about 2.5 s of unattributed "program" 
 | 1 | **P0** | **Oversized uploads are the LCP image.** The service-page slide is a 551 KB PNG (11.3 s LCP). The banner is a 1376×600 JPG of 899 KB. Nothing converts uploads to WebP/AVIF. | Code + CLI | M | Done 12 Oct: library converted (3.2 GB → 628 MB in the main run); service mobile LCP 11.3 s → 1.7 s |
 | 2 | **P0** | **The first screen is hidden until our JS runs.** The header (`data-fade-down`) and the first section fade in from `opacity: 0`, so FCP waits for the bundle: 5.8 s on service pages. (SEO #17, was P2) | Code | S | Done 12 Oct. Mobile FCP 1.55–1.91 s on all 8 pages. Service inner FCP 5.8 → 1.76 s, LCP 11.3 → 1.76 s (with #1) |
 | 3 | **P0** | **Homepage LCP is the cookie banner (7.3 s).** CookieYes waits for DOMContentLoaded, which waits for our bundle, which is starved of bandwidth by the tags, fonts and legacy CSS. | Code + CMS | S (result depends on #4, #5) | Live 12 Oct (preconnects, inline Ads tag out). Home mobile LCP 6.05 → 5.72 s, DOMContentLoaded 5.17 → 4.78 s. Still the banner: needs #4 step 3 and the `btn-circle.svg` fix |
-| 4 | **P1** | **Legacy CSS/JS on new templates**: `theme.min.css`, `mainstyle.css`, `typeformstyle.css`, jQuery in `<head>`, `theme.min.js`, `lozad`, `footer.js`, plus TweenMax 2 and `js/about.js` on /about/. (SEO #18, #23) | Code | L | Steps 1–3 and 5 (CSS and JS) live 14 Oct. Mobile FCP 1.6–2.0 → 0.73–0.88 s on all 7 new pages, render-blocking 8 → 4, CSS 85 → 16 KB, Home LCP 4.86 → 3.88 s. The tags now start earlier and compete (Services LCP 1.72 → 2.36 s). `/works/` first card eager (live 14 Oct): mobile LCP 3.26 → 2.01 s. Next: posts (step 4), dead code |
+| 4 | **P1** | **Legacy CSS/JS on new templates**: `theme.min.css`, `mainstyle.css`, `typeformstyle.css`, jQuery in `<head>`, `theme.min.js`, `lozad`, `footer.js`, plus TweenMax 2 and `js/about.js` on /about/. (SEO #18, #23) | Code | L | **Done (14 Oct).** Mobile FCP 1.6–2.0 → 0.73–0.88 s on all 7 new pages, render-blocking 8 → 4, CSS 85 → 16 KB, Home LCP 4.86 → 3.88 s, Works LCP 2.01 s. The tags now start earlier and compete (Services LCP 1.72 → 2.36 s; see #5, #11). Posts → #16, dead code → #17 |
 | 5 | **P1** | **Marketing tags: ~1 MB and ~0.5 s of main thread per page.** The Ads tag loads twice, there are two GA4 IDs, the dead Universal Analytics `analytics.js` still loads, and Hotjar, Apollo and Meta are hard-coded. (SEO #25, was P3) | GTM + Code | M | Step 1 live (12 Oct, with #3): one Ads `gtag/js`, −197 KB third-party; Ads hits and conversions checked |
 | 6 | **P1** | **Fonts.** `theme.min.css` adds its own old Proxima Nova faces, so 400 downloads twice and 400 italic once more. There was no preconnect. (`font-display` is already `swap` on live via WP Rocket; the kit's unused weights cost no bytes.) | Adobe + Code | S | Step 3 (preconnect) live 12 Oct. Old faces gone on new pages with #4 (14 Oct): 6–7 files (184–216 KB) → 5 (150 KB). Step 1 (Adobe project) open |
 | 7 | **P1** | **No srcset on work images.** The work row, work cards and parallax request `large` with no srcset. Parallax card 1 (`NUYU.jpg`, 315 KB) loads at 2.4 s on phones. (SEO #16, was P2) | Code | M | Open |
@@ -103,6 +103,9 @@ Parse and compile time is on top of this (about 2.5 s of unattributed "program" 
 | 13 | **P3** | **HTML is not cached at the edge** (`cf-cache-status: DYNAMIC`): use Cloudflare APO or a cache rule. Measure TTFB from the UK and US first. | CMS | M | Open |
 | 14 | **P3** | **Nav overlay videos** are 1080×1080 but show at 280px. Export at 560×560. | Content | S | Open |
 | 15 | **P3** | **Small leftovers.** `global-styles` inline CSS on ACF-only templates, a speculation-rules overlap with WP Rocket preload, and uncached queries in `fdry_template_page_url()` and `fdry_work_categories()`. | Code | S | Open |
+| 16 | **P1** | **Posts still load the legacy CSS/JS** (was #4 step 4). Single posts keep 8 render-blocking files: their Gutenberg content takes its type from `theme.css`/`mainstyle.css`. | Code | M | **Done (15 Oct).** Mobile FCP 1.78–1.92 → 0.75–0.90 s, render-blocking 8 → 4, CSS 85 → 16 KB. Live screenshots match the simulation (0.00% on 9 posts). Embed-heavy posts → #18 |
+| 17 | **P2** | **Dead legacy code** (was #4 phase 5). About 20 MB of tracked files with no references, rollback copies, and code behind branches that can't run. | Code | M | Open. All three tiers and the rollback copies approved 13 Oct |
+| 18 | **P2** | **Embed-heavy posts: the hero now competes with YouTube thumbnails and eager content images.** Found after #16: Valentine's mobile LCP 2.44 → 4.35–4.59 s. | Code (or WP Rocket) | S | Open |
 
 **Expected outcome once P0 and P1 are done:**
 - Mobile FCP drops from about 2–2.8 s to about 1–1.3 s on every page. Legacy CSS alone ends at about 1.9 s on slow 4G.
@@ -419,7 +422,13 @@ Chrome doesn't count the full-viewport hero poster, so for a first visit the ban
 
 ### #4 Legacy CSS and JS on new templates (absorbs SEO #18 and #23)
 
-**Status (14 Oct 2026): the CSS (steps 1–3) and the JS (step 5) are live, with the skip-link fix (redeployed 14 Oct).** Measured below. A small follow-up for `/works/` (first card eager) is live too. The posts (step 4) and the dead-code deletion come next.
+**Status: done (14 Oct 2026).** The CSS (steps 1–3) and the JS (step 5) are live, with the skip-link fix (redeployed 14 Oct) and the `/works/` first-card follow-up. Measured below. The posts (step 4) moved to #16, and the dead-code deletion (phase 5) to #17.
+
+**SEO crawl warnings (crawl run before the 14 Oct deploy, checked 15 Oct).**
+- **"CSS too big" (`theme.min.css`) and "JavaScript not minified" (`lozad.min.js`)** were flagged on Sectors and Services pages. Those pages no longer load either file, so a re-crawl should clear them there.
+- **They stay on the legacy pages,** which keep the old files on purpose: `/brief/`, case studies, work category pages, the job, posts and search.
+- **The lozad warning is a false positive.** `js/lozad.min.js` is lozad.js v1.9.0, 2.4 KB and minified. It keeps its MIT banner (`/*! … */`), which the crawler most likely reads as unminified. WP Rocket serves it untouched (the live file is byte-identical to the repo's). Mark it "Ignore" in the crawler.
+- **lozad is only used on the work category pages** (96 `.lozad` images on `/works/category/ecommerce/`, from `archive-works-category.php`). On other legacy pages it does nothing, but it can't be dropped there: `theme.min.js` calls `lozad().observe()` unguarded, so every legacy page would throw. It goes with those templates.
 
 **Measured after the deploy (14 Oct, `after-4`, 3 runs, slow 4G and 4× CPU).** Mobile, against `p2-base` (13 Oct, 1 run; `after-8b` 3 runs in brackets):
 
@@ -475,8 +484,8 @@ The approved implementation plan has 6 phases:
 - **1:** these quick wins;
 - **2:** the CSS;
 - **3:** the JS;
-- **4:** posts;
-- **5:** deleting dead code, all three tiers plus the rollback copies (decided 13 Oct).
+- **4:** posts, now #16;
+- **5:** deleting dead code, all three tiers plus the rollback copies (decided 13 Oct), now #17.
 
 **In code.**
 - `fdry_is_legacy_free()` covers the homepage, the 404 page, the 8 ACF-only templates and `template-one-column.php`, which is 36 of the 37 published pages (not `/brief/`).
@@ -546,7 +555,7 @@ The approved implementation plan has 6 phases:
    - Port the base rules the new templates really use into `src/styles/common/_legacy-base.scss` (Appendix A).
      - **Where:** `@use` it in `main.scss` right after `preflight` and **unlayered**. That keeps today's cascade: legacy beats the Preflight layer, and our later rules beat legacy.
      - **What:** only the rules our components don't already set. Screenshots decide (see Verify).
-4. **Insight typography (M).**
+4. **Insight typography (M). Moved to #16.**
    - The Gutenberg output on single insights gets its heading sizes and bullets from `theme.css`/`mainstyle.css` (FRONTEND.md → Single insight → Legacy typography).
    - Include the existing `wysiwyg-content` mixin (`src/styles/common/_wysiwyg.scss`) on `.single-insight .entry-content`, check a long post, then add posts to the allowlist.
 5. **JS (M).** Do this when `fdry_is_legacy_free()` is true.
@@ -679,6 +688,44 @@ The approved implementation plan has 6 phases:
 - At 1440px DPR 1 they are ≤ 768w, and DPR 2 picks the larger one.
 - The sticky stack still works on the homepage, and CLS stays at about 0.
 
+### #16 Posts off the legacy CSS/JS (was #4 step 4)
+
+**Status: done (15 Oct 2026).** Live, checked and measured below. One side effect on embed-heavy posts moved to #18.
+
+- **Why:** single posts were the last high-traffic template still loading `theme.min.css`, the mainstyle sheets, jQuery, `theme.min.js`, lozad and `footer.js`: 8 render-blocking files against 4 on the new pages, and mobile FCP 1.82 s (`after-4`).
+- **What they really took from the old CSS** (`pnpm perf --legacy-css` on 4 posts, computed styles on 7, a block census of all 40):
+  - **Already covered** once a post is legacy-free: `_legacy-base.scss` (body font and colour, heading weight 500, h2 line-height 35px, h2/h3 colour), the scoped skip link, our reset, WordPress's block CSS (aligned images, galleries, columns, separators, spacers, embeds) and `_single-insight.scss` (spacing, links, image corners).
+  - **Ported to `_single-insight.scss`:** h2 26px and h3 20px at every width (without them headings inherit 16px: `--text-h2` and the like are only set inside the `wysiwyg-content` mixin), `ul` bullets with a 20px indent, Bootstrap's 1rem margin on a separator nested in a column, and `#single-wrapper`'s 10px bottom padding (for `.single-post` only).
+  - **Changed on purpose (decided 15 Oct):** numbered lists now show their numbers. The old CSS only restored `ul` bullets, so the two `ol` lists had none.
+  - **Kept as they were:** heading sizes (decided 15 Oct: pixel-identical rather than the job page's smaller mixin sizes).
+  - **Dropped, no effect:** `.postid-9206 h2 { 30px }` (beaten by the `!important` 26px, and no other h2 on that post), and the 15px `a,p` rule (paragraphs and links were already 16px).
+  - **JS:** no post content uses jQuery, and no post has `.lozad` images. The Instagram and TikTok embeds bring their own scripts.
+- **In code:** `fdry_is_legacy_free()` returns true for `is_singular('post')`. That dequeues the legacy CSS and JS, skips `footer.js` (the email conversion runs through `fdry_legacy_conversions()`) and adds the `fdry-legacy-free` body class. Case studies and post archives are unaffected.
+- **Simulated on live (15 Oct)** on 9 posts covering every block type in the 40: embeds, galleries, columns, separators, aligned images, h4/h5, `ol`. Both widths, all 8 legacy files blocked, the new build injected, `pnpm perf:diff` against `posts-before`. Two baseline runs differ by 0.00% on all 9.
+  - **Round 1:** one real gap. A separator inside a column lost Bootstrap's 16px margins, so Social Media Campaigns was 32px shorter. Fixed with the nested `hr` rule.
+  - **Round 2:** 5 posts at 0.00%. The rest differ only as expected:
+    - **Synthesised italic** in the posts with `<em>` (Valentine's, Back to School, Ready Set Convert). The old `theme.css` faces had a true 400 italic; the Adobe kit has none, so lines with italics are 1–2px shorter and the content below moves up. Same fix as Sectors: add Proxima Nova 400 italic to the kit.
+    - **Numbered lists** (2024 predictions, AI automations): numbers and a 20px indent.
+    - **Photo noise:** a few pixels inside two photos, like the baseline-to-baseline noise.
+  - **No JS errors** with jQuery, `theme.min.js`, lozad and `footer.js` blocked.
+- **Checked after the deploy (15 Oct).**
+  - **Requests:** posts load none of `theme.min.css`, the mainstyle sheets, jQuery, `theme.min.js`, lozad or `footer.js`, and have the `fdry-legacy-free` body class. `/works/calling/` still loads them all.
+  - **Screenshots:** `posts-after` is 0.00% against `posts-sim2` on all 9 posts at both widths, so live matches the simulation (the italics and numbered lists as above).
+  - **Width:** 412px on a 412px phone. The skip link now uses the scoped new-page styles. No JS errors.
+  - **Tracking:** `gtm-check` on a post. Ads page view and remarketing, both GA4 IDs, `_gcl_aw`/`_gcl_au`, and the `AW-790752334` email conversion through `fdry_legacy_conversions()`.
+- **Measured (`after-16`, 3 runs, slow 4G and 4× CPU; before = `after-4` 3 runs for the AI post, `posts-legacy` 1 run for the others):**
+
+  | Post (mobile) | FCP | LCP | Requests | First-party | CSS |
+  |---|---|---|---|---|---|
+  | 2025 is the year of AI | 1.82 → **0.90 s** | 2.62 → 2.56 s | 50 → 41 | 356 → 236 KB | 85 → 16 KB |
+  | Ready, set, convert | 1.78 → **0.82 s** | 1.78 → **0.93 s** | 53 → 45 | 360 → 240 KB | 85 → 16 KB |
+  | Valentine's (6 YouTube embeds) | 1.92 → **0.75 s** | 2.44 → 4.59 s | 61 → 53 | 452 → 331 KB | 85 → 16 KB |
+
+  - **Render-blocking files 8 → 4** on every post.
+  - **Desktop:** FCP 0.32–0.38 s; LCP 0.90 → 0.81 s (AI), 0.76 → 0.36 s (Ready, set, convert), 1.37 → 1.28 s (Valentine's).
+  - **The Valentine's LCP got worse, see #18.** With no jQuery in `<head>` holding the parser, the page's lazy YouTube iframes are reached at 0.8 s instead of 2.0 s. Chrome fetches a `maxresdefault.jpg` thumbnail for each lazy YouTube embed when the parser reaches it (about 100 KB each, the requests' initiator is the parser), and they now compete with the hero. Blocking `img.youtube.com` brings that post's LCP from 4.35 to 3.11 s.
+- **Rollback:** remove `is_singular('post')` from `fdry_is_legacy_free()`. The cancel rules in `_single-insight.scss` stay, so the old look comes back.
+
 ## P2: Nice to have
 
 ### #8 Showreel modal poster
@@ -771,6 +818,27 @@ The approved implementation plan has 6 phases:
   - Warn (ACF `acf/validate_value`) for PNGs over 300 KB used as photos.
   - Return copy-paste export instructions, like `fdry_video_encode_instructions()`.
 - **Skip** SVGs and the favicon.
+
+### #17 Delete dead legacy code (was #4 phase 5)
+
+- **Decided 13 Oct:** all three tiers, plus the rollback copies (the new homepage and single insight are confirmed).
+- **Tier A, no references at all (about 20 MB tracked):** for example `css/theme.css` (2.2 MB), `css/theme.min.css.map`, `js/theme.js`, `components/fonts/`, `loop-templates/tech-banner.php`, the `sidebar-*.php` templates, `single-job_post.php`, `svg-template/svg-{build,create,promote}.php`, `inc/custom-header.php`, `inc/wpcom.php`, `js/jquery.unveil.js`, `js/myloadmore.js`, `mainjs/load-more.js`.
+- **Tier B, reachable only from rollback copies or branches that can't run:** `components/page/legacy-home.php`, `loop-templates/content-home.php`, `video/showreel.mp4` and `video/mobile-still.jpg`, `loop-templates/content-single-insight.php`, the `is_page('work')` branches (`tab-work.php`, `functions.php` work AJAX, `js/filterCategory.js`, `my_enqueue_ajax_data()`), and the `parent.php` branches for pages now on NEW templates.
+- **Tier C, legacy page templates:** `header.php`, `page-templates/*` and their partials, `inc/customizer.php`, `inc/woocommerce.php`, `inc/jetpack.php`, the unused widget areas.
+- **Before deleting:** re-check the REST page list (which templates are still assigned), and take removed `inc/` files out of the `functions.php` includes.
+- **Keep:** `parent.php` (brief-1, brief-2, brief-final), `typeform.php`, `content-single-work.php`, `archive-works-category.php`, and the legacy assets (`theme.min.css`, `theme.min.js`, `lozad.min.js`, `footer.js`, the mainstyle sheets) while legacy pages use them.
+
+### #18 Embed-heavy posts: the hero competes with YouTube thumbnails and eager images
+
+Found after #16 (15 Oct) on `/insights/10-best-valentines-day-marketing-campaigns-to-inspire-you-this-valentines/`: mobile LCP 2.44 → 4.35–4.59 s, while FCP dropped to 0.75 s. The hero (101 KB, High) starts at 0.35 s as before but now shares the line with:
+- **YouTube thumbnails:** six `<iframe loading="lazy">` embeds in the content. Chrome fetches `img.youtube.com/vi/<id>/maxresdefault.jpg` (about 100 KB each) for each one as soon as the parser reaches it, now at 0.8 s. Blocking them: LCP 4.35 → 3.11 s. Posts with YouTube iframes: Valentine's (6), Back to School (12; its LCP is text, 0.83 s), 4 tips to increase ecommerce conversions (2).
+- **Three eager content images** (Flowers, perfume, Knorr: 84 KB, Medium), below the hero. WordPress leaves the first 3 content images without `loading="lazy"` (`wp_omit_loading_attr_threshold`, default 3), guessing one might be the LCP. On posts the hero is always the LCP.
+
+**Fix (S):**
+1. **Code:** on single posts, filter `wp_omit_loading_attr_threshold` to 0, so every content image is lazy. The hero keeps `loading="eager"` and `fetchpriority="high"` from `insight.php`.
+2. **YouTube:** replace the iframes in post content with a click-to-play facade (a lazy `hqdefault.jpg` thumbnail, about 15–30 KB, swapped for the iframe on click), via a `the_content` filter on posts. Or turn on WP Rocket's "Replace YouTube iframe with preview image" (Media → LazyLoad, iframes and videos), which does the same with its own script.
+
+**Verify:** `pnpm perf mobile` on Valentine's and Back to School, 3 runs: no `img.youtube.com` or content-image requests before the hero ends, and LCP at or under the 2.44 s from before #16. Videos still play on click.
 
 ## P3: Optional
 

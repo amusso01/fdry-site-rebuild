@@ -272,16 +272,17 @@ function fdry_get_vite_assets(): ?array
  * Whether this request renders only new markup, so the legacy Understrap CSS
  * and JS can stay off (PERFORMANCE-PLAN.md #4).
  *
- * True for the homepage, the 404 page and pages on the new templates. Posts,
- * case studies, jobs, work categories, search and the legacy page templates
- * (/brief/) still render Understrap markup and keep everything. Before adding
- * a template, simulate it on live with `pnpm perf --block … --inject-css …`
- * and compare with `pnpm perf:diff` (FRONTEND.md → Legacy assets).
+ * True for the homepage, the 404 page, single posts (components/single/insight.php,
+ * PERFORMANCE-PLAN.md #16) and pages on the new templates. Case studies, jobs,
+ * work categories, search and the legacy page templates (/brief/) still render
+ * Understrap markup and keep everything. Before adding a template, simulate it
+ * on live with `pnpm perf --block … --inject-css …` and compare with
+ * `pnpm perf:diff` (FRONTEND.md → Legacy assets).
  * To roll back, return false.
  */
 function fdry_is_legacy_free(): bool
 {
-	if (is_front_page() || is_404()) {
+	if (is_front_page() || is_404() || is_singular('post')) {
 		return true;
 	}
 

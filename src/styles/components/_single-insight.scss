@@ -3,9 +3,15 @@
 @use '../common/mixin' as *;
 
 // Single insight (components/single/insight.php). The top offset comes from
-// #single-wrapper in _legacy-header-offset.scss. The spacing between Gutenberg
-// blocks inside .single-insight__content is set here; their typography still
-// comes from theme.css / mainstyle.css.
+// #single-wrapper in _legacy-header-offset.scss. Posts are legacy-free
+// (PERFORMANCE-PLAN.md #16): the Gutenberg typography ported from theme.css /
+// mainstyle.css is here, the heading weights and colours in _legacy-base.scss.
+
+// Was mainstyle.css's `.wrapper { padding: 10px 0 }`; the top is the header
+// offset. Scoped to posts: case studies share #single-wrapper and keep theirs.
+.single-post #single-wrapper {
+	padding-bottom: 10px;
+}
 
 .single-insight {
 	color: $color__text;
@@ -98,14 +104,14 @@
 		color: $color__text;
 	}
 
-	// Cancels the 74px padding .insight-content gets from theme.css (same
-	// specificity, loads later). The block typography is left alone.
+	// Cancels the 74px padding .insight-content gets from theme.css. Posts no
+	// longer load it; kept so a rollback (#16) looks the same.
 	&__content {
 		padding: 0;
 	}
 
-	// Gutenberg links, images and block spacing. The doubled class outranks
-	// theme.css's purple `.insight-content .entry-content p a`.
+	// Gutenberg typography, links, images and block spacing. The doubled class
+	// outranks WordPress's block CSS, which prints after ours.
 	&__content.insight-content .entry-content {
 		// Block images, plus classic-editor images still wrapped in a paragraph
 		// or heading (e.g. `<h3><figure><img>`). Emoji and smilies are inline
@@ -115,6 +121,35 @@
 
 		a {
 			@include wysiwyg-link;
+		}
+
+		// From mainstyle.css, the same at every width. Line heights, weights and
+		// colours come from _legacy-base.scss. Without a size, headings inherit
+		// 16px: --text-h2/h3 are only set inside the wysiwyg-content mixin.
+		h2 {
+			font-size: 26px;
+		}
+
+		h3 {
+			font-size: 20px;
+		}
+
+		// The reset strips list markers. mainstyle.css only restored the bullets,
+		// so numbered lists had no numbers.
+		ul {
+			list-style: disc outside;
+			padding-left: 20px;
+		}
+
+		ol {
+			list-style: decimal outside;
+			padding-left: 20px;
+		}
+
+		// Bootstrap's hr margin, for separators nested in a block (a column).
+		// Direct children get their gap from the rules below.
+		* > hr {
+			margin-block: 1rem;
 		}
 
 		// Margin-top only: the gap is set by the pair of blocks.
