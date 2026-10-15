@@ -1,7 +1,8 @@
 <?php
 
 /**
- * Single insight — eyebrow, title, share links, hero image, then the post
+ * Single insight — eyebrow, title, category pill, date and reading time,
+ * hero image, then the post
  *
  * Rendered from single.php for the `post` type. The old partial is kept in
  * loop-templates/content-single-insight.php as a rollback.
@@ -10,9 +11,6 @@
  * wrappers: its typography (heading sizes, bullets, link colours) still comes
  * from theme.css and mainstyle.css. The spacing between blocks, and
  * everything around them (new markup), is styled in _single-insight.scss.
- *
- * LinkedIn and X share the post. Instagram has no share URL, so it links to
- * the FDRY profile instead.
  *
  * @author Andrea Musso
  *
@@ -76,10 +74,6 @@ if ($image_id) {
 } else {
 	$image_html = '';
 }
-
-$share = array(
-	
-);
 ?>
 
 <main class="single-insight">
@@ -91,22 +85,15 @@ $share = array(
 
 			<h1 class="single-insight__title"<?= fdry_fade_attrs(true, 0.1); ?>><?= esc_html($title); ?></h1>
 
-			<ul class="single-insight__share" aria-label="<?= esc_attr__('Share this article', 'foundry'); ?>"<?= fdry_fade_attrs(true, 0.2); ?>>
-				<?php foreach ($share as $network => $link) : ?>
-					<li>
-						<a
-							class="single-insight__share-link"
-							href="<?= esc_url($link['url']); ?>"
-							target="_blank"
-							rel="noopener noreferrer"
-							aria-label="<?= esc_attr($link['label']); ?>">
-							<span class="single-insight__share-icon" aria-hidden="true">
-								<?php get_template_part('svg-template/svg-' . $network); ?>
-							</span>
-						</a>
-					</li>
-				<?php endforeach; ?>
-			</ul>
+			<?php if ($category !== '') : ?>
+				<p class="single-insight__tag"<?= fdry_fade_attrs(true, 0.2); ?>><?= esc_html($category); ?></p>
+			<?php endif; ?>
+
+			<p class="single-insight__meta"<?= fdry_fade_attrs(true, 0.3); ?>>
+				<time datetime="<?= esc_attr(get_the_date('c')); ?>"><?= esc_html(get_the_date('j F Y')); ?></time>
+				<span aria-hidden="true">·</span>
+				<span><?= esc_html(sprintf(__('%d min read', 'foundry'), fdry_reading_time(get_the_ID()))); ?></span>
+			</p>
 		</header>
 
 		<?php if ($image_html !== '') : ?>

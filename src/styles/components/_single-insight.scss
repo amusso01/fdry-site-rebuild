@@ -49,45 +49,22 @@
 		color: $color__text;
 	}
 
-	&__share {
-		display: flex;
-		justify-content: center;
-		gap: 24px;
+	// Same pill as the work cards, dark on the light header.
+	&__tag {
 		margin: 24px 0 0;
-		padding: 0;
-		list-style: none;
+		@include category-pill(rgba($color__text, 0.85));
 	}
 
-	&__share-link {
-		display: block;
-		transition: opacity 0.25s ease;
-
-		&:link,
-		&:visited,
-		&:hover,
-		&:focus {
-			color: $color__text;
-		}
-
-		&:hover,
-		&:focus-visible {
-			opacity: 0.6;
-		}
-	}
-
-	&__share-icon {
-		display: block;
-
-		svg {
-			display: block;
-			width: 20px;
-			height: 20px;
-		}
-
-		// Beats the SVGs' fill="#676767" presentation attribute.
-		path {
-			fill: currentColor;
-		}
+	// Date · reading time.
+	&__meta {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: center;
+		gap: 8px;
+		margin: 16px 0 0;
+		font-size: 14px;
+		line-height: 20px;
+		color: rgba($color__black, 0.8);
 	}
 
 	&__image {
@@ -226,7 +203,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-	.single-insight__share-link,
 	.single-insight__back {
 		transition: none;
 	}

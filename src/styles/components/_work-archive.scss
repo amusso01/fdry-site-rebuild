@@ -1,5 +1,6 @@
 @use '../common/variables' as *;
 @use '../common/media' as *;
+@use '../common/mixin' as *;
 
 .work-archive {
 	padding-top: calc(var(--site-header-height, 88px) + 50px);
@@ -271,15 +272,7 @@
 	}
 
 	&__category {
-		padding: 0.375rem 0.875rem;
-		border: 1px dashed rgba($color__white, 0.85);
-		border-radius: 999px;
-		font-size: 14px;
-		font-weight: 500;
-		line-height: 1;
-		letter-spacing: 1px;
-		text-transform: uppercase;
-		white-space: nowrap;
+		@include category-pill(rgba($color__white, 0.85));
 	}
 
 	&__link:hover &__image,

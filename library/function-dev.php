@@ -657,6 +657,28 @@ function fdry_insight_permalink_maybe_flush(): void
 add_action('init', 'fdry_insight_permalink_maybe_flush', 99);
 
 /**
+ * Reading time of a post in minutes, worked out like the block editor's
+ * "Time to read" (which it doesn't save): words in the saved content at 189
+ * a minute, rounded, at least 1.
+ */
+function fdry_reading_time(int $post_id): int
+{
+	$text = (string) get_post_field('post_content', $post_id);
+
+	// Like @wordpress/wordcount: drop block comments, shortcodes and tags, then
+	// count whitespace-separated tokens holding a letter or digit.
+	$text = preg_replace('/<!--.*?-->/s', ' ', $text);
+	$text = strip_shortcodes($text);
+	$text = preg_replace('/<[^>]*>/', ' ', $text);
+	$text = html_entity_decode($text, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+
+	$tokens = preg_split('/[\s\x{00A0}]+/u', $text, -1, PREG_SPLIT_NO_EMPTY);
+	$words  = count(preg_grep('/[\p{L}\p{N}]/u', $tokens));
+
+	return max(1, (int) round($words / 189));
+}
+
+/**
  * Viewport width at or below which the hero shows a still instead of video.
  *
  * Single source of truth: feeds the <picture> art-direction switch, the
