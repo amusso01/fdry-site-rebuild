@@ -3,8 +3,9 @@
 @use '../common/mixin' as *;
 
 // Single insight (components/single/insight.php). The top offset comes from
-// #single-wrapper in _legacy-header-offset.scss. The Gutenberg output inside
-// .single-insight__content is still styled by theme.css / mainstyle.css.
+// #single-wrapper in _legacy-header-offset.scss. The spacing between Gutenberg
+// blocks inside .single-insight__content is set here; their typography still
+// comes from theme.css / mainstyle.css.
 
 .single-insight {
 	color: $color__text;
@@ -126,18 +127,53 @@
 		padding: 0;
 	}
 
-	// Gutenberg links and images. The doubled class outranks theme.css's
-	// purple `.insight-content .entry-content p a`.
+	// Gutenberg links, images and block spacing. The doubled class outranks
+	// theme.css's purple `.insight-content .entry-content p a`.
 	&__content.insight-content .entry-content {
+		// Block images, plus classic-editor images still wrapped in a paragraph
+		// or heading (e.g. `<h3><figure><img>`). Emoji and smilies are inline
+		// images, so they are left out.
+		$images: 'figure, .wp-block-image, :has(img:not(.emoji, .wp-smiley))';
+		$headings: 'h1, h2, h3, h4, h5, h6';
+
 		a {
 			@include wysiwyg-link;
 		}
 
-		// Emoji and smilies are inline images, so they are left out.
+		// Margin-top only: the gap is set by the pair of blocks.
+		> * {
+			margin-block: 0;
+		}
+
+		> * + * {
+			margin-top: 15px;
+		}
+
+		> * + :is(#{$headings}) {
+			margin-top: 25px;
+		}
+
+		// After the rule above, so heading + heading also gets 15px.
+		> :is(#{$headings}) + * {
+			margin-top: 15px;
+		}
+
+		> :is(#{$headings}) + :is(ul, ol) {
+			margin-top: 20px;
+		}
+
+		// Outranks the heading rules (0,4,1), so an image wrapped in a heading
+		// still gets 30px.
+		> * + :is(#{$images}),
+		> :is(#{$images}) + * {
+			margin-top: 30px;
+		}
+
+		li + li {
+			margin-top: 4px;
+		}
+
 		img:not(.emoji, .wp-smiley) {
-			// !important: mainstyle.css has
-			// `.insight-content .aligncenter img { margin: 0 auto !important }`.
-			margin-top: 20px !important;
 			border-radius: 4px;
 		}
 	}

@@ -8,8 +8,8 @@
  *
  * The Gutenberg output keeps the legacy .insight-content / .entry-content
  * wrappers: its typography (heading sizes, bullets, link colours) still comes
- * from theme.css and mainstyle.css. Everything around it is new markup,
- * styled in _single-insight.scss.
+ * from theme.css and mainstyle.css. The spacing between blocks, and
+ * everything around them (new markup), is styled in _single-insight.scss.
  *
  * LinkedIn and X share the post. Instagram has no share URL, so it links to
  * the FDRY profile instead.
