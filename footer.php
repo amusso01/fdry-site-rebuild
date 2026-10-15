@@ -31,7 +31,10 @@ endif;
 
 <?php wp_footer(); ?>
 
+<?php // jQuery tracking for legacy templates; new pages get fdry_legacy_conversions(). ?>
+<?php if (! fdry_is_legacy_free()) : ?>
 <script src="<?php echo get_template_directory_uri(); ?>/mainjs/footer.js"></script>
+<?php endif; ?>
 
 
 <?php if (defined('FDRY_USING_NEW_HEADER') && FDRY_USING_NEW_HEADER) : ?>

@@ -116,6 +116,7 @@ foreach (['footermenu_1', 'footermenu_2', 'footermenu_3', 'footermenu_4'] as $lo
       <div class="site-footer__legal">
         <a class="site-footer__meta-link" href="/terms-and-conditions/"><?php esc_html_e('Terms', 'foundry'); ?></a>
         <a class="site-footer__meta-link" href="/privacy-policy/"><?php esc_html_e('Privacy Policy', 'foundry'); ?></a>
+        <a class="site-footer__meta-link" href="/sitemap/"><?php esc_html_e('Sitemap', 'foundry'); ?></a>
         <span class="site-footer__meta-text">&#169; <?php echo esc_html(wp_date('Y')); ?> FDRY</span>
       </div>
     </div>

@@ -1,5 +1,8 @@
 // Tailwind's reset, in @layer base. Loses to every unlayered rule below.
 @use 'common/preflight';
+// What theme.css used to provide on the new templates (#4). Unlayered, before
+// everything else, so the same cascade as when theme.css loaded first.
+@use 'common/legacy-base';
 @use 'overrides';
 
 //Custom styles start here
@@ -17,6 +20,7 @@
 @use 'common/helper';
 
 // Components
+@use 'components/skip-link';
 @use 'components/hamburger';
 @use 'components/button';
 @use 'components/nav';

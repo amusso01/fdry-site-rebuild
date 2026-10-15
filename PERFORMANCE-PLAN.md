@@ -91,9 +91,9 @@ Parse and compile time is on top of this (about 2.5 s of unattributed "program" 
 | 1 | **P0** | **Oversized uploads are the LCP image.** The service-page slide is a 551 KB PNG (11.3 s LCP). The banner is a 1376×600 JPG of 899 KB. Nothing converts uploads to WebP/AVIF. | Code + CLI | M | Done 12 Oct: library converted (3.2 GB → 628 MB in the main run); service mobile LCP 11.3 s → 1.7 s |
 | 2 | **P0** | **The first screen is hidden until our JS runs.** The header (`data-fade-down`) and the first section fade in from `opacity: 0`, so FCP waits for the bundle: 5.8 s on service pages. (SEO #17, was P2) | Code | S | Done 12 Oct. Mobile FCP 1.55–1.91 s on all 8 pages. Service inner FCP 5.8 → 1.76 s, LCP 11.3 → 1.76 s (with #1) |
 | 3 | **P0** | **Homepage LCP is the cookie banner (7.3 s).** CookieYes waits for DOMContentLoaded, which waits for our bundle, which is starved of bandwidth by the tags, fonts and legacy CSS. | Code + CMS | S (result depends on #4, #5) | Live 12 Oct (preconnects, inline Ads tag out). Home mobile LCP 6.05 → 5.72 s, DOMContentLoaded 5.17 → 4.78 s. Still the banner: needs #4 step 3 and the `btn-circle.svg` fix |
-| 4 | **P1** | **Legacy CSS/JS on new templates**: `theme.min.css`, `mainstyle.css`, `typeformstyle.css`, jQuery in `<head>`, `theme.min.js`, `lozad`, `footer.js`, plus TweenMax 2 and `js/about.js` on /about/. (SEO #18, #23) | Code | L | Open |
+| 4 | **P1** | **Legacy CSS/JS on new templates**: `theme.min.css`, `mainstyle.css`, `typeformstyle.css`, jQuery in `<head>`, `theme.min.js`, `lozad`, `footer.js`, plus TweenMax 2 and `js/about.js` on /about/. (SEO #18, #23) | Code | L | Steps 1–3 and 5 (CSS and JS) live 14 Oct. Mobile FCP 1.6–2.0 → 0.73–0.88 s on all 7 new pages, render-blocking 8 → 4, CSS 85 → 16 KB, Home LCP 4.86 → 3.88 s. The tags now start earlier and compete (Services LCP 1.72 → 2.36 s). `/works/` first card eager (live 14 Oct): mobile LCP 3.26 → 2.01 s. Next: posts (step 4), dead code |
 | 5 | **P1** | **Marketing tags: ~1 MB and ~0.5 s of main thread per page.** The Ads tag loads twice, there are two GA4 IDs, the dead Universal Analytics `analytics.js` still loads, and Hotjar, Apollo and Meta are hard-coded. (SEO #25, was P3) | GTM + Code | M | Step 1 live (12 Oct, with #3): one Ads `gtag/js`, −197 KB third-party; Ads hits and conversions checked |
-| 6 | **P1** | **Fonts.** `theme.min.css` adds its own old Proxima Nova faces, so 400 downloads twice and 400 italic once more. There was no preconnect. (`font-display` is already `swap` on live via WP Rocket; the kit's unused weights cost no bytes.) | Adobe + Code | S | Step 3 (preconnect) in code (12 Oct, with #3); the old faces go with #4 step 3 |
+| 6 | **P1** | **Fonts.** `theme.min.css` adds its own old Proxima Nova faces, so 400 downloads twice and 400 italic once more. There was no preconnect. (`font-display` is already `swap` on live via WP Rocket; the kit's unused weights cost no bytes.) | Adobe + Code | S | Step 3 (preconnect) live 12 Oct. Old faces gone on new pages with #4 (14 Oct): 6–7 files (184–216 KB) → 5 (150 KB). Step 1 (Adobe project) open |
 | 7 | **P1** | **No srcset on work images.** The work row, work cards and parallax request `large` with no srcset. Parallax card 1 (`NUYU.jpg`, 315 KB) loads at 2.4 s on phones. (SEO #16, was P2) | Code | M | Open |
 | 8 | **P2** | **Showreel modal poster.** The modal's `<video poster>` downloads the desktop poster (55 KB) on every page with a showreel, phones included, with the modal closed. | Code | S | Done 12 Oct: Home mobile LCP 5.75 → 4.5–4.9 s, DOMContentLoaded 4.81 → 3.5–3.9 s. The lazy Services showreel poster it exposed is fixed (Services mobile LCP 1.72 s) |
 | 9 | **P2** | **Marquee SVGs are 116 KB of the 240 KB homepage HTML.** The 9 logos are printed twice and not optimised. | Code | S | Open |
@@ -126,11 +126,20 @@ pnpm perf desktop /about/ /works/ --legacy-css --screenshots
 - **Default.** Each page gets:
   - FCP, LCP and the LCP element, CLS, approximate TBT, TTFB, DOMContentLoaded and load;
   - the render-blocking resources (from `renderBlockingStatus`) and the synchronous scripts;
-  - the 15 largest requests, the full request list, and page weight split first party / third party and by type;
+  - the 15 largest requests, the full request list (each with its initial priority, and `start`/`end` in ms from navigation), and page weight split first party / third party and by type;
   - CSS coverage per stylesheet.
 - **Element tags.** The LCP element is tagged `[fade-first]` or `[gsap fade]` when it sits inside a fade.
 - **`--profile`.** Main-thread JS self time by script, from load to the reading. Each `gtag/js?id=` is a separate row. It costs a little: FCP about 0.1 s later, TBT about 20 ms higher.
 - **`--legacy-css`.** The used rules of `theme.min.css`, `mainstyle.css` and `typeformstyle.css`, each with its `@media` condition. The JSON's `legacyCssSummary` lists every rule with the pages that use it, i.e. Appendix A.
+- **Simulating a change on live (added 13 Oct, #4).** These options load the live pages as if a change were already deployed:
+  - **`--block <pattern>`** (repeatable, `*` wildcards): blocks matching requests, which simulates a dequeue.
+  - **`--inject-css <file>`:** adds a local CSS file, e.g. a fresh `dist/fdry.*.css` (block the live one too).
+  - **`--add-class <names>`:** adds classes to `<body>`, as a PHP change would.
+  - **`--reduced-motion`:** emulates `prefers-reduced-motion`, so fades, the hero video and CSS animations hold still and screenshots repeat exactly. Two identical runs diff at 0.00%.
+- **`pnpm perf:diff <a.json> <b.json>`** ([`scripts/perf-diff.mjs`](scripts/perf-diff.mjs)) compares two runs' full-page screenshots.
+  - **Output:** the % of changed pixels, the page heights, and the bands of changed rows per page. It writes red-overlay images to `build/perf/diff/`.
+  - **Reading it:** a shift high up moves everything below it, so the first band shows where a change starts.
+  - The PNG helpers both scripts use are in [`scripts/lib/png.mjs`](scripts/lib/png.mjs).
 - **`--screenshots`.** A first-screen PNG, plus a full-page PNG taken after the scroll, for #4's visual diff.
   - The full page is stitched from viewport tiles. Chrome's own full-page capture never returns on the homepage once it has been scrolled.
   - Fixed elements (the header and the cookie banner) only appear at the top of the full-page image.
@@ -410,6 +419,105 @@ Chrome doesn't count the full-viewport hero poster, so for a first visit the ban
 
 ### #4 Legacy CSS and JS on new templates (absorbs SEO #18 and #23)
 
+**Status (14 Oct 2026): the CSS (steps 1–3) and the JS (step 5) are live, with the skip-link fix (redeployed 14 Oct).** Measured below. A small follow-up for `/works/` (first card eager) is live too. The posts (step 4) and the dead-code deletion come next.
+
+**Measured after the deploy (14 Oct, `after-4`, 3 runs, slow 4G and 4× CPU).** Mobile, against `p2-base` (13 Oct, 1 run; `after-8b` 3 runs in brackets):
+
+| Page | FCP | LCP | DOMContentLoaded | Requests | First-party | CSS |
+|---|---|---|---|---|---|---|
+| Home | 1.82 → **0.80 s** | (4.86) → **3.88 s** (the banner) | (3.91) → 2.85 s | 59 → 50 | 596 → 278 KB | 85 → 16 KB |
+| About | 1.86 → **0.74 s** | 1.86 → **0.74 s** | 1.94 → 2.23 s | 54 → 44 | 543 → 385 KB | 85 → 16 KB |
+| Services | 1.96 → **0.88 s** | (1.72) → 2.36 s | 3.63 → 2.98 s | 54 → 46 | 404 → 283 KB | 85 → 16 KB |
+| Shopify agency | 1.82 → **0.85 s** | 1.82 → 1.69 s | 3.46 → 2.76 s | 53 → 44 | 366 → 246 KB | 85 → 16 KB |
+| Works | 1.85 → **0.79 s** | 1.85 → 3.26 s | 1.93 → 2.62 s | 54 → 47 | 500 → 388 KB | 85 → 16 KB |
+| Insights | 1.63 → **0.73 s** | 1.63 → **0.79 s** | 1.73 → 2.28 s | 53 → 45 | 355 → 236 KB | 85 → 16 KB |
+| Contact | 1.61 → **0.82 s** | 1.61 → **0.82 s** | 1.64 → 2.10 s | 59 → 51 | 549 → 428 KB | 85 → 16 KB |
+
+- **Render-blocking files 8 → 4 on every new page.** Font files 6–7 (184–216 KB) → 5 (150 KB): the old `theme.min.css` faces are gone (#6).
+- **Desktop:** FCP 0.41–0.98 → 0.29–0.36 s on all 7 pages. LCP is equal or better within one-run noise (About 1.08 → 0.65 s, Works 0.98 → 0.71 s).
+- **The single insight** (still legacy, step 4) is unchanged: 8 render-blocking files.
+- **What got worse, and why: the tags now start about 1 s earlier.** The GTM snippet is an inline script, and it used to wait for `theme.min.css` (inline scripts wait for the stylesheets before them). Now it runs at about 0.7 s, so `gtm.js` (176 KB) downloads with our bundle (81 KB), the fonts and the images. GTM now finishes 1–1.9 s sooner.
+  - **DOMContentLoaded** follows the end of our bundle. It improved where the bundle was the bottleneck (Home, Services), and rose 0.3–0.7 s on About, Works, Insights and Contact. Those pages already paint at 0.7–0.8 s, so it doesn't delay anything visible.
+  - **TBT** (long tasks after FCP) rose from about 200 to 400–600 ms. FCP moved about 1 s earlier, so the tags' work that used to run before first paint now counts. Main-thread JS shrank (788 → 728–736 KB of script).
+  - **Services LCP** 1.72 → 2.25–2.36 s. The poster starts at 0.28 s as before, but now shares the line with the bundle, GTM, the fonts and the work-row slider (3 eager images, 98 KB; see #7). Note that DevTools throttling shares bandwidth evenly and ignores HTTP/2 priorities, so the lab penalty is probably larger than on a real connection.
+  - **Works LCP** 1.85 → 3.26 s. The first card was `loading="lazy"`: it started only after layout at Low priority. On 13 Oct WP Rocket's "critical images" data had upgraded it, but that data was being re-collected after the cache clear (its beacon was back on `/works/`; see #11).
+    - **Fix (live 14 Oct):** `fdry_render_work_cards($query, true)` makes the archive's first card `loading="eager" fetchpriority="high"`. AJAX pages stay lazy (checked: Load more returns 18 lazy cards).
+    - **Measured on live** (`after-4-works`, 3 runs): mobile LCP 3.26 → **2.01 s** (1.92–2.10), the image starting at 0.28 s at High; desktop 0.71 → **0.31 s**. WP Rocket's beacon was still on the page, so this no longer depends on its data. No JS errors.
+    - **Tested on local copies of live `/works/`** (3 runs each): LCP 4.25 → **2.33 s**; the image starts at once at High instead of after layout at Low.
+  - **Next lever:** delay the tags (#5 step 2, #11 "Delay JS"), now that they, not the legacy files, are what competes with the first screen.
+- **Legacy pages after the skip-link fix:** 412px wide on a 412px phone on all 7 (`/brief/`, 2 case studies, a category, the job, a post, search), and on Contact and Home. No JS errors. Screenshots against 13 Oct:
+  - `/brief/` and the category page: 0.00% once the new footer Sitemap link is hidden.
+  - **Content edits, not code:** `/works/no-straight-lines/` now says "**Send FDRY your brief**" (bold, in the post content). The search results show new "modified" dates.
+  - **Noise:** the scrollbar flash (`/brief/` desktop), and a different frame of the autoplaying video on `/works/calling/`.
+  - **`/careers/account-executive/` mobile: 0.40% sub-pixel.** The CTA subtitle, the "Start your brief" circle and the footer icons re-rasterise. Everything below the job text sits at a fractional offset (.547 px, from `.single-job .entry-content li+li { margin-top: .35em }`), so a drift of a few hundredths of a pixel changes the anti-aliasing. Not traced further: the bundle's only changes reaching legacy pages are scoped (rule-by-rule diff), the stylesheet order is unchanged, the content was last edited 10 Oct and Chrome is the same version. Not visible.
+
+**Checked after the deploy (14 Oct).**
+- **Requests.** On the new pages (Home, About), none of these load any more:
+  - `theme.min.css`, the mainstyle sheets
+  - jQuery, `theme.min.js`, lozad, `footer.js`
+  - TweenMax, `about.js`
+
+  `/works/calling/` still loads all the legacy files.
+- **Tracking.** `gtm-check` matches the baseline. The `790752334` email conversion now comes from `fdry_legacy_conversions()`. No JS errors.
+- **Screenshots of the new pages against the 13 Oct baseline.** Every difference traced to something other than #4:
+  - **The privacy policy page was edited at 16:20 on 13 Oct.** Its "Pages on this website" list was removed (REST `modified`), so the page is 3.7k px shorter.
+  - **A "Sitemap" link was added to the footer's legal links** (`site-footer.php`). On mobile it wraps, so every page is 22px taller.
+  - **The showreel button** was missing in the first post-deploy capture, while the page was cached during the new reel's upload (`FDRY_SHOWREEL_BASENAME` → `showreel-2026-10`). A recapture shows it.
+  - **The Sectors italic** is still pending its Adobe kit change.
+  - **Sub-pixel noise:** the scrollbar flash, and the tech-banner logo edges. Those are already in the 13 Oct simulation with the new CSS, so they're not the deploy.
+- **Legacy pages: one regression found and fixed.** On phones, `/brief/`, case studies, category pages, the job, posts and search were 413px wide on a 412px screen. The header button and the cookie banner shifted, and the page could scroll sideways by 1px.
+  - **Cause.** The new skip-link CSS was global and met `theme.css`'s `a.skip-link { right: 0 }`.
+  - **Fix.** `_skip-link.scss` is now scoped to `.fdry-legacy-free`, like `_legacy-base.scss`.
+  - **Checked on live** (live bundle CSS blocked, fix injected): `/brief/` and `/works/calling/` are back to 412px with the skip link as before. On Contact the skip link stays hidden, and on focus appears at (6, 7).
+
+The approved implementation plan has 6 phases:
+- **0:** the tooling;
+- **1:** these quick wins;
+- **2:** the CSS;
+- **3:** the JS;
+- **4:** posts;
+- **5:** deleting dead code, all three tiers plus the rollback copies (decided 13 Oct).
+
+**In code.**
+- `fdry_is_legacy_free()` covers the homepage, the 404 page, the 8 ACF-only templates and `template-one-column.php`, which is 36 of the 37 published pages (not `/brief/`).
+- `fdry_dequeue_legacy_assets()` removes `theme.min.css`, TweenMax and `about.js`.
+- The mainstyle sheets are enqueued only on legacy pages.
+- `fdry-scripts` no longer depends on jQuery.
+- The front-page `#loading-animation` jQuery is gone (SEO #23).
+- [`_legacy-base.scss`](src/styles/common/_legacy-base.scss) holds the ported rules: the body colour and font stack, the heading weights, line-heights and colours, and `.alignleft`/`.alignright`.
+- The skip link's `.screen-reader-text` is now in our CSS. Without it, "Skip to content" showed on every page and pushed it down 24 px.
+- See FRONTEND.md → Legacy assets.
+
+**Simulated on live before deploying** (`pnpm perf --block … --inject-css … --add-class fdry-legacy-free`, then `pnpm perf:diff`, 12 pages × mobile and desktop):
+
+| Round | Ported | Pages pixel-identical |
+|---|---|---|
+| 1 | skip link only | 6 of 12 desktop (Privacy, Build, Sectors, Shopify, About and Home differed) |
+| 2 | + headings, alignment | 11 of 12 desktop |
+| 3 | + body font stack and colour | **11 of 12 on both widths** |
+
+- **One accepted difference left: the italic word "your" on `/sectors/`.**
+  - **Cause.** The old `theme.css` faces included a true 400 italic (`6aec08`, downloaded on every page). The current Adobe kit has no italic, so Chrome slants the regular. The paragraph is 1–4 px shorter, and the content below moves up by that much.
+  - **Fix (CMS).** Add Proxima Nova 400 italic to the Adobe Fonts web project. It's downloaded only where italic text appears.
+- **Font stack.** The kit has no "→". Without Bootstrap's longer `body` font stack, the arrows in the homepage and Shopify content fell back to Lucida Grande instead of Arial, hence the ported stack.
+- **Desktop FCP in the simulation** dropped on most pages (Services 0.41 → 0.27 s, Insights 0.41 → 0.29 s), but simulated metrics are approximate. Measure after the deploy.
+- **JS (step 5), also in this deploy.**
+  - **Dequeued on legacy-free pages:** `theme.min.js`, lozad and jQuery. `footer.php` skips `footer.js`.
+  - **The old-account email conversion** (`AW-790752334`, decided 13 Oct: keep, without jQuery) is now an inline vanilla handler, `fdry_legacy_conversions()`.
+  - **Simulated:** jQuery, `theme.min.js`, lozad and `footer.js` blocked on all 12 pages.
+    - The screenshots are unchanged.
+    - The only JS errors came from code this change also removes: live's front-page `#loading-animation` inline script, and `about.js`.
+    - `gtm-check` with the handler injected still sends the `790752334` conversion on an email-link mousedown. The Ads, GA4 and `_gcl` results are unchanged.
+- **Case studies checked (13 Oct), still fully legacy.**
+  - **Nothing is dequeued.** `works_post` singles are not legacy-free, so `theme.min.css`, both mainstyle sheets, jQuery, `theme.min.js`, lozad and `footer.js` all stay, and `_legacy-base.scss` doesn't apply.
+  - **They need these files:**
+    - the Bootstrap grid and carousel (`content-single-work.php`, which needs `theme.min.js` and jQuery);
+    - about 2.4% of `theme.min.css` and 8–9% of `mainstyle.css` in use, against 0.8% and 0% on the new pages.
+  - **Cascade order unchanged.** On live `/works/calling/` only scripts sit between `fdry.css` and the hand-printed mainstyle links, so enqueuing the mainstyle sheets right after `fdry.css` keeps the order.
+  - **What reaches them:** only the unscoped `.screen-reader-text`/skip-link rules (the skip link now shows on keyboard focus) and `html { scroll-behavior: smooth }` (already set by `theme.css`).
+  - **Baseline:** `legacy-works-before` (`/works/calling/`, `/works/no-straight-lines/`, both widths). A repeat run diffs at 0.00%, so the carousel doesn't add noise. After the deploy, expect 0.00%.
+- **Legacy pages:** before-screenshots taken (`p2-legacy-before`) for `/brief/`, a case study, a work category, a job, a post and search. Diff them after the deploy: the mainstyle sheets now print through `wp_enqueue_style` right after our CSS, rather than by hand after `wp_head()`.
+
 **Evidence:** see the table above. The legacy files block rendering on every new-template page, and are 0–1 % used:
 - `theme.min.css` also carries old Proxima Nova `@font-face` rules (see #6).
 - `inc/enqueue.php` loads TweenMax 2.0.2 and `js/about.js` on `is_page('about')`, so /about/ downloads an extra 37 KB.
@@ -554,6 +662,8 @@ Chrome doesn't count the full-viewport hero poster, so for a first visit the ban
 - `work-row.php`, `work-parallax.php` and `fdry_render_work_card()` (`library/function-work.php`) output a single `large` URL with no srcset or sizes.
 - Desktop gets 768×1024 portrait crops at roughly double the displayed size in the 3-up grid. Retina still lacks a 2× candidate.
 - `NUYU.jpg` (parallax card 1) is lazy but still loads at 2.4 s on phones. It sits within Chrome's lazy-load distance, so it competes with the hero.
+- **Services (14 Oct, after #4):** the work-row slider's 3 eager images (NUYU, Soie Labs, Goodnest: 98 KB) start at 0.28 s with the hero poster, below the fold on phones. Smaller srcset candidates would cut that. `fetchpriority="low"` would also help, but not on `/services/shopify-agency/`, where a work-row image is the LCP.
+- **Work cards:** the archive's first card is now eager with `fetchpriority="high"` (#4 follow-up, 14 Oct). Keep that when switching to `wp_get_attachment_image()`.
 
 **Fix:**
 - Switch these three to `wp_get_attachment_image()` with an explicit `sizes`, as `insight-archive.php` and `components/single/insight.php` already do. For example:
@@ -645,6 +755,7 @@ Chrome doesn't count the full-viewport hero poster, so for a first visit the ban
 - **Delay JavaScript execution: on**, only for whatever third parties remain outside GTM (Klaviyo onsite, and Hotjar if still inline).
 - **Remove Unused CSS:** not needed on new templates after #4. Only consider it for the legacy brief and case study pages.
 - **Clear Priority Elements and the cache** after each deploy that changes the hero (SEO #9 step 2).
+- **Don't rely on its "critical images" data for an LCP image (found 14 Oct).** After a cache clear its beacon (`wpr-beacon.min.js`) comes back on some pages while it re-collects, and until then those pages get none of its priority hints. `/works/`' lazy first card went from High priority (LCP 1.85 s) to Low (3.26 s) that way. Set `fetchpriority`/`loading` on the LCP image in the template instead, as the hero posters and the first work card now do.
 - **"Separate cache files for mobile devices": turn it off (found 12 Oct while building #0).**
   - **The problem.** Phones get their own cache, and preload doesn't fill it. After a purge, the first phone on each page waits for WordPress to render it: TTFB 0.8–1.9 s, against 0.1 s cached.
   - **Why it's safe.** The theme never serves different HTML to phones: there's no `wp_is_mobile()` or user-agent check anywhere.

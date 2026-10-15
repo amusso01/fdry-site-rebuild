@@ -1,0 +1,68 @@
+// The legacy base rules the new templates still rely on (PERFORMANCE-PLAN.md #4).
+//
+// Where fdry_is_legacy_free() is true, theme.css (Understrap / Bootstrap 4) and
+// the mainstyle sheets no longer load. These are the few of their rules that new
+// markup used, found by blocking those files on live and comparing screenshots
+// (pnpm perf --block … --inject-css …, then pnpm perf:diff).
+//
+// :where() keeps the class out of the specificity: each rule weighs the same as
+// the bare selector it replaces, so component rules still win. Legacy pages
+// don't get the class and keep theme.css.
+
+// Bootstrap's body. The longer font stack matters where Proxima Nova has no
+// glyph: the kit has no arrows, so "→" falls back to Arial (as before) rather
+// than the system UI font.
+body:where(.fdry-legacy-free) {
+	color: #212529;
+	font-family: proxima-nova, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+:where(.fdry-legacy-free) {
+	// Bootstrap's heading reboot. Size, margin and font-family come from
+	// _general.scss, which loads later.
+	h1,
+	h2,
+	h3,
+	h4,
+	h5,
+	h6,
+	.h1,
+	.h2,
+	.h3,
+	.h4,
+	.h5,
+	.h6 {
+		font-weight: 500;
+		line-height: 1.2;
+	}
+
+	// Understrap's own heading styles.
+	h1 {
+		color: #1a1c22;
+		font-weight: 700;
+		line-height: 70px;
+	}
+
+	h2,
+	h3 {
+		color: #212531;
+	}
+
+	h2 {
+		line-height: 35px;
+	}
+
+	// WordPress alignment classes in editor content (e.g. the homepage's
+	// arrow links in navigation-content).
+	.alignleft {
+		display: inline;
+		float: left;
+		margin-right: 1.5em;
+	}
+
+	.alignright {
+		display: inline;
+		float: right;
+		margin-left: 1.5em;
+	}
+}

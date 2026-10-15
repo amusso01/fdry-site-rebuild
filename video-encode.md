@@ -138,7 +138,13 @@ The same uploaded video can be selected on several pages. Reusing one file is be
 
 **The poster is required** whenever a video is set. WordPress won't save the page without it.
 
-**The mobile poster is optional.** Phones never download the video, they only see a still. If this field is empty they get the normal 16:9 poster, cropped to fill a tall screen, which loses most of the frame. For a better result, crop a portrait still from the video in an image editor and upload it here. The encoder does not make this image.
+**The mobile poster is optional.** Phones never download the video, they only see a still. If this field is empty they get the normal 16:9 poster, cropped to fill a tall screen, which loses most of the frame. For a better result, upload a portrait still here (1080×1920, a WebP of 200 KB or less). If the editor exported a portrait version of the video, the encoder can make it from that:
+
+```bash
+pnpm encode "build/masters/My loop mobile.mp4" my-loop-mobile --poster-only
+```
+
+That writes `build/video/my-loop-mobile-poster.webp`. Like the main poster, it's the first frame. Otherwise, crop a portrait still from the video in an image editor.
 
 ## Full showreel
 

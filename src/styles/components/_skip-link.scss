@@ -1,24 +1,55 @@
-.skip-link {
-	position: absolute;
-	top: -100px;
-	/* Styled to match the default WordPress screen reader text */
-	background-color: #f1f1f1;
-	box-shadow: 0 0 2px 2px rgba(0, 0, 0, 0.6);
-	display: block;
-	font-size: 14px;
-	font-weight: 700;
-	height: auto;
-	left: 6px;
-	line-height: normal;
-	padding: 15px 23px 14px;
-	text-decoration: none;
-	width: auto;
-	z-index: 100000; /* Above WP toolbar */
-	transition: top 0.75s ease-out;
-}
+// WordPress's .screen-reader-text and the skip link, on the pages that no
+// longer load theme.css (PERFORMANCE-PLAN.md #4). Without them the skip link in
+// header-new.php shows at the top of every page.
+//
+// Scoped like _legacy-base.scss: legacy pages keep theme.css's own rules.
+// Unscoped, these met theme.css's `a.skip-link { position: fixed; top: 0;
+// right: 0 }` there and stretched the hidden link 1px past the right edge, so
+// phones could scroll the page sideways.
+:where(.fdry-legacy-free) {
+	.screen-reader-text {
+		border: 0;
+		clip-path: inset(50%);
+		height: 1px;
+		margin: -1px;
+		overflow: hidden;
+		padding: 0;
+		position: absolute !important;
+		width: 1px;
+		word-wrap: normal !important;
+	}
 
-.skip-link:focus {
-	color: #21759b;
-	top: 7px;
-	transition: top 0s;
+	// Bootstrap's sr-only in theme.css never showed the skip link on focus.
+	.screen-reader-text:focus {
+		clip-path: none;
+		height: auto;
+		margin: 0;
+		overflow: visible;
+		width: auto;
+	}
+
+	.skip-link {
+		position: absolute;
+		top: -100px;
+		/* Styled to match the default WordPress screen reader text */
+		background-color: #f1f1f1;
+		box-shadow: 0 0 2px 2px rgba(0, 0, 0, 0.6);
+		display: block;
+		font-size: 14px;
+		font-weight: 700;
+		height: auto;
+		left: 6px;
+		line-height: normal;
+		padding: 15px 23px 14px;
+		text-decoration: none;
+		width: auto;
+		z-index: 100000; /* Above WP toolbar */
+		transition: top 0.75s ease-out;
+	}
+
+	.skip-link:focus {
+		color: #21759b;
+		top: 7px;
+		transition: top 0s;
+	}
 }

@@ -6,7 +6,8 @@
 		"dev": "vite build --watch",
 		"build": "vite build",
 		"encode": "node scripts/encode-video.mjs",
-		"perf": "node scripts/perf-measure.mjs"
+		"perf": "node scripts/perf-measure.mjs",
+		"perf:diff": "node scripts/perf-diff.mjs"
 	},
 	"dependencies": {
 		"accordion-js": "^3.4.1",

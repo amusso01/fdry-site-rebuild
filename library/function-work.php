@@ -140,8 +140,11 @@ function fdry_work_card_categories(int $post_id): array
 
 /**
  * Render one work archive card.
+ *
+ * $is_lcp: the archive's first card, the LCP on phones (one column). It loads
+ * at once with high priority instead of waiting for layout like a lazy image.
  */
-function fdry_render_work_card(int $post_id): string
+function fdry_render_work_card(int $post_id, bool $is_lcp = false): string
 {
 	if ($post_id <= 0 || get_post_type($post_id) !== 'works_post') {
 		return '';
@@ -182,7 +185,10 @@ function fdry_render_work_card(int $post_id): string
 					class="work-card__image"
 					src="<?= esc_url($image[0]); ?>"
 					alt="<?= esc_attr($image_alt); ?>"
-					loading="lazy"
+					loading="<?= $is_lcp ? 'eager' : 'lazy'; ?>"
+					<?php if ($is_lcp) : ?>
+						fetchpriority="high"
+					<?php endif; ?>
 					decoding="async"
 					<?php if (! empty($image[1])) : ?>
 						width="<?= esc_attr((string) (int) $image[1]); ?>"
@@ -226,13 +232,15 @@ function fdry_render_work_card(int $post_id): string
 
 /**
  * Render work cards for a query.
+ *
+ * $first_is_lcp: true for the first page load only, not for AJAX pages.
  */
-function fdry_render_work_cards(WP_Query $query): string
+function fdry_render_work_cards(WP_Query $query, bool $first_is_lcp = false): string
 {
 	$html = '';
 
-	foreach ($query->posts as $post_id) {
-		$html .= fdry_render_work_card((int) $post_id);
+	foreach ($query->posts as $index => $post_id) {
+		$html .= fdry_render_work_card((int) $post_id, $first_is_lcp && $index === 0);
 	}
 
 	return $html;

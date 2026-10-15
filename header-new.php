@@ -29,16 +29,6 @@ if (! defined('FDRY_USING_NEW_HEADER')) {
   <meta name="theme-color" content="#5472C6" />
 
   <?php wp_head(); ?>
-  <?php if (is_front_page()) {
-  ?>
-    <script>
-      jQuery(window).on('load', function() {
-        jQuery('#loading-animation').fadeOut(500);
-      });
-    </script>
-  <?php
-  }
-  ?>
 
   <meta name="google-site-verification" content="bO-ylznjkqW94tOj0xpQaYvc2P5QTf40geNG1Hhx_fs" />
 
@@ -78,10 +68,6 @@ if (! defined('FDRY_USING_NEW_HEADER')) {
     })(window, document, 'script', 'dataLayer', 'GTM-5D5B7P');
   </script>
   <!-- End Google Tag Manager -->
-
-
-  <link rel="stylesheet" href="<?php echo get_template_directory_uri(); ?>/mainstyle/typeformstyle.css">
-  <link rel="stylesheet" href="<?php echo get_template_directory_uri(); ?>/mainstyle/mainstyle.css">
 
 
   <!-- Start cookieyes banner -->

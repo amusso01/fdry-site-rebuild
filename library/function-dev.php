@@ -269,12 +269,40 @@ function fdry_get_vite_assets(): ?array
 }
 
 /**
+ * Whether this request renders only new markup, so the legacy Understrap CSS
+ * and JS can stay off (PERFORMANCE-PLAN.md #4).
+ *
+ * True for the homepage, the 404 page and pages on the new templates. Posts,
+ * case studies, jobs, work categories, search and the legacy page templates
+ * (/brief/) still render Understrap markup and keep everything. Before adding
+ * a template, simulate it on live with `pnpm perf --block … --inject-css …`
+ * and compare with `pnpm perf:diff` (FRONTEND.md → Legacy assets).
+ * To roll back, return false.
+ */
+function fdry_is_legacy_free(): bool
+{
+	if (is_front_page() || is_404()) {
+		return true;
+	}
+
+	if (! is_page()) {
+		return false;
+	}
+
+	$templates = array_merge(fdry_acf_only_page_templates(), array('template-one-column.php'));
+
+	return in_array(get_page_template_slug(get_queried_object_id()), $templates, true);
+}
+
+/**
  * Enqueue fdry assets built from src/ via Vite.
  *
  * Filenames are content-hashed; paths come from dist/.vite/manifest.json.
  */
 function fdry_enqueue_assets()
 {
+	$legacy_free = fdry_is_legacy_free();
+
 	wp_enqueue_style(
 		'foundry-typekit',
 		'https://use.typekit.net/rdq4arx.css',
@@ -292,22 +320,87 @@ function fdry_enqueue_assets()
 		wp_enqueue_style(
 			'fdry-overrides',
 			$assets['css'],
-			array('understrap-styles', 'foundry-typekit'),
+			$legacy_free ? array('foundry-typekit') : array('understrap-styles', 'foundry-typekit'),
 			null
 		);
 	}
 
+	// The legacy mainstyle sheets, which header-new.php used to print by hand
+	// after wp_head(). They depend on fdry-overrides so they still print after
+	// it: rules in src/ were written against that order. header.php (legacy)
+	// still prints its own copies.
+	if (! $legacy_free && defined('FDRY_USING_NEW_HEADER') && FDRY_USING_NEW_HEADER && $assets['css']) {
+		wp_enqueue_style('fdry-legacy-typeform', get_template_directory_uri() . '/mainstyle/typeformstyle.css', array('fdry-overrides'), null);
+		wp_enqueue_style('fdry-legacy-mainstyle', get_template_directory_uri() . '/mainstyle/mainstyle.css', array('fdry-legacy-typeform'), null);
+	}
+
+	// src/ never uses jQuery.
 	if ($assets['js']) {
 		wp_enqueue_script(
 			'fdry-scripts',
 			$assets['js'],
-			array('jquery'),
+			array(),
 			null,
 			true
 		);
 	}
 }
 add_action('wp_enqueue_scripts', 'fdry_enqueue_assets', 11);
+
+/**
+ * Take the legacy Understrap assets off pages that render only new markup.
+ *
+ * Runs after understrap_scripts() (inc/enqueue.php, priority 10), which still
+ * enqueues everything for the legacy templates.
+ * - theme.min.js (Bootstrap and Understrap) only handles old markup: .navbar,
+ *   #main-logo, .jumbo-video, .hidden-animate and dropdowns.
+ * - lozad has no .lozad images to load on the new templates.
+ * - TweenMax and about.js are enqueued on is_page('about'), which the new About
+ *   page still matches; they targeted the old About markup (#counter).
+ * - jQuery: nothing left on these pages uses it. A script that still declares
+ *   it as a dependency brings it back.
+ * footer.php skips mainjs/footer.js on the same pages (fdry_legacy_conversions()).
+ */
+function fdry_dequeue_legacy_assets(): void
+{
+	if (! fdry_is_legacy_free()) {
+		return;
+	}
+
+	wp_dequeue_style('understrap-styles');
+	wp_dequeue_script('understrap-scripts');
+	wp_dequeue_script('lazy-jquery');
+	wp_dequeue_script('tweenmax');
+	wp_dequeue_script('about');
+	wp_dequeue_script('jquery');
+}
+add_action('wp_enqueue_scripts', 'fdry_dequeue_legacy_assets', 20);
+
+/**
+ * The one live job of mainjs/footer.js, without jQuery, on the pages that no
+ * longer load it.
+ *
+ * A mousedown on an email link sends a conversion to the old Google Ads
+ * account AW-790752334, through the gtag() stub in header-new.php. footer.js's
+ * two /brief-1/ conversions aren't ported: that URL now 301s to /brief/.
+ * Drop this once marketing confirms the old account is unused.
+ */
+function fdry_legacy_conversions(): void
+{
+	if (! fdry_is_legacy_free()) {
+		return;
+	}
+
+	wp_print_inline_script_tag(
+		"document.addEventListener('mousedown', function (event) {
+	var link = event.target.closest && event.target.closest('[href*=\"mailto:\"]');
+	if (link && typeof window.gtag === 'function') {
+		window.gtag('event', 'conversion', { send_to: 'AW-790752334/N-DvCOepns4DEM7Yh_kC' });
+	}
+});"
+	);
+}
+add_action('wp_footer', 'fdry_legacy_conversions', 99);
 
 /**
  * Mark pages rendered with header-new.php.
@@ -319,6 +412,11 @@ function fdry_new_header_body_class(array $classes): array
 {
 	if (defined('FDRY_USING_NEW_HEADER') && FDRY_USING_NEW_HEADER) {
 		$classes[] = 'fdry-new-header';
+	}
+
+	// Scopes src/styles/common/_legacy-base.scss.
+	if (fdry_is_legacy_free()) {
+		$classes[] = 'fdry-legacy-free';
 	}
 
 	return $classes;
@@ -575,7 +673,7 @@ const FDRY_HERO_MOBILE_MAX_PX = 768;
  * Give a new reel a new name rather than overwriting the files, so no
  * browser or CDN cache can serve the old one.
  */
-const FDRY_SHOWREEL_BASENAME = 'media/showreel-2026-v2';
+const FDRY_SHOWREEL_BASENAME = 'media/showreel-2026-10';
 
 /**
  * Resolve the full showreel files to URLs.

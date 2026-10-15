@@ -15,6 +15,16 @@
  *   --screenshots    Save a first-screen and a full-page PNG per page (the full page at DPR 1,
  *                    after the scroll, with fixed elements only at the top)
  *   --no-warm        Don't request each page once before loading it (see below)
+ *   --reduced-motion Emulate prefers-reduced-motion, so fades, the hero video,
+ *                    the tech grid and CSS animations hold still for screenshots
+ *
+ * Simulating a change on the live pages before deploying it (PERFORMANCE-PLAN.md #4):
+ *   --block <pattern>     Block requests matching a URL pattern (* is a wildcard).
+ *                         Repeat it for several, e.g. --block '*foundry/css/theme.min.css*'
+ *   --inject-css <file>   Add a local CSS file to the page, e.g. a fresh dist/fdry.*.css
+ *                         (block the live one too)
+ *   --add-class <names>   Add classes to <body>, e.g. one a PHP change would print
+ * Compare two runs' screenshots with `pnpm perf:diff` (scripts/perf-diff.mjs).
  *
  * Without URLs it measures the plan's verification set (DEFAULT_PAGES). It
  * prints a summary and writes everything to build/perf/<date>-<label>-<device>.json:
@@ -46,20 +56,22 @@ import { existsSync, mkdtempSync, readFileSync, rmSync } from 'node:fs'
 import { mkdir, writeFile } from 'node:fs/promises'
 import os from 'node:os'
 import path from 'node:path'
-import { crc32, deflateSync, inflateSync } from 'node:zlib'
+import { decodePng, encodePng } from './lib/png.mjs'
 
 // A bare "--" (as in `pnpm perf -- mobile`) is an end-of-options marker,
 // not an option, so drop it before parsing.
 const argv = process.argv.slice(2).filter((a) => a !== '--')
 
 // Only these options take a value; every other --flag is a boolean.
-const VALUE_OPTIONS = ['runs', 'label', 'base', 'settle']
+const VALUE_OPTIONS = ['runs', 'label', 'base', 'settle', 'block', 'inject-css', 'add-class']
 
 const flag = (name) => argv.includes(`--${name}`)
 const opt = (name, fallback) => {
 	const i = argv.indexOf(`--${name}`)
 	return i !== -1 && argv[i + 1] ? argv[i + 1] : fallback
 }
+// Every value of a repeatable option.
+const opts = (name) => argv.flatMap((a, i) => (a === `--${name}` && argv[i + 1] ? [argv[i + 1]] : []))
 const positional = argv.filter((a, i) => {
 	if (a.startsWith('--')) return false
 	const prev = argv[i - 1]
@@ -119,7 +131,6 @@ const LOAD_TIMEOUT = 60_000
 const LARGEST = 15
 // Full-page screenshots stop here, to keep the files a sane size.
 const MAX_SHOT_HEIGHT = 20_000
-const PNG_SIGNATURE = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a])
 
 // Runs in the page before any of its own scripts.
 const OBSERVER = `(() => {
@@ -207,7 +218,7 @@ const HIDE_FIXED = `document.querySelectorAll('body *').forEach((el) => {
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 
 if (flag('help') || flag('h')) {
-	console.log('usage: pnpm perf [mobile|desktop|both] [url-or-path ...] [--runs n] [--label name] [--base url] [--settle ms] [--profile] [--legacy-css] [--screenshots] [--no-warm]')
+	console.log('usage: pnpm perf [mobile|desktop|both] [url-or-path ...] [--runs n] [--label name] [--base url] [--settle ms] [--profile] [--legacy-css] [--screenshots] [--no-warm] [--reduced-motion] [--block pattern]... [--inject-css file] [--add-class names]')
 	process.exit(0)
 }
 
@@ -222,6 +233,52 @@ const withProfile = flag('profile')
 const withLegacyCss = flag('legacy-css')
 const withScreenshots = flag('screenshots')
 const warm = !flag('no-warm')
+const reducedMotion = flag('reduced-motion')
+const blocked = opts('block')
+const injectCssFile = opt('inject-css', '')
+const addClass = opt('add-class', '').trim()
+
+let injectCss = ''
+
+if (injectCssFile) {
+	try {
+		injectCss = readFileSync(injectCssFile, 'utf8')
+	} catch {
+		console.error(`Can't read --inject-css file: ${injectCssFile}`)
+		process.exit(1)
+	}
+}
+
+// Runs before the page's own scripts. The <style> goes at the end of <head>
+// and the classes on <body> as soon as each exists, so they apply from the
+// first paint. A simulation's metrics are still approximate; its screenshots
+// are what it's for.
+const INJECT = `(() => {
+	const css = ${JSON.stringify(injectCss)}
+	const classes = ${JSON.stringify(addClass ? addClass.split(/\s+/) : [])}
+	const apply = () => {
+		let done = true
+		if (css) {
+			if (document.head) {
+				if (!document.querySelector('style[data-fdry-inject]')) {
+					const style = document.createElement('style')
+					style.dataset.fdryInject = ''
+					style.textContent = css
+					document.head.appendChild(style)
+				}
+			} else done = false
+		}
+		if (classes.length) {
+			if (document.body) document.body.classList.add(...classes)
+			else done = false
+		}
+		return done
+	}
+	if (apply()) return
+	const observer = new MutationObserver(() => apply() && observer.disconnect())
+	observer.observe(document, { childList: true, subtree: true })
+	document.addEventListener('DOMContentLoaded', () => { apply(); observer.disconnect() })
+})()`
 
 let urls
 
@@ -353,79 +410,19 @@ async function userAgent(cdp, device) {
 	return device.mobile ? `Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) ${chrome} Mobile Safari/537.36` : desktop
 }
 
+// Chrome 13x replaced Network.setBlockedURLs' `urls` with `urlPatterns`;
+// try the new form first.
+async function blockUrls(cdp, patterns) {
+	try {
+		await cdp.send('Network.setBlockedURLs', { urlPatterns: patterns.map((urlPattern) => ({ urlPattern, block: true })) })
+	} catch {
+		await cdp.send('Network.setBlockedURLs', { urls: patterns })
+	}
+}
+
 async function screenshot(cdp, file) {
 	const { data } = await cdp.send('Page.captureScreenshot', { format: 'png' })
 	await writeFile(file, Buffer.from(data, 'base64'))
-}
-
-const paeth = (left, up, upLeft) => {
-	const p = left + up - upLeft
-	const [a, b, c] = [Math.abs(p - left), Math.abs(p - up), Math.abs(p - upLeft)]
-
-	return a <= b && a <= c ? left : b <= c ? up : upLeft
-}
-
-// Reads the 8-bit, non-interlaced RGB(A) PNGs Chrome writes, as unfiltered rows.
-function decodePng(buffer) {
-	const idat = []
-	let header
-
-	for (let offset = 8; offset < buffer.length; ) {
-		const length = buffer.readUInt32BE(offset)
-		const type = buffer.toString('ascii', offset + 4, offset + 8)
-		const body = buffer.subarray(offset + 8, offset + 8 + length)
-
-		if (type === 'IHDR') header = { width: body.readUInt32BE(0), height: body.readUInt32BE(4), depth: body[8], color: body[9], interlace: body[12] }
-		else if (type === 'IDAT') idat.push(body)
-
-		offset += length + 12
-	}
-
-	if (!header || header.depth !== 8 || header.interlace || ![2, 6].includes(header.color)) throw new Error('Unexpected screenshot format')
-
-	const bpp = header.color === 6 ? 4 : 3
-	const stride = header.width * bpp
-	const raw = inflateSync(Buffer.concat(idat))
-	const rows = []
-	let prev = Buffer.alloc(stride)
-
-	for (let y = 0; y < header.height; y++) {
-		const start = y * (stride + 1)
-		const filter = raw[start]
-		const row = Buffer.from(raw.subarray(start + 1, start + 1 + stride))
-
-		for (let i = 0; i < stride; i++) {
-			const left = i >= bpp ? row[i - bpp] : 0
-
-			if (filter === 1) row[i] += left
-			else if (filter === 2) row[i] += prev[i]
-			else if (filter === 3) row[i] += (left + prev[i]) >> 1
-			else if (filter === 4) row[i] += paeth(left, prev[i], i >= bpp ? prev[i - bpp] : 0)
-		}
-
-		rows.push(row)
-		prev = row
-	}
-
-	return { ...header, rows }
-}
-
-function encodePng(width, color, rows) {
-	const chunk = (type, body) => {
-		const typed = Buffer.concat([Buffer.from(type, 'ascii'), body])
-		const out = Buffer.alloc(typed.length + 8)
-		out.writeUInt32BE(body.length, 0)
-		typed.copy(out, 4)
-		out.writeUInt32BE(crc32(typed), typed.length + 4)
-		return out
-	}
-	const ihdr = Buffer.alloc(13)
-	ihdr.writeUInt32BE(width, 0)
-	ihdr.writeUInt32BE(rows.length, 4)
-	ihdr[8] = 8
-	ihdr[9] = color
-
-	return Buffer.concat([PNG_SIGNATURE, chunk('IHDR', ihdr), chunk('IDAT', deflateSync(Buffer.concat(rows.flatMap((row) => [Buffer.from([0]), row])))), chunk('IEND', Buffer.alloc(0))])
 }
 
 // Chrome's own full-page capture (captureBeyondViewport) never returns on the
@@ -477,6 +474,7 @@ function summariseRequests(requests, start, host) {
 			priority: r.priority,
 			status: r.status ?? null,
 			bytes: r.bytes ?? 0,
+			start: r.start ? Math.round((r.start - start) * 1000) : null,
 			end: r.end ? Math.round((r.end - start) * 1000) : null,
 			...(r.failed ? { failed: r.failed } : {}),
 		}))
@@ -638,7 +636,8 @@ async function measure(url, deviceName, details) {
 				start = timestamp
 			}
 
-			requests.set(requestId, { ...requests.get(requestId), url: request.url, type, priority: request.initialPriority })
+			// A redirect reuses the requestId: keep the first start.
+			requests.set(requestId, { start: timestamp, ...requests.get(requestId), url: request.url, type, priority: request.initialPriority })
 		})
 		cdp.on('Network.responseReceived', ({ requestId, response }) => {
 			if (requests.has(requestId)) requests.get(requestId).status = response.status
@@ -650,12 +649,17 @@ async function measure(url, deviceName, details) {
 			if (requests.has(requestId)) Object.assign(requests.get(requestId), { failed: errorText, end: timestamp })
 		})
 		cdp.on('CSS.styleSheetAdded', ({ header }) => sheets.set(header.styleSheetId, header))
+		// Uncaught exceptions and console.error calls, e.g. when --block removes a script something still needs.
+		const jsErrors = []
+		cdp.on('Runtime.exceptionThrown', ({ exceptionDetails: e }) => jsErrors.push((e.exception?.description || e.text || '').split('\n')[0].slice(0, 300)))
+		cdp.on('Runtime.consoleAPICalled', ({ type, args }) => type === 'error' && jsErrors.push(`console.error: ${args.map((a) => a.value ?? a.description ?? '').join(' ')}`.slice(0, 300)))
 		cdp.on('Page.loadEventFired', () => {
 			loaded = true
 		})
 
 		await cdp.send('Page.enable')
 		await cdp.send('Network.enable')
+		await cdp.send('Runtime.enable')
 
 		await cdp.send('Network.setCacheDisabled', { cacheDisabled: true })
 		await cdp.send('Emulation.setDeviceMetricsOverride', { width: device.width, height: device.height, deviceScaleFactor: device.scale, mobile: device.mobile })
@@ -669,8 +673,12 @@ async function measure(url, deviceName, details) {
 
 		if (warm) await (await fetch(url, { headers: { 'user-agent': agent } })).arrayBuffer()
 
+		if (blocked.length) await blockUrls(cdp, blocked)
+		if (reducedMotion) await cdp.send('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-reduced-motion', value: 'reduce' }] })
+
 		await throttle(cdp, device, true)
 		await cdp.send('Page.addScriptToEvaluateOnNewDocument', { source: OBSERVER })
+		if (injectCss || addClass) await cdp.send('Page.addScriptToEvaluateOnNewDocument', { source: INJECT })
 
 		if (withProfile) {
 			await cdp.send('Profiler.enable')
@@ -722,6 +730,9 @@ async function measure(url, deviceName, details) {
 			coverage: summariseCoverage(sheets, usage),
 			...(withLegacyCss ? { legacyCss: await legacyRules(cdp, sheets, usage) } : {}),
 			...(profile ? { profile } : {}),
+			...(withScreenshots ? { screenshots: { first: `${shotBase}-first.png`, full: `${shotBase}-full.png` } } : {}),
+			blockedRequests: list.filter((r) => r.failed === 'net::ERR_BLOCKED_BY_CLIENT').map((r) => r.url),
+			jsErrors,
 			requests: list,
 		}
 	} finally {
@@ -847,6 +858,13 @@ function printSummary(deviceName, pages, file) {
 		console.log(`  ${legacySummary(pages).length} distinct rules in all (see legacyCssSummary in the JSON)`)
 	}
 
+	const withErrors = pages.filter((page) => page.jsErrors?.length)
+
+	if (withErrors.length) {
+		console.log('\n  JS errors:')
+		withErrors.forEach((page) => page.jsErrors.forEach((error) => console.log(`  ${pad(new URL(page.url).pathname, 34)} ${error.slice(0, 160)}`)))
+	}
+
 	console.log(`\n  ${deviceName}: ${file}`)
 }
 
@@ -885,7 +903,7 @@ for (const deviceName of devices) {
 		date: now.toISOString(),
 		label,
 		device: deviceName,
-		settings: { ...DEVICES[deviceName], runs, settle, warm },
+		settings: { ...DEVICES[deviceName], runs, settle, warm, reducedMotion, block: blocked, injectCss: injectCssFile || null, addClass: addClass || null },
 		pages,
 		...(withLegacyCss ? { legacyCssSummary: legacySummary(pages) } : {}),
 	}

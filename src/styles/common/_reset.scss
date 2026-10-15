@@ -44,7 +44,15 @@ body {
 	line-height: 1.5;
 }
 
-/* Lenis animates the scroll itself; theme.css's html smooth would fight it.
+/* Smooth same-page anchors where Lenis is off (touch devices). theme.css set
+   this on every page until PERFORMANCE-PLAN.md #4. */
+@media (prefers-reduced-motion: no-preference) {
+	html {
+		scroll-behavior: smooth;
+	}
+}
+
+/* Lenis animates the scroll itself; the smooth rule above would fight it.
    !important to beat the Table of Content block plugin, which prints
    html{scroll-behavior:smooth!important} inline. Smooth there also breaks
    ScrollTrigger.refresh(), which jumps to the top and back to measure. */

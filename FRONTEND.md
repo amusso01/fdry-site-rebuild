@@ -73,8 +73,8 @@ Add new helpers, CPTs, ACF hooks, and enqueue rules to this file as the new site
 
 | Handle           | Source                 | Depends on          |
 |------------------|------------------------|---------------------|
-| `fdry-overrides` | `dist/fdry.[hash].css` | `understrap-styles` |
-| `fdry-scripts`   | `dist/fdry.[hash].js`  | `jquery`            |
+| `fdry-overrides` | `dist/fdry.[hash].css` | `foundry-typekit`, plus `understrap-styles` on legacy pages |
+| `fdry-scripts`   | `dist/fdry.[hash].js`  | none (`src/` never uses jQuery) |
 
 **Cache busting:** each build emits new hashed filenames. PHP reads the manifest to resolve the current paths. Upload the new hashed files plus `dist/.vite/manifest.json`; remove old `fdry.*` files from the server when convenient.
 
@@ -88,7 +88,47 @@ The full showreel files in `media/` are gitignored, so they are uploaded separat
 
 If the manifest is missing (no build yet), assets are not enqueued and the site still loads.
 
-Legacy assets remain in [`inc/enqueue.php`](inc/enqueue.php) (`understrap-styles`, `understrap-scripts`, page-specific old JS).
+Legacy assets remain in [`inc/enqueue.php`](inc/enqueue.php) (`understrap-styles`, `understrap-scripts`, page-specific old JS). The new templates don't load the legacy CSS: see **Legacy assets**.
+
+### Legacy assets
+
+`inc/enqueue.php` still enqueues the old Understrap front end on every page: `theme.min.css`, jQuery, `theme.min.js`, lozad and page-specific scripts. `header-new.php` used to print the two `mainstyle/*.css` sheets by hand. Pages that render only new markup don't need any of it (PERFORMANCE-PLAN.md #4).
+
+- **The allowlist.** `fdry_is_legacy_free()` in [`function-dev.php`](library/function-dev.php) decides.
+  - **True for:** the homepage, the 404 page, and pages on `fdry_acf_only_page_templates()` plus `template-one-column.php`.
+  - **Still legacy:** posts, case studies (`content-single-work.php`), jobs, `/works/category/{slug}/`, search, and the legacy page templates (`/brief/`, which uses `typeform.php`).
+- **What it turns off.**
+  - **The dequeues.** `fdry_dequeue_legacy_assets()` (`wp_enqueue_scripts`, priority 20, after `understrap_scripts()`) dequeues:
+    - `understrap-styles` (`theme.min.css`);
+    - `understrap-scripts` (`theme.min.js`), whose handlers only target old markup;
+    - `lazy-jquery` (lozad);
+    - TweenMax and `about.js`, which `is_page('about')` still matched;
+    - `jquery` itself. A script that still declares it as a dependency brings it back, so check the page's requests after adding a plugin.
+  - `fdry-overrides` stops depending on `understrap-styles`.
+  - The mainstyle sheets aren't enqueued.
+  - `footer.php` skips `mainjs/footer.js`. Its one live job, an email-link click sending a conversion to the old Google Ads account `AW-790752334`, is done without jQuery by `fdry_legacy_conversions()` (an inline `wp_footer` script). Drop that once marketing confirms the account is unused.
+- **Mainstyle on legacy pages.** On legacy pages under the new header, `fdry_enqueue_assets()` enqueues them as `fdry-legacy-typeform` and `fdry-legacy-mainstyle`, which depend on `fdry-overrides`, so they still print after our CSS as before. `header.php` (legacy) still prints its own copies.
+- **What replaced `theme.css`.** [`_legacy-base.scss`](src/styles/common/_legacy-base.scss) holds the few `theme.css` rules the new markup still relied on:
+  - the `body` colour and font stack (the kit has no "→", so the stack decides its fallback);
+  - Bootstrap's heading weight and line-height, and Understrap's `h1`/`h2`/`h3` colours and line-heights;
+  - `.alignleft` / `.alignright`.
+
+  The rules are scoped with `:where(.fdry-legacy-free)`, a body class `fdry_new_header_body_class()` adds on the same pages, so they weigh the same as the bare selectors they replace and never reach legacy pages.
+- **The skip link.** `.screen-reader-text` and the skip-link styles are in [`_skip-link.scss`](src/styles/components/_skip-link.scss), now imported and scoped the same way. Without them, "Skip to content" shows at the top of every page. The skip link now also appears on keyboard focus, which Bootstrap's `sr-only` never allowed.
+  - **Keep it scoped.** The first deploy made these rules global. On legacy pages they met `theme.css`'s `a.skip-link { position: fixed; top: 0; right: 0 }` and stretched the hidden link 1px past the right edge. Pages were 413px wide on a 412px phone, so they could scroll sideways by 1px.
+- **Smooth anchors.** `html { scroll-behavior: smooth }` in `_reset.scss` is global, for touch devices without Lenis. `theme.css` sets the same on legacy pages.
+- **Adding a template to the allowlist.**
+  1. Simulate it on live before changing any PHP: block the legacy files and the live bundle CSS, inject a fresh build and add the body class.
+     ```bash
+     pnpm perf both /path/ --screenshots --reduced-motion --label before
+     pnpm perf both /path/ --screenshots --reduced-motion --label sim \
+       --block '*foundry/css/theme.min.css*' --block '*foundry/mainstyle/*' --block '*foundry/dist/fdry.*.css*' \
+       --inject-css dist/fdry.[hash].css --add-class fdry-legacy-free
+     pnpm perf:diff build/perf/<before>.json build/perf/<sim>.json
+     ```
+  2. Port into `_legacy-base.scss` whatever the diff shows (`pnpm perf ... --legacy-css` lists the legacy rules a page uses). Repeat until the diff is clean.
+  3. Then add the template to `fdry_is_legacy_free()`.
+- **Rollback.** Make `fdry_is_legacy_free()` return `false`: everything loads as before, and `_legacy-base.scss` stops matching.
 
 ### Resource hints
 
@@ -104,7 +144,7 @@ Legacy assets remain in [`inc/enqueue.php`](inc/enqueue.php) (`understrap-styles
 - **The stale hint.** The same function drops core's dns-prefetch for `ajax.googleapis.com`, since nothing loads from it any more.
 - **Keep the list short.** Every preconnect opens a connection early and competes for bandwidth. Add a host only if it's on the first screen's critical path.
 
-**`gtag()` stub.** `header-new.php` defines `gtag()` (a `dataLayer` push) but no longer loads `gtag.js`: Google Ads comes from GTM. The stub is there for `mainjs/footer.js`'s old conversion calls. Remove it together with `footer.js` (PERFORMANCE-PLAN.md #4 step 5).
+**`gtag()` stub.** `header-new.php` defines `gtag()` (a `dataLayer` push) but no longer loads `gtag.js`: Google Ads comes from GTM. The stub is there for the old `AW-790752334` email-click conversion: `mainjs/footer.js` on legacy pages, `fdry_legacy_conversions()` on the others (see **Legacy assets**). Remove it together with both.
 
 ### Templates and headers
 
@@ -124,6 +164,7 @@ Legacy assets remain in [`inc/enqueue.php`](inc/enqueue.php) (`understrap-styles
   - **Old URLs.** In [`function-redirect.php`](library/function-redirect.php), `fdry_redirect_moved_urls()` 301s `/work/`, `/work/category/{slug}/` (to `/works/category/{slug}/`), `/works/feed/` and `?post_type=works_post` on `template_redirect` priority 1, before `redirect_canonical`.
   - **Breadcrumb.** With no archive, Yoast adds no post-type crumb to case studies. `fdry_works_breadcrumb()` (`wpseo_breadcrumb_links`) inserts "Work" → `/works/` after Home, and that feeds the BreadcrumbList schema too.
   - **Category pages.** `/works/category/{slug}/` also queries `works_post` (the rewrite rule in `functions.php`, added on `init` so it lands before the CPT's rules), so the redirect skips requests with a `category_name`. Those pages still use the legacy [`archive-works-category.php`](archive-works-category.php), whose intro still prints page 50's content.
+- **Work archive cards.** [`work-archive.php`](components/page/work-archive.php) calls `fdry_render_work_cards($query, true)`, which makes the first card `loading="eager" fetchpriority="high"`: it's the LCP on phones (one column). The AJAX filter and Load more call it without `true`, so their cards stay lazy. Don't leave the LCP image to WP Rocket's "critical images" data, which is re-collected after each cache clear (PERFORMANCE-PLAN.md #11).
 - **Insights.** [`template-insight.php`](template-insight.php) ("NEW template Insight") renders [`insight-archive.php`](components/page/insight-archive.php): a 50/50 intro from the "New Insight" ACF group (`insight_tagline`, `insight_title`, `insight_content`), then every published post as an `.insight-card`, two per row, styled in [`_insight-archive.scss`](src/styles/components/_insight-archive.scss). Each card has three links to the post: the image, Read more and the title (an `h2`). The article is not wrapped in `<a>`. The image link repeats the title link, so it has `tabindex="-1"` and `aria-hidden="true"`. Images are cropped to 3:2 with 4px corners, lazy-loaded natively with `wp_get_attachment_image()`, and zoom in on hover like the work cards. The component does not use the legacy `.grid-insight` / `.insight-grid` CSS. The old page, `page-templates/parent.php` with [`content-insight.php`](loop-templates/content-insight.php), is unchanged. To roll back, set the Insights page template back to "Parent-pages".
 - **Single insight.** [`single.php`](single.php) renders [`components/single/insight.php`](components/single/insight.php) for posts. Works still use the legacy `content-single-work.php`. The page is laid out as follows, styled in [`_single-insight.scss`](src/styles/components/_single-insight.scss):
   - The header is centred. It has an "Insights" eyebrow (a `<p>` link to the page using `template-insight.php`), the post title as the `<h1>`, and share icons from `svg-template/svg-{linkedin,instagram,x}.php`.

@@ -36,7 +36,7 @@ $content = is_string($content) ? trim($content) : '';
 
 $categories = fdry_work_categories();
 $query      = fdry_work_query('all', 1);
-$cards_html = fdry_render_work_cards($query);
+$cards_html = fdry_render_work_cards($query, true);
 $has_more   = $query->max_num_pages > 1;
 ?>
 
