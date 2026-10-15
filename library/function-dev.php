@@ -1161,9 +1161,7 @@ add_action('acf/validate_save_post', 'fdry_validate_poster_present', 20);
  *     id: int,
  *     title: string,
  *     permalink: string,
- *     image_url: string,
- *     image_width: int,
- *     image_height: int,
+ *     image_id: int,
  *     image_alt: string,
  *     tagline: string,
  *     categories: string[]
@@ -1195,13 +1193,7 @@ function fdry_get_work_parallax_cards(int $post_id): array
 			$image_id = (int) get_post_thumbnail_id($work_id);
 		}
 
-		if ($image_id <= 0) {
-			continue;
-		}
-
-		$image = wp_get_attachment_image_src($image_id, 'large');
-
-		if (! is_array($image) || empty($image[0])) {
+		if ($image_id <= 0 || ! wp_attachment_is_image($image_id)) {
 			continue;
 		}
 
@@ -1226,9 +1218,7 @@ function fdry_get_work_parallax_cards(int $post_id): array
 			'id'           => $work_id,
 			'title'        => get_the_title($work_id),
 			'permalink'    => (string) get_permalink($work_id),
-			'image_url'    => $image[0],
-			'image_width'  => isset($image[1]) ? (int) $image[1] : 0,
-			'image_height' => isset($image[2]) ? (int) $image[2] : 0,
+			'image_id'     => $image_id,
 			'image_alt'    => (string) get_post_meta($image_id, '_wp_attachment_image_alt', true),
 			'tagline'      => $tagline,
 			'categories'   => $categories,

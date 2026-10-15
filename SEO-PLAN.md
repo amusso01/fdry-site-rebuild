@@ -342,6 +342,8 @@ Hook `wpseo_schema_graph`.
 In Yoast, turn off "Show in search results" for Tags and Categories.
 
 ### #16 Responsive work images
+> **Status (15 Oct 2026): code done under PERFORMANCE-PLAN.md #7, deploy pending.** The work cards, work rows and parallax now print a srcset with `sizes`. Retina desktops get the 1152w file, and phones stay on the `large` file. Parallax card 1 stays lazy, at low priority.
+
 > **Image decisions (1 Oct, with the designer):**
 > - **Case study featured image:** becomes a portrait **3:4, 1200×1600** (JPG/WebP, ≤250 KB). It feeds the Work grid and the work rows.
 >   - On phones the Work card is 4:3, so keep the key content in the middle third of the height.

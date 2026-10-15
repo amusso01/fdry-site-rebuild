@@ -199,6 +199,12 @@
 		position: absolute;
 		inset: 0;
 		overflow: hidden;
+
+		// fdry_work_image() wraps the image in a <picture> when phones get a
+		// shorter srcset. No box of its own, so the image still fills this one.
+		picture {
+			display: contents;
+		}
 	}
 
 	&__image {

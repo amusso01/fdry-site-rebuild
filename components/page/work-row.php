@@ -74,9 +74,8 @@ while (have_rows($field, $post_id)) {
 	}
 
 	$thumbnail_id = (int) get_post_thumbnail_id($work_id);
-	$image        = wp_get_attachment_image_src($thumbnail_id, 'large');
 
-	if (! is_array($image) || empty($image[0])) {
+	if (! wp_attachment_is_image($thumbnail_id)) {
 		continue;
 	}
 
@@ -109,9 +108,7 @@ while (have_rows($field, $post_id)) {
 		'title'        => get_the_title($work_id),
 		'permalink'    => get_permalink($work_id),
 		'description'  => $description,
-		'image_url'    => $image[0],
-		'image_width'  => isset($image[1]) ? (int) $image[1] : 0,
-		'image_height' => isset($image[2]) ? (int) $image[2] : 0,
+		'image_id'     => $thumbnail_id,
 		'image_alt'    => (string) get_post_meta($thumbnail_id, '_wp_attachment_image_alt', true),
 		'categories'   => $categories,
 	);
@@ -132,26 +129,35 @@ if ($cards === array()) {
 		<div class="swiper work-row__slider"<?= $fade_attr; ?>>
 	<?php endif; ?>
 		<div class="work-row__grid<?= $enable_slider ? ' swiper-wrapper' : ''; ?>"<?= $enable_slider ? '' : $fade_attr; ?>>
-			<?php foreach ($cards as $card) : ?>
+			<?php foreach ($cards as $index => $card) : ?>
+				<?php
+				$image_attr = array(
+					'class'   => 'work-row__image',
+					'alt'     => $card['image_alt'] !== '' ? $card['image_alt'] : $card['title'],
+					// Lazy in stack mode (homepage, below the fold). Swiper clips off-screen slides, so lazy images there would pop in mid-drag.
+					'loading' => $enable_slider ? 'eager' : 'lazy',
+					// The cards are 680px tall, so a 3:4 image is cropped by height (about
+					// 510px wide at 1440), and a hovered card grows to 1.25 / 3.25 of the row.
+					'sizes'   => '(max-width: 1139px) 100vw, (max-width: 1919px) 40vw, 768px',
+				);
+
+				// Eager slides: the first one of a first-screen row is the LCP (service
+				// inner), so it gets high priority here rather than from WP Rocket's data.
+				// Other slider rows are below the fold on phones, where they competed with
+				// the LCP (/services/), so they go low (PERFORMANCE-PLAN.md #7).
+				if ($enable_slider && $is_first && $index === 0) {
+					$image_attr['fetchpriority'] = 'high';
+				} elseif ($enable_slider && ! $is_first) {
+					$image_attr['fetchpriority'] = 'low';
+				}
+				?>
 				<article class="work-row__card<?= $enable_slider ? ' swiper-slide' : ''; ?>">
 					<a
 						class="work-row__link"
 						href="<?= esc_url($card['permalink']); ?>"
 						aria-label="<?= esc_attr(sprintf(__('View %s', 'foundry'), $card['title'])); ?>">
 						<div class="work-row__media">
-							<img
-								class="work-row__image"
-								src="<?= esc_url($card['image_url']); ?>"
-								alt="<?= esc_attr($card['image_alt'] !== '' ? $card['image_alt'] : $card['title']); ?>"
-								<?php // Lazy in stack mode (homepage, below the fold). Swiper clips off-screen slides, so lazy images there would pop in mid-drag. ?>
-								loading="<?= $enable_slider ? 'eager' : 'lazy'; ?>"
-								decoding="async"
-								<?php if ($card['image_width'] > 0) : ?>
-									width="<?= esc_attr((string) $card['image_width']); ?>"
-								<?php endif; ?>
-								<?php if ($card['image_height'] > 0) : ?>
-									height="<?= esc_attr((string) $card['image_height']); ?>"
-								<?php endif; ?>>
+							<?= fdry_work_image($card['image_id'], $image_attr); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- built by wp_get_attachment_image() ?>
 						</div>
 
 						<div class="work-row__overlay">

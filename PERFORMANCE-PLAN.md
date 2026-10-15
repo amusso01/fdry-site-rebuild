@@ -94,7 +94,7 @@ Parse and compile time is on top of this (about 2.5 s of unattributed "program" 
 | 4 | **P1** | **Legacy CSS/JS on new templates**: `theme.min.css`, `mainstyle.css`, `typeformstyle.css`, jQuery in `<head>`, `theme.min.js`, `lozad`, `footer.js`, plus TweenMax 2 and `js/about.js` on /about/. (SEO #18, #23) | Code | L | **Done (14 Oct).** Mobile FCP 1.6–2.0 → 0.73–0.88 s on all 7 new pages, render-blocking 8 → 4, CSS 85 → 16 KB, Home LCP 4.86 → 3.88 s, Works LCP 2.01 s. The tags now start earlier and compete (Services LCP 1.72 → 2.36 s; see #5, #11). Posts → #16, dead code → #17 |
 | 5 | **P1** | **Marketing tags: ~1 MB and ~0.5 s of main thread per page.** The Ads tag loads twice, there are two GA4 IDs, the dead Universal Analytics `analytics.js` still loads, and Hotjar, Apollo and Meta are hard-coded. (SEO #25, was P3) | GTM + Code | M | Step 1 live (12 Oct, with #3): one Ads `gtag/js`, −197 KB third-party; Ads hits and conversions checked |
 | 6 | **P1** | **Fonts.** `theme.min.css` adds its own old Proxima Nova faces, so 400 downloads twice and 400 italic once more. There was no preconnect. (`font-display` is already `swap` on live via WP Rocket; the kit's unused weights cost no bytes.) | Adobe + Code | S | Step 3 (preconnect) live 12 Oct. Old faces gone on new pages with #4 (14 Oct): 6–7 files (184–216 KB) → 5 (150 KB). Step 1 (Adobe project) open |
-| 7 | **P1** | **No srcset on work images.** The work row, work cards and parallax request `large` with no srcset. Parallax card 1 (`NUYU.jpg`, 315 KB) loads at 2.4 s on phones. (SEO #16, was P2) | Code | M | Open |
+| 7 | **P1** | **No srcset on work images.** The work row, work cards and parallax request `large` with no srcset. Parallax card 1 (`NUYU.jpg`, 315 KB) loads at 2.4 s on phones. (SEO #16, was P2) | Code | M | **Code done (15 Oct), deploy pending.** srcset with phones capped at today's `large` file. Picks checked at DPR 1.75 and 3 (mobile) and 1 and 2 (desktop). Parallax and `/services/` slides `fetchpriority="low"`. Before: `before-7` |
 | 8 | **P2** | **Showreel modal poster.** The modal's `<video poster>` downloads the desktop poster (55 KB) on every page with a showreel, phones included, with the modal closed. | Code | S | Done 12 Oct: Home mobile LCP 5.75 → 4.5–4.9 s, DOMContentLoaded 4.81 → 3.5–3.9 s. The lazy Services showreel poster it exposed is fixed (Services mobile LCP 1.72 s) |
 | 9 | **P2** | **Marquee SVGs are 116 KB of the 240 KB homepage HTML.** The 9 logos are printed twice and not optimised. | Code | S | Open |
 | 10 | **P2** | **One 248 KB bundle on every page.** Swiper, the showreel, the work archive and the tech grid load everywhere. `smoothscroll-polyfill` is obsolete. | Code | M | Open |
@@ -667,26 +667,89 @@ The approved implementation plan has 6 phases:
 
 ### #7 Responsive work images (supersedes SEO #16)
 
-**Evidence:**
+**Status: code done (15 Oct 2026), deploy pending.** The work cards, the work row and the homepage parallax print their images with `fdry_work_image()` (`library/function-work.php`): a srcset and `sizes`, with phones capped at today's file. See FRONTEND.md → Work images (srcset).
+
+**Evidence (before the change):**
 - `work-row.php`, `work-parallax.php` and `fdry_render_work_card()` (`library/function-work.php`) output a single `large` URL with no srcset or sizes.
 - Desktop gets 768×1024 portrait crops at roughly double the displayed size in the 3-up grid. Retina still lacks a 2× candidate.
 - `NUYU.jpg` (parallax card 1) is lazy but still loads at 2.4 s on phones. It sits within Chrome's lazy-load distance, so it competes with the hero.
 - **Services (14 Oct, after #4):** the work-row slider's 3 eager images (NUYU, Soie Labs, Goodnest: 98 KB) start at 0.28 s with the hero poster, below the fold on phones. Smaller srcset candidates would cut that. `fetchpriority="low"` would also help, but not on `/services/shopify-agency/`, where a work-row image is the LCP.
 - **Work cards:** the archive's first card is now eager with `fetchpriority="high"` (#4 follow-up, 14 Oct). Keep that when switching to `wp_get_attachment_image()`.
 
-**Fix:**
-- Switch these three to `wp_get_attachment_image()` with an explicit `sizes`, as `insight-archive.php` and `components/single/insight.php` already do. For example:
-  - Work row: `(max-width: 1139px) 100vw, 33vw`.
-  - Work card: `(max-width: 767px) 100vw, (max-width: 1139px) 50vw, 33vw`.
-  - Parallax: `100vw`.
-- Keep the existing loading rules: slider mode eager, stack mode lazy, parallax lazy.
-- Add `fetchpriority="low"` to the parallax images.
-- Apply the image decisions recorded in SEO #16: the 3:4 1200×1600 featured image and the parallax field.
+**Found while planning (15 Oct), which changed the fix:**
+- **#1 changed the maths.** The `large` portrait files are now 768w WebP at 31–53 KB. A 3:4 work image has **225w (about 7 KB), 768w, 1152w (55–102 KB, the `1536x1536` size) and the original**. Nothing sits between 225 and 768, so "≤ 600w at 390px" (the old Verify) can't happen without a new image size.
+- **Uncapped, srcset makes phones heavier.** A 1-column card is about 340–360 CSS px wide, so at DPR ≥ 2.2 (most iPhones and Androids) the browser picks 1152w or the original over today's 768w. Measured at DPR 3: the `/works/` LCP card went from 54 KB to the 123 KB original, and the 4 test images from 164 KB to 336 KB.
+- **The parallax originals are 1374×760** (`nuyu`, `weathered-penny` and `calling-feature-banner`, uploaded Oct 2026 as Card image). The candidates are 300w, 768w (21 KB), 1024w (35 KB, today's file) and 1374w (62 KB).
+  - **Desktop:** the card is about 1332×850 with `object-fit: cover`, so 1024w was upscaled.
+  - **Phones:** the card is a full-height portrait box (`min(100svh, 850px)`) holding a landscape image, so it's upscaled whatever is served (see Follow-ups).
+- **The breakpoints are 640 and 1140** (`_media.scss`), not 768. The suggested `sizes` were wrong.
+- **`width`/`height` print as 640×…** because Understrap's `$content_width` (640) caps `large`. The ratio is right, so CLS is unaffected.
+- **Live WordPress adds `sizes="auto, …"` to lazy images,** and Chrome then sizes them from their layout box. The hand-written `sizes` decide for eager images and in browsers without `auto`.
+- **On Shopify desktop the LCP is the third slide** (Bamboogoo, 0.34 s), not the first. So only slide 1 gets `fetchpriority="high"`, and slides 2–3 keep the browser's default.
 
-**Verify:**
-- At 390px, the work-row and card requests are ≤ 600w candidates.
-- At 1440px DPR 1 they are ≤ 768w, and DPR 2 picks the larger one.
-- The sticky stack still works on the homepage, and CLS stays at about 0.
+**Decisions (15 Oct 2026):**
+- **Scope:** all three components in one pass.
+- **Phones capped at `large`.** Below 640px a `<source>` lists only the candidates up to the `large` file (768w portrait, 1024w parallax), so phones never download more than before. At 340px, 768w is already 2.3×. Retina desktops get every candidate.
+
+**In code:**
+- **`fdry_work_image($id, $attr)`** wraps `wp_get_attachment_image()` at `large`. The WebP swap covers every candidate and the Load more AJAX action. When a candidate is wider than `large`, it adds the phone `<source>`. Otherwise it stays a plain `<img>`.
+- **`sizes`:**
+  - **Work card:** `(max-width: 639px) 100vw, (max-width: 1139px) 50vw, (max-width: 1919px) 33vw, 624px`.
+  - **Work row:** `(max-width: 1139px) 100vw, (max-width: 1919px) 40vw, 768px`. The 680px-tall cards crop a 3:4 image by height, and a hovered card grows.
+  - **Parallax:** `100vw`.
+- **Priority:**
+  - **Card 1 on the first load:** eager + `high` (unchanged).
+  - **Parallax:** lazy + **`low`**.
+  - **Slider rows:** eager. Slide 1 of a first-screen row gets **`high`**, from the template rather than WP Rocket's data (#11). The slides of other slider rows get **`low`**, which covers `/services/`.
+  - **Stack rows:** lazy (unchanged).
+- **The data functions pass an ID now.** `fdry_get_work_parallax_cards()` and `work-row.php` pass `image_id` instead of a URL and its dimensions.
+- **`picture { display: contents }`** in each component's `__media` rule.
+- **`pnpm perf --dpr <n>`** loads at another device pixel ratio.
+
+**Checked before deploying (15 Oct):**
+- **Helper.** Run with stubbed WordPress on the live srcsets:
+  - portrait and parallax get the capped `<source>`;
+  - an original below `large` (`calling-by-fdry.png`, 640px) and a single-size image stay a plain `<img>`;
+  - a missing image prints nothing.
+- **Picks.** A static page built with the real helper, the built CSS and live image URLs, loaded with `pnpm perf --dpr` (same throttling as the baseline):
+
+  | Load | Work card (eager / lazy) | Work row (eager) | Parallax (lazy) |
+  |---|---|---|---|
+  | Mobile 412px, DPR 1.75 | 768w / 768w | 768w | **768w** (21 KB, was 1024w, 35 KB) |
+  | Mobile 412px, DPR 3 | 768w / 768w (uncapped: original and 1152w) | 768w | 1024w (uncapped: 1374w) |
+  | Desktop 1440px, DPR 1 | 768w / 768w | 768w | **1374w** (62 KB, was 1024w) |
+  | Desktop 1440px, DPR 2 | **1152w** / **1152w** | 1152w | 1374w |
+
+  The priorities came out as intended: card 1 High, the row slide and the parallax Low.
+- `php -l` passes on the 4 PHP files. `pnpm build`: the CSS has the 3 scoped `picture` rules. The JS is byte-identical, only renamed (Vite's hash covers the CSS import).
+- **Not checked:** the markup on a WordPress install. The local Docker site was down and runs an older copy of the theme.
+
+**Before** (live, 15 Oct, `before-7`, median of 3, slow 4G and 4× CPU):
+
+| Page | Mobile LCP | LCP element | Work images on mobile | Desktop LCP |
+|---|---|---|---|---|
+| Home | 4.02 s | cookie banner (#3) | parallax 1 `1024x566`, 35 KB, Low, 0.97 → 2.56 s | 0.94 s |
+| Works | 1.85 s | card 1 (Niki, 54 KB, High, 0.24 → 1.83 s) | 6 cards, 257 KB | 0.32 s |
+| Services | 2.36 s | showreel poster | 3 slides, 101 KB, **Medium**, from 0.28 s; Goodnest ends at 2.39 s | 0.32 s |
+| Shopify agency | 1.64 s | slide 1 (calling-by-fdry, High via WP Rocket) | 3 slides, 114 KB | 0.34 s (slide 3) |
+
+**After deploying:**
+1. Deploy the PHP, `dist/` and the manifest, then clear the WP Rocket cache **and Priority Elements**.
+2. **Markup.** On Home, Works, Services and Shopify agency, check that:
+   - the work images have `.webp` srcsets and the phone `<source>`;
+   - each page has exactly one `fetchpriority="high"` (`/works/` card 1, Shopify slide 1);
+   - the parallax and `/services/` slides are `low`;
+   - WP Rocket's critical-images feature hasn't prepended `fetchpriority="high"` to a parallax or slide `<img>` (with a duplicate attribute the first value wins).
+3. **Load more and filters.** Works Load more and a category filter return the same markup.
+4. **Measure.** `pnpm perf both / /works/ /services/ /services/shopify-agency/ --runs 3 --label after-7`, and record it here. Expected:
+   - **Services mobile LCP** down from 2.36 s, with the slides out of the poster's way;
+   - **Home:** parallax 1 at 21 KB;
+   - **Works and Shopify:** unchanged, the same files.
+5. **Look.** Screenshots (`--screenshots --reduced-motion`, then `pnpm perf:diff`) should change only inside images. Also check the sticky stack, hover, the Swiper slider on a phone, and CLS of about 0.
+
+**Follow-ups:**
+- **Parallax on phones.** It's upscaled whatever is served. The fix is an optional portrait mobile image per card (`work_image_mobile`, e.g. 1080×1920 WebP ≤ 200 KB) through `<source media>`, like `banner_mobile_image` and the hero's `poster_mobile`. It needs the designer's assets.
+- **A 480w image size** for DPR 1 desktops, where cards render at 430–490px but get 768w. It would save about 15–25 KB per card on desktop only, and needs `add_image_size` plus `wp media regenerate --only-missing` on the work images. Not worth it while desktop `/works/` LCP is 0.32 s.
 
 ### #16 Posts off the legacy CSS/JS (was #4 step 4)
 

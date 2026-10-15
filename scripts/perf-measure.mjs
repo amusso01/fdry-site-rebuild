@@ -10,6 +10,8 @@
  *   --label <name>   Added to the output file name, e.g. before-4 / after-4 (default: run)
  *   --base <url>     Base URL for paths (default: https://www.fdry.com)
  *   --settle <ms>    Wait after the load event before reading the metrics (default: 5000)
+ *   --dpr <n>        Device pixel ratio instead of the device's own (mobile 1.75, desktop 1),
+ *                    e.g. to see which srcset candidate a 3× phone picks (PERFORMANCE-PLAN.md #7)
  *   --profile        Add main-thread JS time by script
  *   --legacy-css     Add the legacy CSS rules each page uses (PERFORMANCE-PLAN.md Appendix A)
  *   --screenshots    Save a first-screen and a full-page PNG per page (the full page at DPR 1,
@@ -63,7 +65,7 @@ import { decodePng, encodePng } from './lib/png.mjs'
 const argv = process.argv.slice(2).filter((a) => a !== '--')
 
 // Only these options take a value; every other --flag is a boolean.
-const VALUE_OPTIONS = ['runs', 'label', 'base', 'settle', 'block', 'inject-css', 'add-class']
+const VALUE_OPTIONS = ['runs', 'label', 'base', 'settle', 'dpr', 'block', 'inject-css', 'add-class']
 
 const flag = (name) => argv.includes(`--${name}`)
 const opt = (name, fallback) => {
@@ -237,6 +239,9 @@ const reducedMotion = flag('reduced-motion')
 const blocked = opts('block')
 const injectCssFile = opt('inject-css', '')
 const addClass = opt('add-class', '').trim()
+
+const dpr = parseFloat(opt('dpr', '')) || 0
+if (dpr > 0) for (const device of Object.values(DEVICES)) device.scale = dpr
 
 let injectCss = ''
 

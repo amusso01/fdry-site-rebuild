@@ -43,18 +43,20 @@ if ($cards === array()) {
 							href="<?= esc_url($card['permalink']); ?>"
 							aria-label="<?= esc_attr(sprintf(__('View %s', 'foundry'), $card['title'])); ?>">
 							<div class="work-parallax__media">
-								<img
-									class="work-parallax__image"
-									src="<?= esc_url($card['image_url']); ?>"
-									alt="<?= esc_attr($card['image_alt'] !== '' ? $card['image_alt'] : $card['title']); ?>"
-									loading="lazy"
-									decoding="async"
-									<?php if ($card['image_width'] > 0) : ?>
-										width="<?= esc_attr((string) $card['image_width']); ?>"
-									<?php endif; ?>
-									<?php if ($card['image_height'] > 0) : ?>
-										height="<?= esc_attr((string) $card['image_height']); ?>"
-									<?php endif; ?>>
+								<?php
+								// Below the hero, but within Chrome's lazy-load distance on phones,
+								// where it competed with the hero: low priority (PERFORMANCE-PLAN.md #7).
+								echo fdry_work_image( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- built by wp_get_attachment_image()
+									$card['image_id'],
+									array(
+										'class'         => 'work-parallax__image',
+										'alt'           => $card['image_alt'] !== '' ? $card['image_alt'] : $card['title'],
+										'loading'       => 'lazy',
+										'fetchpriority' => 'low',
+										'sizes'         => '100vw',
+									)
+								);
+								?>
 							</div>
 
 							<div class="work-parallax__overlay">

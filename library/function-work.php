@@ -139,6 +139,63 @@ function fdry_work_card_categories(int $post_id): array
 }
 
 /**
+ * A work image (card, row or parallax) with srcset, capped on phones.
+ *
+ * Wraps wp_get_attachment_image() at `large`, so the WebP swap and
+ * WordPress's `sizes="auto"` for lazy images apply as usual. Pass `sizes`
+ * and the loading attributes in $attr.
+ *
+ * Phones never get a file wider than `large`, which is what they loaded
+ * before srcset (PERFORMANCE-PLAN.md #7): at 340px a 768w card is already
+ * 2.3×, so the 1152w candidate would cost bytes nobody sees. Below the
+ * `phone` breakpoint (640px, as in image-banner.php) a <source> lists only
+ * the candidates up to `large`. Wider screens get them all, so retina
+ * screens get a 2× file.
+ *
+ * @param array $attr wp_get_attachment_image() attributes.
+ */
+function fdry_work_image(int $attachment_id, array $attr): string
+{
+	$image = wp_get_attachment_image($attachment_id, 'large', false, $attr + array('decoding' => 'async'));
+
+	if ($image === '') {
+		return '';
+	}
+
+	$meta   = wp_get_attachment_metadata($attachment_id);
+	$cap    = is_array($meta) ? (int) ($meta['sizes']['large']['width'] ?? $meta['width'] ?? 0) : 0;
+	$srcset = (string) wp_get_attachment_image_srcset($attachment_id, 'large');
+
+	if ($cap <= 0 || $srcset === '') {
+		return $image;
+	}
+
+	// Upload names can't contain commas (sanitize_file_name()), so ", " only
+	// separates candidates.
+	$phone   = array();
+	$dropped = false;
+
+	foreach (explode(', ', $srcset) as $candidate) {
+		if (preg_match('/\s(\d+)w$/', $candidate, $match) && (int) $match[1] > $cap) {
+			$dropped = true;
+			continue;
+		}
+
+		$phone[] = $candidate;
+	}
+
+	if (! $dropped || $phone === array()) {
+		return $image;
+	}
+
+	return sprintf(
+		'<picture><source media="(max-width: 639px)" srcset="%s" sizes="100vw">%s</picture>',
+		esc_attr(implode(', ', $phone)),
+		$image
+	);
+}
+
+/**
  * Render one work archive card.
  *
  * $is_lcp: the archive's first card, the LCP on phones (one column). It loads
@@ -154,15 +211,28 @@ function fdry_render_work_card(int $post_id, bool $is_lcp = false): string
 		return '';
 	}
 
-	$thumbnail_id = (int) get_post_thumbnail_id($post_id);
-	$image        = wp_get_attachment_image_src($thumbnail_id, 'large');
-
-	if (! is_array($image) || empty($image[0])) {
-		return '';
-	}
-
 	$title = get_the_title($post_id);
 	$title = is_string($title) ? $title : '';
+
+	$thumbnail_id = (int) get_post_thumbnail_id($post_id);
+	$image_alt    = (string) get_post_meta($thumbnail_id, '_wp_attachment_image_alt', true);
+	$image_attr   = array(
+		'class'   => 'work-card__image',
+		'alt'     => $image_alt !== '' ? $image_alt : $title,
+		'loading' => $is_lcp ? 'eager' : 'lazy',
+		// 3, 2 and 1 columns (_work-archive.scss); content-max stops growing at 1920px.
+		'sizes'   => '(max-width: 639px) 100vw, (max-width: 1139px) 50vw, (max-width: 1919px) 33vw, 624px',
+	);
+
+	if ($is_lcp) {
+		$image_attr['fetchpriority'] = 'high';
+	}
+
+	$image_html = fdry_work_image($thumbnail_id, $image_attr);
+
+	if ($image_html === '') {
+		return '';
+	}
 
 	$permalink = (string) get_permalink($post_id);
 
@@ -170,8 +240,6 @@ function fdry_render_work_card(int $post_id, bool $is_lcp = false): string
 	$description = is_string($description) ? trim($description) : '';
 
 	$categories = fdry_work_card_categories($post_id);
-	$image_alt  = (string) get_post_meta($thumbnail_id, '_wp_attachment_image_alt', true);
-	$image_alt  = $image_alt !== '' ? $image_alt : $title;
 
 	ob_start();
 	?>
@@ -181,21 +249,7 @@ function fdry_render_work_card(int $post_id, bool $is_lcp = false): string
 			href="<?= esc_url($permalink); ?>"
 			aria-label="<?= esc_attr(sprintf(__('View %s', 'foundry'), $title)); ?>">
 			<div class="work-card__media">
-				<img
-					class="work-card__image"
-					src="<?= esc_url($image[0]); ?>"
-					alt="<?= esc_attr($image_alt); ?>"
-					loading="<?= $is_lcp ? 'eager' : 'lazy'; ?>"
-					<?php if ($is_lcp) : ?>
-						fetchpriority="high"
-					<?php endif; ?>
-					decoding="async"
-					<?php if (! empty($image[1])) : ?>
-						width="<?= esc_attr((string) (int) $image[1]); ?>"
-					<?php endif; ?>
-					<?php if (! empty($image[2])) : ?>
-						height="<?= esc_attr((string) (int) $image[2]); ?>"
-					<?php endif; ?>>
+				<?= $image_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- built by wp_get_attachment_image() ?>
 			</div>
 
 			<div class="work-card__overlay">
