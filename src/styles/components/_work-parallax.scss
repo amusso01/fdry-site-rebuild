@@ -14,6 +14,20 @@
 		position: sticky;
 		top: 0;
 		height: min(100svh, 850px);
+
+		// Never taller than wide. The images are landscape (about 1.8:1) with
+		// object-fit: cover, so a full-height card on a phone showed only the
+		// middle quarter of the image, upscaled. The width is .content-block's
+		// content box (_helper.scss), so phones get a square card. Below 390px
+		// it stops at 340px tall: the title, a 3-line tagline and 3 category
+		// pills overlapped on a 270px square.
+		@include media('<desktop') {
+			height: min(100svh, 850px, calc(100vw - 64px));
+		}
+
+		@include media('<phone') {
+			height: min(100svh, 850px, max(100vw - 50px, 340px));
+		}
 	}
 
 	&__link {

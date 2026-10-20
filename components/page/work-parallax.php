@@ -46,6 +46,8 @@ if ($cards === array()) {
 								<?php
 								// Below the hero, but within Chrome's lazy-load distance on phones,
 								// where it competed with the hero: low priority (PERFORMANCE-PLAN.md #7).
+								// On phones the card is square and the image about 1.8:1, so cover
+								// crops it by height and it renders 1.8× the card width.
 								echo fdry_work_image( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- built by wp_get_attachment_image()
 									$card['image_id'],
 									array(
@@ -54,7 +56,8 @@ if ($cards === array()) {
 										'loading'       => 'lazy',
 										'fetchpriority' => 'low',
 										'sizes'         => '100vw',
-									)
+									),
+									'calc((100vw - 50px) * 1.8)'
 								);
 								?>
 							</div>

@@ -152,9 +152,12 @@ function fdry_work_card_categories(int $post_id): array
  * the candidates up to `large`. Wider screens get them all, so retina
  * screens get a 2× file.
  *
- * @param array $attr wp_get_attachment_image() attributes.
+ * @param array  $attr        wp_get_attachment_image() attributes.
+ * @param string $phone_sizes `sizes` for the phone <source>. Pass the width the
+ *                            image renders at when object-fit: cover crops it by
+ *                            height, as on the square parallax cards.
  */
-function fdry_work_image(int $attachment_id, array $attr): string
+function fdry_work_image(int $attachment_id, array $attr, string $phone_sizes = '100vw'): string
 {
 	$image = wp_get_attachment_image($attachment_id, 'large', false, $attr + array('decoding' => 'async'));
 
@@ -189,8 +192,9 @@ function fdry_work_image(int $attachment_id, array $attr): string
 	}
 
 	return sprintf(
-		'<picture><source media="(max-width: 639px)" srcset="%s" sizes="100vw">%s</picture>',
+		'<picture><source media="(max-width: 639px)" srcset="%s" sizes="%s">%s</picture>',
 		esc_attr(implode(', ', $phone)),
+		esc_attr($phone_sizes),
 		$image
 	);
 }
