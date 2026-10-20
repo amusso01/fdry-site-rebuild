@@ -1,9 +1,11 @@
 @use '../common/variables' as *;
 @use '../common/media' as *;
 
-// Site footer (components/footer/site-footer.php). The top row (contact
-// block and contact details) and the menu grid below it share the same four
-// columns, so the contact details line up with the fourth menu.
+// Site footer (components/footer/site-footer.php). The top row is a
+// four-column grid with the contact details at the end of the fourth column.
+// The menus below it spread across the full width, so the first menu lines
+// up with the contact block and the last ends at the contact details' right
+// edge.
 //
 // Links inherit their colour (see _general.scss, including :hover and
 // :focus), so colours are set on the containers and only hover states
@@ -100,7 +102,8 @@ $site-footer-column-gap: 32px;
 		}
 	}
 
-	// 190px keeps the address on two lines, as in the design.
+	// 190px keeps the address on two lines, as in the design. From tablet up
+	// the block sits at the end of column 4, with its lines right-aligned.
 	&__info {
 		max-width: 190px;
 		margin: 0;
@@ -119,6 +122,8 @@ $site-footer-column-gap: 32px;
 
 		@include media('>=tablet') {
 			grid-column: 4;
+			justify-self: end;
+			text-align: right;
 		}
 	}
 
@@ -126,11 +131,13 @@ $site-footer-column-gap: 32px;
 		color: $site-footer-info-hover;
 	}
 
-	// Footer menu 1–4. Below 768px the accordion replaces the grid.
+	// Footer menu 1–4, spread edge to edge: flex rather than a fixed grid,
+	// since only the locations with a menu assigned are printed. Below 768px
+	// the accordion replaces the row.
 	&__menus {
-		display: grid;
-		grid-template-columns: $site-footer-columns;
-		gap: 32px $site-footer-column-gap;
+		display: flex;
+		justify-content: space-between;
+		gap: $site-footer-column-gap;
 		padding-top: 68px;
 
 		@include media('<768px') {
