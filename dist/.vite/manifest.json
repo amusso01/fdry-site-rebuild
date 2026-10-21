@@ -1,11 +1,28 @@
 {
+  "node_modules/.pnpm/@fontsource-variable+darker-grotesque@5.3.0/node_modules/@fontsource-variable/darker-grotesque/files/darker-grotesque-latin-ext-wght-normal.woff2": {
+    "file": "fdry.xx2jglnN.woff2",
+    "src": "node_modules/.pnpm/@fontsource-variable+darker-grotesque@5.3.0/node_modules/@fontsource-variable/darker-grotesque/files/darker-grotesque-latin-ext-wght-normal.woff2"
+  },
+  "node_modules/.pnpm/@fontsource-variable+darker-grotesque@5.3.0/node_modules/@fontsource-variable/darker-grotesque/files/darker-grotesque-latin-wght-normal.woff2": {
+    "file": "fdry.DM2Vj1rZ.woff2",
+    "src": "node_modules/.pnpm/@fontsource-variable+darker-grotesque@5.3.0/node_modules/@fontsource-variable/darker-grotesque/files/darker-grotesque-latin-wght-normal.woff2"
+  },
+  "node_modules/.pnpm/@fontsource-variable+darker-grotesque@5.3.0/node_modules/@fontsource-variable/darker-grotesque/files/darker-grotesque-vietnamese-wght-normal.woff2": {
+    "file": "fdry.CAv45exj.woff2",
+    "src": "node_modules/.pnpm/@fontsource-variable+darker-grotesque@5.3.0/node_modules/@fontsource-variable/darker-grotesque/files/darker-grotesque-vietnamese-wght-normal.woff2"
+  },
   "src/scripts/main.js": {
-    "file": "fdry.DN8O6Hb-.js",
+    "file": "fdry.BDaJudHs.js",
     "name": "main",
     "src": "src/scripts/main.js",
     "isEntry": true,
     "css": [
-      "fdry.CewJXPIH.css"
+      "fdry.BxPnCICf.css"
+    ],
+    "assets": [
+      "fdry.CAv45exj.woff2",
+      "fdry.xx2jglnN.woff2",
+      "fdry.DM2Vj1rZ.woff2"
     ]
   }
 }

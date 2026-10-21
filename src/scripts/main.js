@@ -1,4 +1,7 @@
 import '../styles/main.scss'
+// Title font ($title__fontname), self-hosted. Imported here, not with @use,
+// so Vite resolves the package's url()s and emits the woff2 files.
+import '@fontsource-variable/darker-grotesque'
 
 // JS IMPORT
 // Must stay the first JS import: it hides a page-level window.gsap until the

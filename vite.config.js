@@ -2,6 +2,9 @@ import { resolve } from 'path';
 import { defineConfig } from 'vite';
 
 export default defineConfig({
+	// Relative, so asset URLs in the CSS (the font files) resolve next to it
+	// in dist/ rather than from the site root.
+	base: './',
 	css: {
 		preprocessorOptions: {
 			scss: {

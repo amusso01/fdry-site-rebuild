@@ -184,10 +184,6 @@ if (! defined('FDRY_USING_NEW_HEADER')) {
           $nav_button_target = is_string($nav_button_target) ? $nav_button_target : '';
           $nav_button_label  = is_string($nav_button_label) ? $nav_button_label : '';
 
-          if (strcasecmp($nav_button_label, 'SEND A BRIEF') === 0) {
-            $nav_button_label = 'Send a brief';
-          }
-
           if ($nav_button_label !== '') {
             get_template_part(
               'components/partials/button',

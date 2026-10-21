@@ -2,7 +2,7 @@
 
 /**
  * Single insight — eyebrow, title, category pill, date and reading time,
- * hero image, then the post
+ * hero image, the post, then the image cards grid (components/page/image-cards-grid.php)
  *
  * Rendered from single.php for the `post` type. The old partial is kept in
  * loop-templates/content-single-insight.php as a rollback.
@@ -24,7 +24,6 @@ if (! defined('ABSPATH')) {
 $title        = get_the_title();
 $permalink    = (string) get_permalink();
 $insights_url = fdry_template_page_url('template-insight.php', '/insights/');
-$work_url     = fdry_template_page_url('template-work.php', '/works/');
 
 $category = '';
 
@@ -123,12 +122,6 @@ if ($image_id) {
 		</div>
 	</article>
 
-	<div class="single-insight__work content-block">
-		<a class="single-insight__work-link" href="<?= esc_url($work_url); ?>">
-			<picture>
-				<source media="(max-width: 767px)" srcset="https://www.fdry.com/wp-content/uploads/2023/10/case-studies_banner_mobile.png">
-				<img class="single-insight__work-image" src="https://www.fdry.com/wp-content/uploads/2023/10/Case-Studies_Image.png" alt="<?= esc_attr__('Our Work', 'foundry'); ?>" loading="lazy" decoding="async">
-			</picture>
-		</a>
-	</div>
+	<?php // The same three cards on every post, from Global variables. ?>
+	<?php get_template_part('components/page/image-cards-grid'); ?>
 </main>

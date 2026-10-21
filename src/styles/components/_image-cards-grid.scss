@@ -1,0 +1,124 @@
+@use '../common/variables' as *;
+@use '../common/media' as *;
+
+// Three-column take on _two-images-grid.scss: contained cards with gaps and
+// 4px corners, like the rest of the single insight page.
+.image-cards-grid {
+	// Same as .single-insight__body's padding-block.
+	padding-bottom: 74px;
+
+	&__grid {
+		// Also places the column lines, centred in the gap.
+		--image-cards-gap: 75px;
+
+		display: grid;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		gap: var(--image-cards-gap);
+		margin: 0;
+		padding: 0;
+		list-style: none;
+
+		@include media('<tablet') {
+			--image-cards-gap: 32px;
+		}
+
+		@include media('<phone-land') {
+			grid-template-columns: 1fr;
+			row-gap: 48px;
+		}
+	}
+
+	&__item {
+		position: relative;
+		display: flex;
+		flex-direction: column;
+		min-width: 0;
+		margin: 0;
+	}
+
+	// A faint line between the columns, the full height of the row. None in the
+	// one-column layout.
+	&__item + &__item::before {
+		content: '';
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		left: calc(var(--image-cards-gap) / -2);
+		width: 1px;
+		background-color: rgba($color__black, 0.1);
+		transform: translateX(-50%);
+
+		@include media('<phone-land') {
+			content: none;
+		}
+	}
+
+	// 3:2, the same landscape crop as the insight archive cards.
+	&__media {
+		overflow: hidden;
+		aspect-ratio: 3 / 2;
+		border-radius: 4px;
+	}
+
+	&__image {
+		display: block;
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		object-position: center;
+	}
+
+	&__copy {
+		display: flex;
+		flex: 1 1 auto;
+		flex-direction: column;
+		gap: 13px;
+		padding-top: 20px;
+		text-align: center;
+	}
+
+	// A step down from two-images-grid's 32px, the size of the post's h1.
+	&__title {
+		margin: 0;
+		font-size: 24px;
+		font-weight: 400;
+		line-height: 28px;
+		letter-spacing: -1px;
+	}
+
+	&__body {
+		max-width: 48ch;
+		margin-inline: auto;
+		font-size: 16px;
+		font-weight: 300;
+		line-height: 20px;
+
+		> :first-child {
+			margin-top: 0;
+		}
+
+		> :last-child {
+			margin-bottom: 0;
+		}
+
+		p + p {
+			margin-top: 1.25rem;
+		}
+	}
+
+	// Pushed to the bottom so the buttons line up when the copy lengths differ.
+	&__actions {
+		display: flex;
+		justify-content: center;
+		margin-top: auto;
+
+		.btn {
+			padding: 8px 28px;
+		}
+
+		// Show the label as typed in the link field.
+		.btn a {
+			text-transform: none;
+		}
+	}
+}

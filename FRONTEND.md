@@ -36,6 +36,7 @@ src/
 dist/
   fdry.[hash].css    # Hashed CSS (filename changes when content changes)
   fdry.[hash].js     # Hashed JS
+  fdry.[hash].woff2  # Title font files, referenced from the CSS (see Fonts)
   .vite/
     manifest.json    # Maps entry to current hashed filenames (read by PHP)
 components/          # PHP partials for header-new templates (footer/ is on every page)
@@ -82,6 +83,7 @@ Add new helpers, CPTs, ACF hooks, and enqueue rules to this file as the new site
 
 - `fdry.[hash].css`
 - `fdry.[hash].js`
+- `fdry.[hash].woff2`: the title font files, referenced from the CSS (see **Fonts**)
 - `.vite/manifest.json`
 
 The full showreel files in `media/` are gitignored, so they are uploaded separately and only when the reel changes (see **Showreel modal** below).
@@ -171,7 +173,9 @@ Legacy assets remain in [`inc/enqueue.php`](inc/enqueue.php) (`understrap-styles
   - The header is centred. It has an "Insights" eyebrow (a `<p>` link to the page using `template-insight.php`), the post title as the `<h1>`, the category pill, and the date with the reading time. `fdry_reading_time()` counts words like the block editor's "Time to read", at 189 a minute.
   - The hero image comes from ACF `hero_image`, falling back to the featured image. It is 600px tall with 4px corners, eager and `fetchpriority="high"`, and never faded, because it is the LCP element.
   - The post body is a 750px column: the category, then the Gutenberg content, then a back link to Insights.
-  - The "Our Work" banner at the bottom also has 4px corners.
+  - **Bottom cards.** Below the post are three image cards, the same on every post: [`image-cards-grid.php`](components/page/image-cards-grid.php), styled in [`_image-cards-grid.scss`](src/styles/components/_image-cards-grid.scss). They replaced the hard-coded "Our Work" banner.
+    - **Fields.** They're edited on the **Global variables** options page, in the "Single Insight: bottom cards (all posts)" group ([`group_6ad78da4bcebf.json`](acf-json/group_6ad78da4bcebf.json)). It holds the `single_insight_cards` repeater, max 3 rows. Each row has the same fields as the About page's Two images grid: image, title (an `h2`), content and a white button. Read them with `get_field('single_insight_cards', 'option')`.
+    - **Layout.** The Two images grid in three columns, but contained: inside `.content-block`, with a 75px gap from `tablet` (32px below). A faint 1px line (black at 10%) runs down the middle of each gap, from the `--image-cards-gap` custom property, and goes away when the cards stack. Images are cropped to 3:2 with `object-fit: cover` and 4px corners, the same crop as the insight archive cards. The cards stack below `phone-land` (920px). They're lazy and fade up. With no cards, nothing renders.
   - **No legacy CSS or JS.** Posts are in the `fdry_is_legacy_free()` allowlist (PERFORMANCE-PLAN.md #16), so `theme.css`, `mainstyle.css`, jQuery, `theme.min.js` and lozad don't load.
   - **Gutenberg typography.** Ported from `mainstyle.css` into `_single-insight.scss`: h2 26px and h3 20px at every width, bullets, numbered lists with numbers (the old CSS only restored bullets, so they had none), and Bootstrap's 1rem margin on a separator nested in a block such as a column (direct children get their gap from the spacing rules). Line heights, weights and colours come from `_legacy-base.scss`. Set heading sizes explicitly: `--text-h2` and the like are only defined inside the `wysiwyg-content` mixin, so a bare `h2` inherits 16px (as h4 and h5 do).
   - **Gutenberg links, images and spacing.** Links use the `wysiwyg-link` mixin (underlined, fading to grey). Images get 4px corners. The gap is set by each pair of blocks: 15px, 25px before a heading, 30px around an image.
@@ -315,9 +319,9 @@ The platform logo grid above the footer is [`components/footer/tech-banner.php`]
 
 ## Footer brief
 
-The "Let's talk / Send your brief / START" band is [`components/footer/brief.php`](components/footer/brief.php), included from `footer.php` on every page, and styled in [`_footer-brief.scss`](src/styles/components/_footer-brief.scss). It replaced the old `#wrapper-footer` markup and its Vanta HALO WebGL background.
+The "Let's talk / Let's make something great together / START" band is [`components/footer/brief.php`](components/footer/brief.php), included from `footer.php` on every page, and styled in [`_footer-brief.scss`](src/styles/components/_footer-brief.scss). It replaced the old `#wrapper-footer` markup and its Vanta HALO WebGL background.
 
-- **Layout.** Text on the left and the START circle on the right, `space-between`, stacking below `phone`. Vertical padding is 80 / 64 / 48px (desktop / below `tablet` / below `phone`).
+- **Layout.** Text on the left and the START circle on the right, `space-between`, stacking below `phone`. Vertical padding is 240 / 64 / 48px (desktop / below `tablet` / below `phone`).
 - **Side padding.** `content-block content-block--footer` in [`_helper.scss`](src/styles/common/_helper.scss) gives 90px on desktop, 32px below `tablet` and 25px below `phone`. Use it for the other footer sections too.
 - **Background.** A static image, `img/footer/brief-bg.jpg` (2880×720, committed). Keep it under about 300 KB: it's a grainy gradient, so export it as a progressive JPG at around quality 75, which keeps the grain (the current file is mozjpeg q75, 266 KB). It's a lazy `<img>` with `object-fit: cover`. It only renders if the file exists, so without it the band shows `$color__footerBg`.
 - **START.** A `$color__btn-yellow` circle linking to `/brief-1/`, with a box-shadow pulse (`footer-brief-pulse`) that stops on hover and focus and under reduced motion. It has no `id`. Target `.footer-brief__button`, not the old `#box`. Link text is “Start your brief” (uppercase in the UI) so Lighthouse’s link-text audit sees descriptive `innerText`.
@@ -363,6 +367,33 @@ The contact block, menus, logo, social and legal links and the copyright bar are
 - **Breakpoint.** 768px (`media('<768px')`), the old Tailwind `md:`. Side padding is `content-block content-block--footer`.
 - **Wrapper.** A `div` with `role="contentinfo"`, not a `<footer>`, because `mainstyle/linktree.css` hides every `<footer>` on the linktree template.
 - **Spacing from legacy CSS.** The contact row's desktop padding (55px / 58px) used to come from an old `.mainfooter` rule in `mainstyle.css`. `.site-footer__top` now sets it itself.
+
+## Fonts
+
+| Variable | Font | Source |
+|----------|------|--------|
+| `$text__fontname`, `$header__fontname` | proxima-nova | Typekit kit (`foundry-typekit` in `fdry_enqueue_assets()`) |
+| `$title__fontname` | Darker Grotesque | Self-hosted from `@fontsource-variable/darker-grotesque` |
+
+The variables are in [`_variables.scss`](src/styles/common/_variables.scss).
+
+- **Darker Grotesque is self-hosted.** It is imported in [`main.js`](src/scripts/main.js), not loaded from Google Fonts, so it adds no third-party host to preconnect to (see **Resource hints**).
+  - It's imported from JS, not with `@use`, so that Vite resolves the package's `url()`s and emits the woff2 files to `dist/` next to the CSS.
+  - `base: './'` in `vite.config.js` keeps those URLs relative to the CSS (see **Bundler**).
+- **One variable font.** Each subset is a single file covering weights 300–900, with `font-display: swap`. Thanks to `unicode-range`, English pages only download the Latin file (about 24 KB). The Latin Extended and Vietnamese files load only on pages that use those characters.
+- **The family name is `'Darker Grotesque Variable'`.** That's the name Fontsource gives the variable font, not `'Darker Grotesque'`.
+- **Where it's used.** `$title__fontname` is set on:
+  - `.intro-content__title`
+  - `.navigation-content__title`
+  - `.two-column-content__title`
+  - `.two-column-list__title`
+  - `.centered-content__title`
+  - `.four-column-grid__card-title`
+  - `.image-text-alternate__title`
+  - `.insight-archive__title`
+  - `.work-archive__content > p`
+
+  Use the variable for any new title that should match.
 
 ## Tailwind (removed)
 
@@ -410,6 +441,8 @@ Commit `pnpm-lock.yaml` so installs stay reproducible.
 [Vite](https://vite.dev/) with the `sass` package. Config: [`vite.config.js`](vite.config.js).
 
 Build output is hashed `fdry.[hash].js`, `fdry.[hash].css`, and `dist/.vite/manifest.json`. WordPress reads the manifest to enqueue the current filenames — no query-string cache busting, so CDN and WP Rocket pick up new assets automatically.
+
+Files the CSS references (the `fdry.[hash].woff2` fonts) are emitted to `dist/` too. `base: './'` makes the CSS refer to them relatively (`url(./fdry.[hash].woff2)`). With Vite's default base, `/`, the URLs would point at the site root, not the theme's `dist/`, and the files would 404. The manifest also lists them, under their source paths, but `fdry_get_vite_assets()` only reads the `src/scripts/main.js` entry.
 
 ## Images (WebP)
 
