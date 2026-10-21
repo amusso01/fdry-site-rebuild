@@ -567,9 +567,9 @@
     "location": [
         [
             {
-                "param": "post_type",
+                "param": "post_template",
                 "operator": "==",
-                "value": "works_post"
+                "value": "default"
             }
         ]
     ],
@@ -585,5 +585,5 @@
     "display_title": "",
     "allow_ai_access": false,
     "ai_description": "",
-    "modified": 1788260387
+    "modified": 1792576577
 }

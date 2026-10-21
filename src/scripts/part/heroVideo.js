@@ -102,26 +102,16 @@ function initMediaObserver(root, media, play, pause) {
 	}
 }
 
-/** Load now for the above-the-fold hero, or on approach for the inline variant. */
-function startWhenReady(root, video) {
-	const begin = () => {
-		attachSources(video)
+/**
+ * Run now for the above-the-fold hero, or once the root comes near the
+ * viewport for the inline variant and [data-hero-video-lazy] roots.
+ */
+function onApproach(root, callback) {
+	const isLazy =
+		root.classList.contains('hero-video--inline') || root.hasAttribute('data-hero-video-lazy')
 
-		video.addEventListener(
-			'loadeddata',
-			() => {
-				video.classList.add('is-playing')
-			},
-			{ once: true }
-		)
-
-		initMediaObserver(root, video, playHtml5Video, pauseHtml5Video)
-	}
-
-	const isInline = root.classList.contains('hero-video--inline')
-
-	if (!isInline || !('IntersectionObserver' in window)) {
-		begin()
+	if (!isLazy || !('IntersectionObserver' in window)) {
+		callback()
 		return
 	}
 
@@ -133,7 +123,7 @@ function startWhenReady(root, video) {
 				}
 
 				observer.disconnect()
-				begin()
+				callback()
 			})
 		},
 		{
@@ -145,24 +135,70 @@ function startWhenReady(root, video) {
 	loader.observe(root)
 }
 
+function startWhenReady(root, video) {
+	onApproach(root, () => {
+		attachSources(video)
+
+		video.addEventListener(
+			'loadeddata',
+			() => {
+				video.classList.add('is-playing')
+			},
+			{ once: true }
+		)
+
+		initMediaObserver(root, video, playHtml5Video, pauseHtml5Video)
+	})
+}
+
+/**
+ * Reduced motion or save-data on a root with no still: load just enough to
+ * paint the first frame, paused, rather than leave an empty box. iOS Safari
+ * paints nothing before playback, which is why a still is recommended.
+ */
+function showFirstFrame(root, video) {
+	onApproach(root, () => {
+		video.preload = 'metadata'
+		attachSources(video)
+	})
+}
+
 function initAutoplayMedia(root) {
-	const video = root.querySelector('.hero-video__media')
+	const video = root.querySelector('.hero-video__media, [data-hero-video-media]')
 
 	if (!(video instanceof HTMLVideoElement)) {
 		return
 	}
 
+	// [data-hero-video-all-screens] roots (work image rows) play on phones too.
+	if (isSmallScreen(root) && !root.hasAttribute('data-hero-video-all-screens')) {
+		return
+	}
+
 	// The poster is already painted from markup. Leaving the video unloaded
-	// here is the whole mobile/reduced-motion saving: zero video bytes.
-	if (isSmallScreen(root) || prefersReducedMotion() || prefersReducedData()) {
+	// here is the whole reduced-motion/data-saver saving: zero video bytes.
+	if (prefersReducedMotion() || prefersReducedData()) {
+		if (root.hasAttribute('data-hero-video-no-still')) {
+			showFirstFrame(root, video)
+		}
+
 		return
 	}
 
 	startWhenReady(root, video)
 }
 
+/**
+ * .hero-video (homepage hero, service showreel) and [data-hero-video] roots
+ * with their own markup: the single work hero (work/hero-media.php) and image
+ * rows (work/image-row.php). Opt-in attributes on the root:
+ * - data-hero-video-lazy: wait until it comes near the viewport.
+ * - data-hero-video-all-screens: load on small screens too.
+ * - data-hero-video-no-still: with reduced motion or save-data, show the
+ *   paused first frame, as there is no still to stand in.
+ */
 export default function heroVideo() {
-	const roots = document.querySelectorAll('.hero-video')
+	const roots = document.querySelectorAll('.hero-video, [data-hero-video]')
 
 	if (!roots.length) {
 		return

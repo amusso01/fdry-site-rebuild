@@ -12,12 +12,12 @@
     "src": "node_modules/.pnpm/@fontsource-variable+darker-grotesque@5.3.0/node_modules/@fontsource-variable/darker-grotesque/files/darker-grotesque-vietnamese-wght-normal.woff2"
   },
   "src/scripts/main.js": {
-    "file": "fdry.BDaJudHs.js",
+    "file": "fdry.CN9GuuBf.js",
     "name": "main",
     "src": "src/scripts/main.js",
     "isEntry": true,
     "css": [
-      "fdry.BxPnCICf.css"
+      "fdry.eSt-a6F7.css"
     ],
     "assets": [
       "fdry.CAv45exj.woff2",

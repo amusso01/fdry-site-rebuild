@@ -1,0 +1,801 @@
+{
+    "key": "group_6ad886be15ef4",
+    "title": "NEW Single Work",
+    "fields": [
+        {
+            "key": "field_6ad886be16ab5",
+            "label": "Hero",
+            "name": "",
+            "aria-label": "",
+            "type": "tab",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "placement": "top",
+            "endpoint": 0,
+            "selected": 0
+        },
+        {
+            "key": "field_6ad886be17494",
+            "label": "Intro title",
+            "name": "work_hero_title",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "Shown under the work title, at the top of the page.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_6ad886be17e88",
+            "label": "Media",
+            "name": "work_hero_media_type",
+            "aria-label": "",
+            "type": "button_group",
+            "instructions": "Image, or a muted looping video over the image.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "choices": {
+                "image": "Image",
+                "video": "Video"
+            },
+            "default_value": "image",
+            "return_format": "value",
+            "allow_null": 0,
+            "allow_in_bindings": 0,
+            "layout": "horizontal"
+        },
+        {
+            "key": "field_6ad886be1887e",
+            "label": "Image",
+            "name": "work_hero_image",
+            "aria-label": "",
+            "type": "image",
+            "instructions": "Cropped to 2:1 landscape: upload at least 2560×1280. With Video, this is the still shown while the video loads, and instead of the video on phones.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "return_format": "id",
+            "library": "all",
+            "min_width": "",
+            "min_height": "",
+            "min_size": "",
+            "max_width": "",
+            "max_height": "",
+            "max_size": "",
+            "mime_types": "",
+            "allow_in_bindings": 0,
+            "preview_size": "medium"
+        },
+        {
+            "key": "field_6ad886be1927a",
+            "label": "Video",
+            "name": "work_hero_video",
+            "aria-label": "",
+            "type": "file",
+            "instructions": "Choose the uploaded MP4, 2:1 like the image. Plays muted and looping over the image. It must be a web encode with faststart — master exports straight from an editing suite are rejected, and the error will give you a note to send to your developer.",
+            "required": 0,
+            "conditional_logic": [
+                [
+                    {
+                        "field": "field_6ad886be17e88",
+                        "operator": "==",
+                        "value": "video"
+                    }
+                ]
+            ],
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "return_format": "url",
+            "library": "all",
+            "min_size": "",
+            "max_size": "",
+            "mime_types": "mp4",
+            "allow_in_bindings": 0
+        },
+        {
+            "key": "field_6ad886be19c90",
+            "label": "Platform",
+            "name": "work_platform",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "What the project was built on, e.g. WordPress. Shown in the bar below the hero.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_6ad886be1a67f",
+            "label": "Website",
+            "name": "work_website",
+            "aria-label": "",
+            "type": "url",
+            "instructions": "The live site. The Visit site link in the bar below the hero; opens in a new tab.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "allow_in_bindings": 0,
+            "placeholder": "https://"
+        },
+        {
+            "key": "field_6ad8931b1079b",
+            "label": "Results",
+            "name": "",
+            "aria-label": "",
+            "type": "tab",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "placement": "top",
+            "endpoint": 0,
+            "selected": 0
+        },
+        {
+            "key": "field_6ad8931b112a4",
+            "label": "Image",
+            "name": "work_results_image",
+            "aria-label": "",
+            "type": "image",
+            "instructions": "Cropped to 10:9: upload at least 1530×1380.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "return_format": "id",
+            "library": "all",
+            "min_width": "",
+            "min_height": "",
+            "min_size": "",
+            "max_width": "",
+            "max_height": "",
+            "max_size": "",
+            "mime_types": "",
+            "allow_in_bindings": 0,
+            "preview_size": "medium"
+        },
+        {
+            "key": "field_6ad8931b11c77",
+            "label": "Eyebrow",
+            "name": "work_results_eyebrow",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "30",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "Results",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_6ad8931b1264b",
+            "label": "Title",
+            "name": "work_results_title",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "70",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "Measurable impact from day one",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_6ad8931b13026",
+            "label": "Results",
+            "name": "work_results_stats",
+            "aria-label": "",
+            "type": "repeater",
+            "instructions": "2 to 4. Fewer results get bigger type. A result without a value isn't shown.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "layout": "block",
+            "pagination": 0,
+            "min": 2,
+            "max": 4,
+            "collapsed": "field_6ad8931b143d4",
+            "button_label": "Add result",
+            "rows_per_page": 20,
+            "sub_fields": [
+                {
+                    "key": "field_6ad8931b139ff",
+                    "label": "Label",
+                    "name": "label",
+                    "aria-label": "",
+                    "type": "text",
+                    "instructions": "",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "30",
+                        "class": "",
+                        "id": ""
+                    },
+                    "default_value": "",
+                    "maxlength": "",
+                    "allow_in_bindings": 0,
+                    "placeholder": "Conversion rate",
+                    "prepend": "",
+                    "append": "",
+                    "parent_repeater": "field_6ad8931b13026"
+                },
+                {
+                    "key": "field_6ad8931b143d4",
+                    "label": "Value",
+                    "name": "value",
+                    "aria-label": "",
+                    "type": "text",
+                    "instructions": "",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "20",
+                        "class": "",
+                        "id": ""
+                    },
+                    "default_value": "",
+                    "maxlength": "",
+                    "allow_in_bindings": 0,
+                    "placeholder": "+41%",
+                    "prepend": "",
+                    "append": "",
+                    "parent_repeater": "field_6ad8931b13026"
+                },
+                {
+                    "key": "field_6ad8931b14dac",
+                    "label": "Description",
+                    "name": "description",
+                    "aria-label": "",
+                    "type": "textarea",
+                    "instructions": "",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "50",
+                        "class": "",
+                        "id": ""
+                    },
+                    "default_value": "",
+                    "maxlength": "",
+                    "allow_in_bindings": 0,
+                    "rows": 2,
+                    "placeholder": "",
+                    "new_lines": "",
+                    "parent_repeater": "field_6ad8931b13026"
+                }
+            ]
+        },
+        {
+            "key": "field_6ad8af492519e",
+            "label": "Rows",
+            "name": "",
+            "aria-label": "",
+            "type": "tab",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "placement": "top",
+            "endpoint": 0,
+            "selected": 0
+        },
+        {
+            "key": "field_6ad8af4925be8",
+            "label": "Rows",
+            "name": "work_rows",
+            "aria-label": "",
+            "type": "flexible_content",
+            "instructions": "Add rows and drag them to reorder. They appear on the page in this order.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "layouts": {
+                "layout_6ad8af49265e6": {
+                    "key": "layout_6ad8af49265e6",
+                    "name": "image_row",
+                    "label": "Image row",
+                    "display": "block",
+                    "sub_fields": [
+                        {
+                            "key": "field_6ad8af4926ff4",
+                            "label": "Left",
+                            "name": "media_1",
+                            "aria-label": "",
+                            "type": "group",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "50",
+                                "class": "",
+                                "id": ""
+                            },
+                            "layout": "block",
+                            "sub_fields": [
+                                {
+                                    "key": "field_6ad8af4927847",
+                                    "label": "Media",
+                                    "name": "type",
+                                    "aria-label": "",
+                                    "type": "button_group",
+                                    "instructions": "",
+                                    "required": 0,
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "",
+                                        "class": "",
+                                        "id": ""
+                                    },
+                                    "choices": {
+                                        "image": "Image",
+                                        "video": "Video"
+                                    },
+                                    "default_value": "image",
+                                    "return_format": "value",
+                                    "allow_null": 0,
+                                    "allow_in_bindings": 0,
+                                    "layout": "horizontal"
+                                },
+                                {
+                                    "key": "field_6ad8af4928221",
+                                    "label": "Image",
+                                    "name": "image",
+                                    "aria-label": "",
+                                    "type": "image",
+                                    "instructions": "Cropped to 628×805 portrait: upload at least 1256×1610. Corners are rounded in code.",
+                                    "required": 0,
+                                    "conditional_logic": [
+                                        [
+                                            {
+                                                "field": "field_6ad8af4927847",
+                                                "operator": "==",
+                                                "value": "image"
+                                            }
+                                        ]
+                                    ],
+                                    "wrapper": {
+                                        "width": "",
+                                        "class": "",
+                                        "id": ""
+                                    },
+                                    "return_format": "id",
+                                    "library": "all",
+                                    "min_width": "",
+                                    "min_height": "",
+                                    "min_size": "",
+                                    "max_width": "",
+                                    "max_height": "",
+                                    "max_size": "",
+                                    "mime_types": "",
+                                    "allow_in_bindings": 0,
+                                    "preview_size": "medium"
+                                },
+                                {
+                                    "key": "field_6ad8af4928c01",
+                                    "label": "Video (MP4)",
+                                    "name": "video_mp4",
+                                    "aria-label": "",
+                                    "type": "file",
+                                    "instructions": "628×805 portrait, cropped to fit. Plays muted and looping. It must be a web encode with faststart — master exports straight from an editing suite are rejected, and the error will give you a note to send to your developer.",
+                                    "required": 0,
+                                    "conditional_logic": [
+                                        [
+                                            {
+                                                "field": "field_6ad8af4927847",
+                                                "operator": "==",
+                                                "value": "video"
+                                            }
+                                        ]
+                                    ],
+                                    "wrapper": {
+                                        "width": "",
+                                        "class": "",
+                                        "id": ""
+                                    },
+                                    "return_format": "url",
+                                    "library": "all",
+                                    "min_size": "",
+                                    "max_size": "",
+                                    "mime_types": "mp4",
+                                    "allow_in_bindings": 0
+                                },
+                                {
+                                    "key": "field_6ad8af49295ff",
+                                    "label": "Video (WebM)",
+                                    "name": "video_webm",
+                                    "aria-label": "",
+                                    "type": "file",
+                                    "instructions": "Optional. Offered before the MP4 to browsers that play it.",
+                                    "required": 0,
+                                    "conditional_logic": [
+                                        [
+                                            {
+                                                "field": "field_6ad8af4927847",
+                                                "operator": "==",
+                                                "value": "video"
+                                            }
+                                        ]
+                                    ],
+                                    "wrapper": {
+                                        "width": "",
+                                        "class": "",
+                                        "id": ""
+                                    },
+                                    "return_format": "url",
+                                    "library": "all",
+                                    "min_size": "",
+                                    "max_size": "",
+                                    "mime_types": "webm",
+                                    "allow_in_bindings": 0
+                                },
+                                {
+                                    "key": "field_6ad8af492a010",
+                                    "label": "Still",
+                                    "name": "still",
+                                    "aria-label": "",
+                                    "type": "image",
+                                    "instructions": "Optional, same size as the video. Shown while it loads, and instead of it for visitors with reduced motion or data saver.",
+                                    "required": 0,
+                                    "conditional_logic": [
+                                        [
+                                            {
+                                                "field": "field_6ad8af4927847",
+                                                "operator": "==",
+                                                "value": "video"
+                                            }
+                                        ]
+                                    ],
+                                    "wrapper": {
+                                        "width": "",
+                                        "class": "",
+                                        "id": ""
+                                    },
+                                    "return_format": "id",
+                                    "library": "all",
+                                    "min_width": "",
+                                    "min_height": "",
+                                    "min_size": "",
+                                    "max_width": "",
+                                    "max_height": "",
+                                    "max_size": "",
+                                    "mime_types": "",
+                                    "allow_in_bindings": 0,
+                                    "preview_size": "medium"
+                                }
+                            ],
+                            "parent_layout": "layout_6ad8af49265e6"
+                        },
+                        {
+                            "key": "field_6ad8af492a907",
+                            "label": "Right",
+                            "name": "media_2",
+                            "aria-label": "",
+                            "type": "group",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "50",
+                                "class": "",
+                                "id": ""
+                            },
+                            "layout": "block",
+                            "sub_fields": [
+                                {
+                                    "key": "field_6ad8af492b306",
+                                    "label": "Media",
+                                    "name": "type",
+                                    "aria-label": "",
+                                    "type": "button_group",
+                                    "instructions": "",
+                                    "required": 0,
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "",
+                                        "class": "",
+                                        "id": ""
+                                    },
+                                    "choices": {
+                                        "image": "Image",
+                                        "video": "Video"
+                                    },
+                                    "default_value": "image",
+                                    "return_format": "value",
+                                    "allow_null": 0,
+                                    "allow_in_bindings": 0,
+                                    "layout": "horizontal"
+                                },
+                                {
+                                    "key": "field_6ad8af492bcf4",
+                                    "label": "Image",
+                                    "name": "image",
+                                    "aria-label": "",
+                                    "type": "image",
+                                    "instructions": "Cropped to 628×805 portrait: upload at least 1256×1610. Corners are rounded in code.",
+                                    "required": 0,
+                                    "conditional_logic": [
+                                        [
+                                            {
+                                                "field": "field_6ad8af492b306",
+                                                "operator": "==",
+                                                "value": "image"
+                                            }
+                                        ]
+                                    ],
+                                    "wrapper": {
+                                        "width": "",
+                                        "class": "",
+                                        "id": ""
+                                    },
+                                    "return_format": "id",
+                                    "library": "all",
+                                    "min_width": "",
+                                    "min_height": "",
+                                    "min_size": "",
+                                    "max_width": "",
+                                    "max_height": "",
+                                    "max_size": "",
+                                    "mime_types": "",
+                                    "allow_in_bindings": 0,
+                                    "preview_size": "medium"
+                                },
+                                {
+                                    "key": "field_6ad8af492c5d9",
+                                    "label": "Video (MP4)",
+                                    "name": "video_mp4",
+                                    "aria-label": "",
+                                    "type": "file",
+                                    "instructions": "628×805 portrait, cropped to fit. Plays muted and looping. It must be a web encode with faststart — master exports straight from an editing suite are rejected, and the error will give you a note to send to your developer.",
+                                    "required": 0,
+                                    "conditional_logic": [
+                                        [
+                                            {
+                                                "field": "field_6ad8af492b306",
+                                                "operator": "==",
+                                                "value": "video"
+                                            }
+                                        ]
+                                    ],
+                                    "wrapper": {
+                                        "width": "",
+                                        "class": "",
+                                        "id": ""
+                                    },
+                                    "return_format": "url",
+                                    "library": "all",
+                                    "min_size": "",
+                                    "max_size": "",
+                                    "mime_types": "mp4",
+                                    "allow_in_bindings": 0
+                                },
+                                {
+                                    "key": "field_6ad8af492cfbc",
+                                    "label": "Video (WebM)",
+                                    "name": "video_webm",
+                                    "aria-label": "",
+                                    "type": "file",
+                                    "instructions": "Optional. Offered before the MP4 to browsers that play it.",
+                                    "required": 0,
+                                    "conditional_logic": [
+                                        [
+                                            {
+                                                "field": "field_6ad8af492b306",
+                                                "operator": "==",
+                                                "value": "video"
+                                            }
+                                        ]
+                                    ],
+                                    "wrapper": {
+                                        "width": "",
+                                        "class": "",
+                                        "id": ""
+                                    },
+                                    "return_format": "url",
+                                    "library": "all",
+                                    "min_size": "",
+                                    "max_size": "",
+                                    "mime_types": "webm",
+                                    "allow_in_bindings": 0
+                                },
+                                {
+                                    "key": "field_6ad8af492d9c1",
+                                    "label": "Still",
+                                    "name": "still",
+                                    "aria-label": "",
+                                    "type": "image",
+                                    "instructions": "Optional, same size as the video. Shown while it loads, and instead of it for visitors with reduced motion or data saver.",
+                                    "required": 0,
+                                    "conditional_logic": [
+                                        [
+                                            {
+                                                "field": "field_6ad8af492b306",
+                                                "operator": "==",
+                                                "value": "video"
+                                            }
+                                        ]
+                                    ],
+                                    "wrapper": {
+                                        "width": "",
+                                        "class": "",
+                                        "id": ""
+                                    },
+                                    "return_format": "id",
+                                    "library": "all",
+                                    "min_width": "",
+                                    "min_height": "",
+                                    "min_size": "",
+                                    "max_width": "",
+                                    "max_height": "",
+                                    "max_size": "",
+                                    "mime_types": "",
+                                    "allow_in_bindings": 0,
+                                    "preview_size": "medium"
+                                }
+                            ],
+                            "parent_layout": "layout_6ad8af49265e6"
+                        }
+                    ],
+                    "min": "",
+                    "max": ""
+                },
+                "layout_6ad8af492e3b8": {
+                    "key": "layout_6ad8af492e3b8",
+                    "name": "content_row",
+                    "label": "Content row",
+                    "display": "block",
+                    "sub_fields": [
+                        {
+                            "key": "field_6ad8af492ed9e",
+                            "label": "Title",
+                            "name": "title",
+                            "aria-label": "",
+                            "type": "text",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "",
+                            "maxlength": "",
+                            "allow_in_bindings": 0,
+                            "placeholder": "",
+                            "prepend": "",
+                            "append": "",
+                            "parent_layout": "layout_6ad8af492e3b8"
+                        },
+                        {
+                            "key": "field_6ad8af492f77e",
+                            "label": "Content",
+                            "name": "content",
+                            "aria-label": "",
+                            "type": "wysiwyg",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "",
+                            "allow_in_bindings": 0,
+                            "tabs": "all",
+                            "toolbar": "full",
+                            "media_upload": 0,
+                            "delay": 0,
+                            "parent_layout": "layout_6ad8af492e3b8"
+                        }
+                    ],
+                    "min": "",
+                    "max": ""
+                }
+            },
+            "min": "",
+            "max": "",
+            "button_label": "Add row"
+        }
+    ],
+    "location": [
+        [
+            {
+                "param": "post_template",
+                "operator": "==",
+                "value": "template-single-work.php"
+            }
+        ]
+    ],
+    "menu_order": 0,
+    "position": "normal",
+    "style": "default",
+    "label_placement": "top",
+    "instruction_placement": "label",
+    "hide_on_screen": "",
+    "active": true,
+    "description": "Case studies on template-single-work.php: one tab per section.",
+    "show_in_rest": 0,
+    "display_title": "",
+    "allow_ai_access": false,
+    "ai_description": "",
+    "modified": 1792585545
+}

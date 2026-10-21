@@ -1,0 +1,161 @@
+@use '../common/variables' as *;
+@use '../common/media' as *;
+@use '../common/mixin' as *;
+
+// Single work results (components/work/results.php): an image beside 2 to 4
+// stats. The stats share the image's height, so the last line sits on the
+// image's bottom edge whatever the count; the count modifier scales the
+// values so 2 still fill it and 4 still fit. Same insets as .work-hero-media.
+// The image `sizes` in the PHP follows the columns: change both together.
+.work-results {
+	--results-value-size: 56px;
+	--results-stat-padding: 30px;
+
+	padding: 60px 80px;
+	background-color: $color__white;
+
+	@include media('<tablet') {
+		padding: 48px 32px;
+	}
+	@include media('<phone') {
+		padding-inline: 25px;
+	}
+
+	&--count-2 {
+		--results-value-size: 70px;
+		--results-stat-padding: 48px;
+	}
+
+	&--count-4 {
+		--results-value-size: 42px;
+		--results-stat-padding: 20px;
+	}
+
+	@include media('<tablet') {
+		--results-stat-padding: 24px;
+
+		&--count-2 {
+			--results-value-size: 48px;
+		}
+
+		&--count-3 {
+			--results-value-size: 42px;
+		}
+
+		&--count-4 {
+			--results-value-size: 36px;
+		}
+	}
+
+	&__grid {
+		display: grid;
+		grid-template-columns: minmax(0, 7fr) minmax(0, 4fr);
+		gap: 80px;
+
+		@include media('<tablet') {
+			grid-template-columns: minmax(0, 1fr);
+			gap: 40px;
+		}
+	}
+
+	&--no-media &__grid {
+		grid-template-columns: minmax(0, 1fr);
+	}
+
+	&__media {
+		align-self: start;
+		aspect-ratio: 10 / 9;
+		overflow: hidden;
+		border-radius: 4px;
+
+		// fdry_work_image() wraps the image in <picture> to cap phones.
+		picture {
+			display: contents;
+		}
+	}
+
+	&__image {
+		display: block;
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+
+	&__content {
+		display: flex;
+		flex-direction: column;
+		align-self: stretch;
+		min-width: 0;
+	}
+
+	&--no-media &__content {
+		max-width: 600px;
+	}
+
+	&__eyebrow {
+		@include work-label;
+		margin: 0;
+	}
+
+	&__title {
+		margin: 12px 0 0;
+		font-family: $title__fontname;
+		font-size: 28px;
+		font-weight: 500;
+		line-height: 32px;
+		color: $color__text;
+	}
+
+	&__stats {
+		display: flex;
+		flex: 1;
+		flex-direction: column;
+		margin: 0;
+	}
+
+	* + &__stats {
+		margin-top: 30px;
+	}
+
+	&__stat {
+		display: flex;
+		flex: 1;
+		flex-direction: column;
+		justify-content: center;
+		padding-block: var(--results-stat-padding);
+		border-bottom: 1px solid rgba($color__black, 0.1);
+
+		// Stacked, the stats keep their natural height.
+		@include media('<tablet') {
+			flex: none;
+		}
+	}
+
+	&__label {
+		@include work-label;
+	}
+
+	&__value {
+		margin: 12px 0 0;
+		font-family: $text__fontname;
+		font-size: var(--results-value-size);
+		font-weight: 600;
+		line-height: 1;
+		// -1.6px at the design's 56px, scaling with the other counts.
+		letter-spacing: -0.0286em;
+		color: $color__text;
+	}
+
+	// No label: nothing above the value.
+	&__value:first-child {
+		margin-top: 0;
+	}
+
+	&__description {
+		max-width: 360px;
+		margin: 12px 0 0;
+		font-size: 14px;
+		line-height: 22px;
+		color: rgba($color__text, 0.7);
+	}
+}

@@ -1,0 +1,52 @@
+{
+    "key": "group_6ad880dbe7eee",
+    "title": "Strategy: service link",
+    "fields": [
+        {
+            "key": "field_6ad880dbe88e2",
+            "label": "Service link",
+            "name": "service_link",
+            "aria-label": "",
+            "type": "page_link",
+            "instructions": "The service page this strategy links to.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "post_type": [
+                "page"
+            ],
+            "post_status": "",
+            "taxonomy": "",
+            "allow_archives": 0,
+            "multiple": 0,
+            "allow_null": 1,
+            "allow_in_bindings": 0
+        }
+    ],
+    "location": [
+        [
+            {
+                "param": "taxonomy",
+                "operator": "==",
+                "value": "strategy"
+            }
+        ]
+    ],
+    "menu_order": 0,
+    "position": "normal",
+    "style": "default",
+    "label_placement": "top",
+    "instruction_placement": "label",
+    "hide_on_screen": "",
+    "active": true,
+    "description": "Shown on the Add and Edit Strategy screens (Works → Strategies).",
+    "show_in_rest": 0,
+    "display_title": "",
+    "allow_ai_access": false,
+    "ai_description": "",
+    "modified": 1792573659
+}

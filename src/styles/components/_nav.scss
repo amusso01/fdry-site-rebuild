@@ -236,6 +236,9 @@ body.page-template-template-home-php {
 	&__parent-label {
 		flex: 1 1 auto;
 		min-width: 0;
+		font-family: $title__fontname;
+		font-weight: 500;
+		letter-spacing: 0;
 	}
 
 	&__parent-arrow {

@@ -60,28 +60,46 @@ function fdry_acf_only_page_templates(): array
 }
 
 /**
- * Whether a page uses an ACF-only template (no block or classic editor).
+ * Work (works_post) templates that use ACF only (no classic content editor).
  *
- * @param int $post_id Page post ID.
+ * @return string[]
  */
-function fdry_page_uses_acf_only_template(int $post_id): bool
+function fdry_acf_only_work_templates(): array
 {
-	if ($post_id <= 0 || get_post_type($post_id) !== 'page') {
-		return false;
-	}
-
-	return in_array(get_page_template_slug($post_id), fdry_acf_only_page_templates(), true);
+	return array(
+		'template-single-work.php',
+	);
 }
 
 /**
- * Disable Gutenberg for ACF-only page templates.
+ * Whether a page or work uses an ACF-only template (no block or classic editor).
+ *
+ * @param int $post_id Page or work post ID.
+ */
+function fdry_post_uses_acf_only_template(int $post_id): bool
+{
+	if ($post_id <= 0) {
+		return false;
+	}
+
+	$templates = match (get_post_type($post_id)) {
+		'page'       => fdry_acf_only_page_templates(),
+		'works_post' => fdry_acf_only_work_templates(),
+		default      => array(),
+	};
+
+	return in_array(get_page_template_slug($post_id), $templates, true);
+}
+
+/**
+ * Disable Gutenberg for ACF-only templates.
  *
  * @param bool    $use_block_editor Whether the block editor is enabled.
  * @param WP_Post $post             Current post object.
  */
 function fdry_disable_block_editor_for_acf_templates(bool $use_block_editor, WP_Post $post): bool
 {
-	if (fdry_page_uses_acf_only_template((int) $post->ID)) {
+	if (fdry_post_uses_acf_only_template((int) $post->ID)) {
 		return false;
 	}
 
@@ -90,7 +108,7 @@ function fdry_disable_block_editor_for_acf_templates(bool $use_block_editor, WP_
 add_filter('use_block_editor_for_post', 'fdry_disable_block_editor_for_acf_templates', 10, 2);
 
 /**
- * Hide the classic content editor on ACF-only page templates.
+ * Hide the classic content editor on ACF-only templates.
  */
 function fdry_hide_classic_editor_for_acf_templates(): void
 {
@@ -106,11 +124,11 @@ function fdry_hide_classic_editor_for_acf_templates(): void
 		$post_id = (int) $_POST['post_ID'];
 	}
 
-	if (! fdry_page_uses_acf_only_template($post_id)) {
+	if (! fdry_post_uses_acf_only_template($post_id)) {
 		return;
 	}
 
-	remove_post_type_support('page', 'editor');
+	remove_post_type_support(get_post_type($post_id), 'editor');
 }
 add_action('admin_init', 'fdry_hide_classic_editor_for_acf_templates');
 
@@ -273,9 +291,10 @@ function fdry_get_vite_assets(): ?array
  * and JS can stay off (PERFORMANCE-PLAN.md #4).
  *
  * True for the homepage, the 404 page, single posts (components/single/insight.php,
- * PERFORMANCE-PLAN.md #16) and pages on the new templates. Case studies, jobs,
- * work categories, search and the legacy page templates (/brief/) still render
- * Understrap markup and keep everything. Before adding a template, simulate it
+ * PERFORMANCE-PLAN.md #16), works on template-single-work.php and pages on the
+ * new templates. Case studies still on single.php, jobs, work categories, search
+ * and the legacy page templates (/brief/) still render Understrap markup and
+ * keep everything. Before adding a template, simulate it
  * on live with `pnpm perf --block … --inject-css …` and compare with
  * `pnpm perf:diff` (FRONTEND.md → Legacy assets).
  * To roll back, return false.
@@ -284,6 +303,10 @@ function fdry_is_legacy_free(): bool
 {
 	if (is_front_page() || is_404() || is_singular('post')) {
 		return true;
+	}
+
+	if (is_singular('works_post')) {
+		return in_array(get_page_template_slug(get_queried_object_id()), fdry_acf_only_work_templates(), true);
 	}
 
 	if (! is_page()) {
@@ -1121,6 +1144,13 @@ add_filter('acf/validate_value/name=hero_autoplay_video', 'fdry_validate_backgro
 add_filter('acf/validate_value/name=hero_autoplay_video_webm', 'fdry_validate_background_video', 10, 3);
 add_filter('acf/validate_value/name=showreel_autoplay_video', 'fdry_validate_background_video', 10, 3);
 add_filter('acf/validate_value/name=showreel_autoplay_video_webm', 'fdry_validate_background_video', 10, 3);
+add_filter('acf/validate_value/name=work_hero_video', 'fdry_validate_background_video', 10, 3);
+// Single work image rows (work_rows → media_1 / media_2). By key: video_mp4
+// and video_webm are too generic for name=.
+add_filter('acf/validate_value/key=field_6ad8af4928c01', 'fdry_validate_background_video', 10, 3);
+add_filter('acf/validate_value/key=field_6ad8af49295ff', 'fdry_validate_background_video', 10, 3);
+add_filter('acf/validate_value/key=field_6ad8af492c5d9', 'fdry_validate_background_video', 10, 3);
+add_filter('acf/validate_value/key=field_6ad8af492cfbc', 'fdry_validate_background_video', 10, 3);
 
 /**
  * Require a poster wherever a background video is set.
@@ -1134,9 +1164,11 @@ function fdry_validate_poster_present(): void
 		return;
 	}
 
+	// Video field key => poster field key. The single work hero's image is its poster.
 	$pairs = array(
 		'field_6a971hero0001' => 'field_6a971hero0005',
 		'field_6aa185527a011' => 'field_6aa185527a015',
+		'field_6ad886be1927a' => 'field_6ad886be1887e',
 	);
 
 	foreach ($pairs as $video_key => $poster_key) {

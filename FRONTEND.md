@@ -97,8 +97,8 @@ Legacy assets remain in [`inc/enqueue.php`](inc/enqueue.php) (`understrap-styles
 `inc/enqueue.php` still enqueues the old Understrap front end on every page: `theme.min.css`, jQuery, `theme.min.js`, lozad and page-specific scripts. `header-new.php` used to print the two `mainstyle/*.css` sheets by hand. Pages that render only new markup don't need any of it (PERFORMANCE-PLAN.md #4).
 
 - **The allowlist.** `fdry_is_legacy_free()` in [`function-dev.php`](library/function-dev.php) decides.
-  - **True for:** the homepage, the 404 page, single posts (`is_singular('post')`, PERFORMANCE-PLAN.md #16), and pages on `fdry_acf_only_page_templates()` plus `template-one-column.php`.
-  - **Still legacy:** case studies (`content-single-work.php`), jobs, `/works/category/{slug}/`, search, and the legacy page templates (`/brief/`, which uses `typeform.php`).
+  - **True for:** the homepage, the 404 page, single posts (`is_singular('post')`, PERFORMANCE-PLAN.md #16), works on `fdry_acf_only_work_templates()` (see **Single work**), and pages on `fdry_acf_only_page_templates()` plus `template-one-column.php`.
+  - **Still legacy:** case studies still on `single.php` (`content-single-work.php`), jobs, `/works/category/{slug}/`, search, and the legacy page templates (`/brief/`, which uses `typeform.php`).
 - **What it turns off.**
   - **The dequeues.** `fdry_dequeue_legacy_assets()` (`wp_enqueue_scripts`, priority 20, after `understrap_scripts()`) dequeues:
     - `understrap-styles` (`theme.min.css`);
@@ -169,7 +169,7 @@ Legacy assets remain in [`inc/enqueue.php`](inc/enqueue.php) (`understrap-styles
   - **Category pages.** `/works/category/{slug}/` also queries `works_post` (the rewrite rule in `functions.php`, added on `init` so it lands before the CPT's rules), so the redirect skips requests with a `category_name`. Those pages still use the legacy [`archive-works-category.php`](archive-works-category.php), whose intro still prints page 50's content.
 - **Work archive cards.** [`work-archive.php`](components/page/work-archive.php) calls `fdry_render_work_cards($query, true)`, which makes the first card `loading="eager" fetchpriority="high"`: it's the LCP on phones (one column). The AJAX filter and Load more call it without `true`, so their cards stay lazy. Don't leave the LCP image to WP Rocket's "critical images" data, which is re-collected after each cache clear (PERFORMANCE-PLAN.md #11). The image comes from `fdry_work_image()`, with a srcset (see **Work images (srcset)**).
 - **Insights.** [`template-insight.php`](template-insight.php) ("NEW template Insight") renders [`insight-archive.php`](components/page/insight-archive.php): a 50/50 intro from the "New Insight" ACF group (`insight_tagline`, `insight_title`, `insight_content`), then every published post as an `.insight-card`, two per row, styled in [`_insight-archive.scss`](src/styles/components/_insight-archive.scss). Each card has three links to the post: the image, Read more and the title (an `h2`). The article is not wrapped in `<a>`. The image link repeats the title link, so it has `tabindex="-1"` and `aria-hidden="true"`. Images are cropped to 3:2 with 4px corners, lazy-loaded natively with `wp_get_attachment_image()`, and zoom in on hover like the work cards. The component does not use the legacy `.grid-insight` / `.insight-grid` CSS. The old page, `page-templates/parent.php` with [`content-insight.php`](loop-templates/content-insight.php), is unchanged. To roll back, set the Insights page template back to "Parent-pages".
-- **Single insight.** [`single.php`](single.php) renders [`components/single/insight.php`](components/single/insight.php) for posts. Works still use the legacy `content-single-work.php`. The page is laid out as follows, styled in [`_single-insight.scss`](src/styles/components/_single-insight.scss):
+- **Single insight.** [`single.php`](single.php) renders [`components/single/insight.php`](components/single/insight.php) for posts. Works without a template still use the legacy `content-single-work.php` (see **Single work**). The page is laid out as follows, styled in [`_single-insight.scss`](src/styles/components/_single-insight.scss):
   - The header is centred. It has an "Insights" eyebrow (a `<p>` link to the page using `template-insight.php`), the post title as the `<h1>`, the category pill, and the date with the reading time. `fdry_reading_time()` counts words like the block editor's "Time to read", at 189 a minute.
   - The hero image comes from ACF `hero_image`, falling back to the featured image. It is 600px tall with 4px corners, eager and `fetchpriority="high"`, and never faded, because it is the LCP element.
   - The post body is a 750px column: the category, then the Gutenberg content, then a back link to Insights.
@@ -183,6 +183,93 @@ Legacy assets remain in [`inc/enqueue.php`](inc/enqueue.php) (`understrap-styles
   - **`#single-wrapper`.** Its 10px bottom padding (once `mainstyle.css`'s `.wrapper`) is set for `.single-post` only, because case studies share the wrapper and keep their legacy CSS.
   - **Links.** The Insights and Work links come from `fdry_template_page_url()` in `function-dev.php`, not from hard-coded page IDs.
   - **Rollback.** The old partial is still at [`content-single-insight.php`](loop-templates/content-single-insight.php). To roll back, point the include in `single.php` back at it.
+- **Single work.** [`template-single-work.php`](template-single-work.php) ("NEW template Single Work") is the new case study template. Case studies move to it one at a time, and the rest stay on the legacy page.
+  - **Switching a work.** Pick the template under **Post Attributes → Template** on the work (works use the classic editor). WordPress checks a post's assigned template before `single.php`, so `single.php` is unchanged, and works on the default template still render [`content-single-work.php`](loop-templates/content-single-work.php) through it.
+  - **Name.** It's `single-work`, not `work`, because [`template-work.php`](template-work.php) is the Work page (`/works/`). `Template Post Type: works_post` keeps it out of the page template list.
+  - **ACF only.** Like the page templates, it hides the content editor. `fdry_acf_only_work_templates()` lists it, and `fdry_post_uses_acf_only_template()` (which replaced `fdry_page_uses_acf_only_template()`) checks the page and work lists. A work's old content stays in the database.
+  - **Fields.** Each component gets a tab in the "NEW Single Work" group ([`group_6ad886be15ef4.json`](acf-json/group_6ad886be15ef4.json)), located on **Post Template** `== template-single-work.php` (`post_template`). The `page_template` rule the page groups use only matches pages.
+  - **Sections.** The template renders them in order:
+    1. [`centered-content.php`](components/page/centered-content.php), the hero text;
+    2. [`work/hero-media.php`](components/work/hero-media.php);
+    3. [`work/meta-bar.php`](components/work/meta-bar.php);
+    4. [`work/results.php`](components/work/results.php);
+    5. [`work/rows.php`](components/work/rows.php).
+
+    The design is "Case study template — Option-2" in Figma (hero node 2277:4501, meta bar node 2277:4508, results node 2277:4530, rows node 2277:4552).
+  - **Hero text.** The template passes `prefix => 'work_hero'`, the work title as the `h1` tagline and `is_first`. The intro title is `work_hero_title`, which centered-content reads as `{prefix}_title`. `.single-work-main` limits the title to 600px, so it wraps in three lines as in the design, and drops the section's bottom padding, as on Service inner.
+  - **Hero media.** It's a 2:1 frame with 4px corners, styled in [`_work-hero-media.scss`](src/styles/components/_work-hero-media.scss).
+    - **Insets.** The frame is inset 80px from `tablet`, 32px below it and 25px below `phone`. The design insets it further than `.content-block`'s 54px. The `sizes` in the PHP follows these insets and `.content-max`, so change them together.
+    - **Image.** `work_hero_image` (an ID) prints through `fdry_work_image()`, so phones are capped at `large` (see **Work images (srcset)**). It's the LCP element: `eager`, `fetchpriority="high"` and never faded. Without an image the section doesn't render.
+    - **Video.** With **Media** (`work_hero_media_type`) set to Video, `work_hero_video` (an MP4) loops muted over the image, which is its still. The frame gets `data-hero-video` and the `<video>` `data-hero-video-media`. [`heroVideo.js`](src/scripts/part/heroVideo.js) matches those as well as `.hero-video`, so it follows the hero's rules (see **Hero / showreel video**): no `src` in the markup, nothing downloaded at 768px or below, with reduced motion or with save-data, and a fade in on `.is-playing`. A saved video stays in the field when Media goes back to Image, but only renders on Video.
+    - **Why not `hero-video.php`.** Its poster has no srcset, its alt is "Showreel", and its inline variant gets no `fetchpriority`. Changing it would affect the homepage and `/services/`.
+    - **Upload checks.** `fdry_validate_background_video()` checks `work_hero_video`, and `fdry_validate_poster_present()` won't save a video without the image.
+  - **Meta bar.** A full-bleed band at black 92%, styled in [`_work-meta-bar.scss`](src/styles/components/_work-meta-bar.scss).
+    - **Data.** Everything comes from `fdry_work_meta()` in [`function-work.php`](library/function-work.php):
+      - Platform: `work_platform`;
+      - Industry: the `industry` term names, joined with commas;
+      - Strategy: the `strategy` terms as pills;
+      - Visit site: `work_website`, which opens in a new tab.
+    - **Strategy pills.** Each pill links to its term's Service link. On hover and focus it turns transparent with white text, leaving its 1px white border as an outline. The border is there all the time (white on white), so the pill doesn't change size. A strategy with no page is a plain pill.
+    - **Empty data.** A missing detail drops its column (the columns share the width), and with nothing at all the bar isn't rendered.
+    - **Type.** The labels are proxima-nova 600 at 11px. Figma has Inter, which the site doesn't load.
+    - **Layout.** Below `phone-land` the details go to two columns, with Strategy full width and Visit site underneath.
+    - **Markup.** The details are a `<dl>`. The arrow is [`svg-arrow.php`](svg-template/svg-arrow.php), the same path as the Figma one.
+    - **Labels.** Its labels and the results' labels share the `work-label` mixin in [`_mixin.scss`](src/styles/common/_mixin.scss).
+  - **Results.** A 10:9 image beside an eyebrow, a title (`h2`) and 2 to 4 stats, from the Results tab. Styled in [`_work-results.scss`](src/styles/components/_work-results.scss).
+    - **Fields.**
+      - Image: `work_results_image`, an ID, lazy, through `fdry_work_image()`;
+      - Eyebrow: `work_results_eyebrow`, "Results" by default;
+      - Title: `work_results_title`;
+      - Stats: the `work_results_stats` repeater, each row with a `label`, a `value` and a `description`.
+    - **Rows.** The repeater is min 2 (ACF starts it with two empty rows) and max 4. A row without a value is skipped, and with none the section isn't rendered.
+    - **Layout.** The columns are 7fr / 4fr with an 80px gap (765 / 437px at 1440), with the same insets as the hero media. Each stat has a faint line under it (black at 10%), the last one included. There's none above the first.
+    - **Stats share the image's height.** The column stretches to the row, and each stat is `flex: 1` with its content centred. The last line therefore sits on the image's bottom edge, as in the design, whatever the count. If the stats are taller than the image, the row grows and the image stays 10:9 at the top.
+    - **Size per count.** The section gets `work-results--count-{2,3,4}`, which sets `--results-value-size` and `--results-stat-padding`. A single row uses the 2-row style.
+
+      | Count | Value | Stat padding | Value below `tablet` |
+      |---|---|---|---|
+      | 2 | 70px | 48px | 48px |
+      | 3 (design) | 56px | 30px | 42px |
+      | 4 | 42px | 20px | 36px |
+
+      The values are proxima-nova 600 with a line-height of 1. The letter spacing is −0.0286em: the design's −1.6px at 56px, scaling with the other sizes.
+
+      Below `tablet` it stacks (image, then stats), the stats keep their natural height and the padding is 24px.
+    - **No image.** `work-results--no-media` puts the stats in one column, at most 600px wide.
+    - **Sizes from the screenshot.** The Figma rate limit blocked the node, so the sizes were measured from a screenshot. Check them against the node: the title at 28/32px and the gaps. The values' type is from the design spec.
+  - **Rows.** The Rows tab is the `work_rows` Flexible Content field. Editors add image rows and content rows in any order, and drag to reorder. [`work/rows.php`](components/work/rows.php) hands each row to its partial by `acf_fc_layout`.
+    - **Spacing.** Each row has 32px top and bottom padding, so rows are 64px apart, with the same insets as the other sections.
+    - **Image row** ([`work/image-row.php`](components/work/image-row.php), [`_work-image-row.scss`](src/styles/components/_work-image-row.scss)).
+      - **Slots.** Two group fields, `media_1` (Left) and `media_2` (Right). Each has a Media switch (`type`, image by default) plus:
+        - with Image, `image`;
+        - with Video, `video_mp4` and/or `video_webm`, and an optional `still`.
+
+        `fdry_work_row_media()` in [`function-work.php`](library/function-work.php) normalises a slot.
+      - **Layout.** The grid is 1fr / 1fr with a 24px gap, and stacks below `phone`.
+      - **Ratio.** Every cell has the design's 628 × 805 ratio (`aspect-ratio`, measured from the screenshot) with 8px corners. The image, video or still is absolutely positioned and `object-fit: cover`, so exports are cropped to fill and don't need rounded corners.
+      - **Empty slots.** An empty slot leaves its column empty: a lone Right media keeps `grid-column: 2`. With no media at all the row isn't rendered.
+      - **Images.** Images and stills go through `fdry_work_image()`, lazy.
+      - **Videos.** They use the hero's loader with the opt-in attributes `data-hero-video-lazy` and `data-hero-video-all-screens` (see **Hero / showreel video**).
+        - **Loading.** A video loads when the row comes near the viewport and plays on every screen size, phones included.
+        - **Reduced motion or save-data.** The still shows instead. Without a still, the paused first frame shows (`data-hero-video-no-still`).
+        - **Upload checks.** `fdry_validate_background_video()` checks the four video sub fields by key (`acf/validate_value/key=…`).
+    - **Content row** ([`work/content-row.php`](components/work/content-row.php), [`_work-content-row.scss`](src/styles/components/_work-content-row.scss)).
+      - **Fields.** A `title` (`h2`) on the left and the `content` WYSIWYG (`.wysiwyg`) on the right, in a 1fr / 1fr grid with a 24px gap.
+      - **Title.** Darker Grotesque 40px / 600, with 64px right padding, so a long title wraps before the gap.
+      - **Body.** 16px / 24px, with 22px between paragraphs. It's pinned to column 2, so it stays on the right without a title.
+      - **Below `phone-land`.** It stacks, and the title is 32px with no right padding.
+  - **Legacy CSS.** Works on it are on the `fdry_is_legacy_free()` allowlist, so `theme.css`, `mainstyle.css` and jQuery don't load. It never had legacy markup, so nothing was simulated: build its components without them.
+  - **Old fields.** The legacy "Work" group ([`group_5c13e27d239f4.json`](acf-json/group_5c13e27d239f4.json), `post_type == works_post`) still shows on every work, this template included.
+  - **No Categories box.** `fdry_hide_work_categories_box()` in [`function-work.php`](library/function-work.php) removes it on works using the template, which use Industry and Strategy instead.
+    - **Existing categories.** A work keeps the ones it has: `wp_update_post()` keeps them when the box isn't submitted.
+    - **Where categories are still used.** The `/works/` filter (`fdry_work_query()`), the `/works/category/{slug}/` pages and the card pills (`fdry_work_card_categories()`). A work given no categories doesn't appear in a category filter, and its cards show no pills.
+    - **Still visible elsewhere.** Quick Edit in the Works list still shows the categories.
+  - **Industry and Strategy.** Two taxonomies on `works_post`, registered in ACF (Local JSON [`taxonomy_6ad880dbe6bf9.json`](acf-json/taxonomy_6ad880dbe6bf9.json) and [`taxonomy_6ad880dbe74fb.json`](acf-json/taxonomy_6ad880dbe74fb.json)), so there's no `register_taxonomy()` in the theme. Edit them in **ACF → Taxonomies**.
+    - **Admin.** Both are hierarchical, so a work picks its terms from a checkbox list, and each is a column in the Works list.
+    - **No front-end URLs.** Both are non-public, with no rewrite rules or query var. There are no `/industry/{slug}/` archive pages for the legacy `archive.php` to render, nothing in the Yoast sitemap, and no rules that could catch a page URL such as `/strategy/…`. Read the terms with `get_the_terms($post_id, 'industry')`. A future filter page needs its own route, like the work categories (see **Work URLs**).
+    - **Service link.** Each strategy has a **Service link** (`service_link`, Page Link to a page) on its Add and Edit screens, from [`group_6ad880dbe7eee.json`](acf-json/group_6ad880dbe7eee.json). ACF stores the page ID and returns its current URL, so a moved page doesn't break it. Read it with `get_field('service_link', $term)`. It's empty when no page is picked.
+    - **Strategies list.** In Works → Strategies, a Service link column (the page title, linked to the page) replaces Description: `fdry_strategy_columns()` and `fdry_strategy_service_link_column()` in [`function-work.php`](library/function-work.php). A strategy with no page shows a dash.
+  - **Rollback.** Set the work's template back to **Default template**.
 - **404.** [`404.php`](404.php) renders a real "not found" page with a 404 status. WordPress sets the status before the template loads, and Yoast adds `noindex`.
   - **No redirect to the homepage.** Every missing URL used to 301 to the homepage. Google treats that as a soft 404, it passes no link value, and it hid broken links from Search Console. When a page moves, add a 301 rule from the old URL to the new one (in the 301 Redirects plugin; enter the target as a URL, not a page, so it can't fall back to `?page_id=`). Don't redirect from the template. To roll back, re-add `header("HTTP/1.1 301 Moved Permanently"); header("Location: " . get_bloginfo('url')); exit();` above `get_header('new')`.
   - **Markup.** It's `main.error-page > .content-block > .content-max`, holding the "Oops!" `h1`, the `h2` and the homepage link. Each one fades up, 0.1 s apart.
@@ -392,6 +479,9 @@ The variables are in [`_variables.scss`](src/styles/common/_variables.scss).
   - `.image-text-alternate__title`
   - `.insight-archive__title`
   - `.work-archive__content > p`
+  - `.site-nav-overlay__parent-label`
+  - `.work-results__title`
+  - `.work-content-row__title`
 
   Use the variable for any new title that should match.
 
@@ -553,6 +643,16 @@ The hero and service showreel play a **self-hosted, muted, looping MP4** behind 
 It **never** downloads the video when the viewport is ≤768px, `prefers-reduced-motion` is set, or `saveData` is on — the poster stands in. The `--inline` variant (service pages) also waits until it approaches the viewport.
 
 Omitting `autoplay` is deliberate: it overrides `preload="none"` and the browser fetches anyway, defeating all of the above.
+
+### Other video roots
+
+`heroVideo.js` also starts any `[data-hero-video]` root, with its video marked `[data-hero-video-media]`. The single work hero and image rows use these. Opt-in attributes on the root change the rules above for that root only:
+
+| Attribute | Effect | Used by |
+|---|---|---|
+| `data-hero-video-lazy` | Waits until the root is within 200px of the viewport, like `.hero-video--inline` | Work image rows |
+| `data-hero-video-all-screens` | Loads on small screens too | Work image rows |
+| `data-hero-video-no-still` | With reduced motion or save-data, attaches the sources with `preload="metadata"` and doesn't play, so the first frame shows instead of an empty box. iOS Safari paints nothing before playback, so a still is still the better fallback | Work image rows without a still |
 
 **Keep the mobile poster small:** a WebP of 200 KB or less. In October 2026 it was a 1.46 MB PNG, which took 31 s to arrive on a simulated slow 4G phone, the first thing on screen. A portrait 1080×1920 still suits the `100vh` phone crop better than a square one.
 

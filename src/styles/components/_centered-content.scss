@@ -121,6 +121,13 @@
 }
 
 .service-inner-main .centered-content--first,
-.about-main .centered-content--first {
+.about-main .centered-content--first,
+.single-work-main .centered-content--first {
 	padding-bottom: 0;
+}
+
+// Single work intro title: three lines at desktop, as in the design.
+.single-work-main .centered-content__title {
+	max-width: 600px;
+	margin-inline: auto;
 }

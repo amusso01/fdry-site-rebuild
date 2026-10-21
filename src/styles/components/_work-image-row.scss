@@ -1,0 +1,74 @@
+@use '../common/variables' as *;
+@use '../common/media' as *;
+
+// Single work image row (components/work/image-row.php): two media side by
+// side. Every cell has the design's 628×805 ratio and crops its image, video
+// or still to fill, so exports don't need to match it exactly. Rows are 64px
+// apart (32px each side), with the same insets as the other single work
+// sections. The image `sizes` in the PHP follows the grid.
+.work-image-row {
+	padding: 32px 80px;
+	background-color: $color__white;
+
+	@include media('<tablet') {
+		padding-inline: 32px;
+	}
+	@include media('<phone') {
+		padding-inline: 25px;
+	}
+
+	&__grid {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 24px;
+
+		@include media('<phone') {
+			grid-template-columns: minmax(0, 1fr);
+		}
+	}
+
+	&__media {
+		position: relative;
+		aspect-ratio: 628 / 805;
+		overflow: hidden;
+		border-radius: 8px;
+		// Only seen while a video without a still loads.
+		background-color: rgba($color__black, 0.05);
+
+		// fdry_work_image() wraps the image in <picture> to cap phones.
+		picture {
+			display: contents;
+		}
+
+		// A lone right media stays in the right column.
+		&--right {
+			grid-column: 2;
+
+			@include media('<phone') {
+				grid-column: auto;
+			}
+		}
+	}
+
+	&__image,
+	&__still,
+	&__video {
+		position: absolute;
+		inset: 0;
+		display: block;
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+
+	// Over a still, the video fades in once its first frame has decoded
+	// (heroVideo.js adds .is-playing). Without one it shows from the start.
+	&__media--still &__video {
+		opacity: 0;
+		transition: opacity 0.6s ease;
+
+		&.is-playing {
+			opacity: 1;
+		}
+	}
+}

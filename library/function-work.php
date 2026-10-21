@@ -388,3 +388,165 @@ function fdry_works_breadcrumb(array $crumbs): array
 	return $crumbs;
 }
 add_filter('wpseo_breadcrumb_links', 'fdry_works_breadcrumb');
+
+/**
+ * The single work meta bar: platform, industries, strategies and website.
+ *
+ * Strategy URLs come from each term's Service link (a Page Link, so the
+ * page's current URL); a strategy with no page has an empty url.
+ *
+ * @return array{
+ *     platform: string,
+ *     industries: string[],
+ *     strategies: array<int, array{name: string, url: string}>,
+ *     website: string
+ * }
+ */
+function fdry_work_meta(int $post_id): array
+{
+	$platform = get_field('work_platform', $post_id);
+	$website  = get_field('work_website', $post_id);
+
+	$industries = array();
+	$terms      = get_the_terms($post_id, 'industry');
+
+	foreach (is_array($terms) ? $terms : array() as $term) {
+		$industries[] = $term->name;
+	}
+
+	$strategies = array();
+	$terms      = get_the_terms($post_id, 'strategy');
+
+	foreach (is_array($terms) ? $terms : array() as $term) {
+		$url = get_field('service_link', $term);
+
+		$strategies[] = array(
+			'name' => $term->name,
+			'url'  => is_string($url) ? $url : '',
+		);
+	}
+
+	return array(
+		'platform'   => is_string($platform) ? trim($platform) : '',
+		'industries' => $industries,
+		'strategies' => $strategies,
+		'website'    => is_string($website) ? trim($website) : '',
+	);
+}
+
+/**
+ * One media slot of a single work image row (media_1 / media_2 group).
+ *
+ * A video slot needs an MP4 or a WebM; its still is optional. A slot with
+ * nothing usable comes back with an empty type.
+ *
+ * @param mixed $group ACF group field value.
+ * @return array{type: string, image_id: int, mp4: string, webm: string, still_id: int}
+ */
+function fdry_work_row_media($group): array
+{
+	$media = array(
+		'type'     => '',
+		'image_id' => 0,
+		'mp4'      => '',
+		'webm'     => '',
+		'still_id' => 0,
+	);
+
+	if (! is_array($group)) {
+		return $media;
+	}
+
+	if (($group['type'] ?? 'image') === 'video') {
+		$media['mp4']      = fdry_media_url($group['video_mp4'] ?? null);
+		$media['webm']     = fdry_media_url($group['video_webm'] ?? null);
+		$media['still_id'] = (int) ($group['still'] ?? 0);
+
+		if ($media['mp4'] !== '' || $media['webm'] !== '') {
+			$media['type'] = 'video';
+		}
+
+		return $media;
+	}
+
+	$media['image_id'] = (int) ($group['image'] ?? 0);
+
+	if ($media['image_id'] > 0) {
+		$media['type'] = 'image';
+	}
+
+	return $media;
+}
+
+/**
+ * Hide the Categories box on works using a new template, which use the
+ * Industry and Strategy taxonomies instead.
+ *
+ * Only the box goes. When it isn't submitted, wp_update_post() keeps the
+ * categories a work already has, so the work stays in the /works/ category
+ * filters and its cards keep their pills.
+ */
+function fdry_hide_work_categories_box(WP_Post $post): void
+{
+	if (! in_array(get_page_template_slug($post), fdry_acf_only_work_templates(), true)) {
+		return;
+	}
+
+	remove_meta_box('categorydiv', 'works_post', 'side');
+}
+add_action('add_meta_boxes_works_post', 'fdry_hide_work_categories_box');
+
+/**
+ * Strategies list (Works → Strategies): a Service link column in place of
+ * Description.
+ *
+ * @param string[] $columns Column labels, keyed by column name.
+ * @return string[]
+ */
+function fdry_strategy_columns(array $columns): array
+{
+	$updated = array();
+
+	foreach ($columns as $name => $label) {
+		if ($name === 'description') {
+			$updated['service_link'] = __('Service link', 'foundry');
+			continue;
+		}
+
+		$updated[$name] = $label;
+	}
+
+	return $updated;
+}
+add_filter('manage_edit-strategy_columns', 'fdry_strategy_columns');
+
+/**
+ * The page picked in a strategy's Service link field, linked to that page.
+ *
+ * Also runs for the row the Add New Strategy form inserts over AJAX; ACF has
+ * saved the field by then.
+ *
+ * @param string $content     Column content.
+ * @param string $column_name Column name.
+ * @param int    $term_id     Strategy term ID.
+ */
+function fdry_strategy_service_link_column(string $content, string $column_name, int $term_id): string
+{
+	if ($column_name !== 'service_link') {
+		return $content;
+	}
+
+	// Unformatted, the field is the page ID.
+	$page_id = (int) get_field('service_link', 'term_' . $term_id, false);
+
+	if ($page_id <= 0 || ! get_post($page_id)) {
+		return '<span aria-hidden="true">&#8212;</span><span class="screen-reader-text">' . esc_html__('No service link', 'foundry') . '</span>';
+	}
+
+	return sprintf(
+		'<a href="%s">%s</a>',
+		esc_url(get_permalink($page_id)),
+		esc_html(get_the_title($page_id))
+	);
+}
+add_filter('manage_strategy_custom_column', 'fdry_strategy_service_link_column', 10, 3);
