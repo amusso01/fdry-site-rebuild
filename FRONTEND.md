@@ -215,13 +215,13 @@ Legacy assets remain in [`inc/enqueue.php`](inc/enqueue.php) (`understrap-styles
     - **Layout.** Below `phone-land` the details go to two columns, with Strategy full width and Visit site underneath.
     - **Markup.** The details are a `<dl>`. The arrow is [`svg-arrow.php`](svg-template/svg-arrow.php), the same path as the Figma one.
     - **Labels.** Its labels and the results' labels share the `work-label` mixin in [`_mixin.scss`](src/styles/common/_mixin.scss).
-  - **Results.** A 10:9 image beside an eyebrow, a title (`h2`) and 2 to 4 stats, from the Results tab. Styled in [`_work-results.scss`](src/styles/components/_work-results.scss).
+  - **Results.** A 10:9 image beside an eyebrow, a title (`h2`) and up to 4 stats, from the Results tab. Styled in [`_work-results.scss`](src/styles/components/_work-results.scss).
     - **Fields.**
       - Image: `work_results_image`, an ID, lazy, through `fdry_work_image()`;
       - Eyebrow: `work_results_eyebrow`, "Results" by default;
       - Title: `work_results_title`;
       - Stats: the `work_results_stats` repeater, each row with a `label`, a `value` and a `description`.
-    - **Rows.** The repeater is min 2 (ACF starts it with two empty rows) and max 4. A row without a value is skipped, and with none the section isn't rendered.
+    - **Rows.** The repeater has no minimum and a max of 4. A row without a value is skipped. With none, the stats list and the count modifier are left out and the image, eyebrow and title still show. The section is only skipped with no image, title or stats: the eyebrow alone doesn't count, since it defaults to "Results".
     - **Layout.** The columns are 7fr / 4fr with an 80px gap (765 / 437px at 1440), with the same insets as the hero media. Each stat has a faint line under it (black at 10%), the last one included. There's none above the first.
     - **Stats share the image's height.** The column stretches to the row, and each stat is `flex: 1` with its content centred. The last line therefore sits on the image's bottom edge, as in the design, whatever the count. If the stats are taller than the image, the row grows and the image stays 10:9 at the top.
     - **Size per count.** The section gets `work-results--count-{2,3,4}`, which sets `--results-value-size` and `--results-stat-padding`. A single row uses the 2-row style.

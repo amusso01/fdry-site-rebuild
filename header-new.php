@@ -189,7 +189,7 @@ if (! defined('FDRY_USING_NEW_HEADER')) {
               'components/partials/button',
               null,
               array(
-                'variant' => 'yellow',
+                'variant' => 'green',
                 'label'   => $nav_button_label,
                 'url'     => $nav_button_url,
                 'target'  => $nav_button_target,

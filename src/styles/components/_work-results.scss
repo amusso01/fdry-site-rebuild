@@ -2,7 +2,7 @@
 @use '../common/media' as *;
 @use '../common/mixin' as *;
 
-// Single work results (components/work/results.php): an image beside 2 to 4
+// Single work results (components/work/results.php): an image beside up to 4
 // stats. The stats share the image's height, so the last line sits on the
 // image's bottom edge whatever the count; the count modifier scales the
 // values so 2 still fill it and 4 still fit. Same insets as .work-hero-media.

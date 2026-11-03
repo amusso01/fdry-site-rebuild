@@ -61,7 +61,11 @@
 		display: grid;
 		grid-template-columns: repeat(2, minmax(0, 1fr));
 		column-gap: 30px;
-		row-gap: 32px;
+		row-gap: 40px;
+
+		@include media('>=tablet') {
+			grid-template-columns: repeat(3, minmax(0, 1fr));
+		}
 
 		@include media('<768px') {
 			grid-template-columns: 1fr;
@@ -80,6 +84,7 @@
 		display: block;
 		overflow: hidden;
 		aspect-ratio: 3 / 2;
+		margin-bottom: 12px;
 		border-radius: 4px;
 	}
 
@@ -99,11 +104,7 @@
 	}
 
 	&__meta {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		gap: 1rem;
-		margin: 12px 0 10px;
+		margin: 0 0 10px;
 	}
 
 	&__category {
@@ -113,36 +114,6 @@
 		line-height: 16px;
 		letter-spacing: 1px;
 		text-transform: uppercase;
-	}
-
-	&__more {
-		flex-shrink: 0;
-		// Stays right when a post has no category.
-		margin-left: auto;
-		font-size: 16px;
-		font-weight: 600;
-		line-height: 19px;
-		letter-spacing: 0;
-		white-space: nowrap;
-		text-decoration-line: underline;
-		text-decoration-color: rgba($color__black, 0.1);
-		text-decoration-thickness: 1px;
-		text-underline-offset: 4px;
-		transition: text-decoration-color 0.25s ease;
-
-		&:link,
-		&:visited,
-		&:hover,
-		&:focus {
-			color: $color__text;
-			text-decoration-line: underline;
-		}
-	}
-
-	// Same trigger as the image zoom, so the whole card reacts together.
-	&:hover &__more,
-	&:focus-within &__more {
-		text-decoration-color: $color__text;
 	}
 
 	&__title {
@@ -167,8 +138,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-	.insight-card__image,
-	.insight-card__more {
+	.insight-card__image {
 		transition: none;
 	}
 

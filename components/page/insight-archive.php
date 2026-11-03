@@ -106,7 +106,7 @@ $insights = new WP_Query(
 								'alt'      => $image_alt,
 								'loading'  => 'lazy',
 								'decoding' => 'async',
-								'sizes'    => '(min-width: 768px) 50vw, 100vw',
+								'sizes'    => '(min-width: 1140px) 33vw, (min-width: 768px) 50vw, 100vw',
 							)
 						) : '';
 						?>
@@ -117,16 +117,11 @@ $insights = new WP_Query(
 								</a>
 							<?php endif; ?>
 
-							<div class="insight-card__meta">
-								<?php if ($category !== '') : ?>
+							<?php if ($category !== '') : ?>
+								<div class="insight-card__meta">
 									<p class="insight-card__category"><?= esc_html($category); ?></p>
-								<?php endif; ?>
-
-								<a
-									class="insight-card__more"
-									href="<?= esc_url($permalink); ?>"
-									aria-label="<?= esc_attr(sprintf(__('Read more about %s', 'foundry'), wp_strip_all_tags($card_title))); ?>"><?= esc_html__('Read more', 'foundry'); ?></a>
-							</div>
+								</div>
+							<?php endif; ?>
 
 							<h2 class="insight-card__title">
 								<a class="insight-card__title-link" href="<?= esc_url($permalink); ?>"><?= esc_html($card_title); ?></a>

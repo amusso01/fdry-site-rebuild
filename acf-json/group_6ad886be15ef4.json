@@ -251,7 +251,7 @@
             "name": "work_results_stats",
             "aria-label": "",
             "type": "repeater",
-            "instructions": "2 to 4. Fewer results get bigger type. A result without a value isn't shown.",
+            "instructions": "Up to 4. Fewer results get bigger type. A result without a value isn't shown. With none, only the image and title show.",
             "required": 0,
             "conditional_logic": 0,
             "wrapper": {
@@ -261,7 +261,7 @@
             },
             "layout": "block",
             "pagination": 0,
-            "min": 2,
+            "min": 0,
             "max": 4,
             "collapsed": "field_6ad8931b143d4",
             "button_label": "Add result",
@@ -797,5 +797,5 @@
     "display_title": "",
     "allow_ai_access": false,
     "ai_description": "",
-    "modified": 1792585545
+    "modified": 1793704479
 }

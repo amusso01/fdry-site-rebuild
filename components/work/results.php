@@ -1,11 +1,14 @@
 <?php
 
 /**
- * Single work results — an image beside 2 to 4 stats (label, value, description)
+ * Single work results — an image beside 0 to 4 stats (label, value, description)
  *
  * The count sets a work-results--count-{2,3,4} modifier: fewer stats get
- * bigger values. Stats without a value are skipped; with none the section is
- * not rendered. Without an image the stats take the full width
+ * bigger values, and a single stat uses the 2-stat size. Stats without a value
+ * are skipped; with none the stats list and the count modifier are left out
+ * and the image, eyebrow and title still show. The section is only skipped
+ * with no image, title or stats (the eyebrow alone defaults to "Results", so
+ * it doesn't count). Without an image the content takes the full width
  * (work-results--no-media).
  *
  * @author Andrea Musso
@@ -47,10 +50,6 @@ foreach (is_array($rows) ? $rows : array() as $row) {
 
 $stats = array_slice($stats, 0, 4);
 
-if ($stats === array()) {
-	return;
-}
-
 $eyebrow  = get_field('work_results_eyebrow', $post_id);
 $eyebrow  = is_string($eyebrow) ? trim($eyebrow) : '';
 $title    = get_field('work_results_title', $post_id);
@@ -68,10 +67,15 @@ $image = $image_id > 0 ? fdry_work_image(
 	'calc(100vw - 50px)'
 ) : '';
 
-$classes = array(
-	'work-results',
-	'work-results--count-' . max(2, count($stats)),
-);
+if ($stats === array() && $image === '' && $title === '') {
+	return;
+}
+
+$classes = array('work-results');
+
+if ($stats !== array()) {
+	$classes[] = 'work-results--count-' . max(2, count($stats));
+}
 
 if ($image === '') {
 	$classes[] = 'work-results--no-media';
@@ -96,19 +100,21 @@ if ($image === '') {
 					<h2 class="work-results__title" data-fade-up><?= esc_html($title); ?></h2>
 				<?php endif; ?>
 
-				<dl class="work-results__stats">
-					<?php foreach ($stats as $index => $stat) : ?>
-						<div class="work-results__stat"<?= fdry_fade_attrs(false, 0.1 * $index); ?>>
-							<?php if ($stat['label'] !== '') : ?>
-								<dt class="work-results__label"><?= esc_html($stat['label']); ?></dt>
-							<?php endif; ?>
-							<dd class="work-results__value"><?= esc_html($stat['value']); ?></dd>
-							<?php if ($stat['description'] !== '') : ?>
-								<dd class="work-results__description"><?= esc_html($stat['description']); ?></dd>
-							<?php endif; ?>
-						</div>
-					<?php endforeach; ?>
-				</dl>
+				<?php if ($stats !== array()) : ?>
+					<dl class="work-results__stats">
+						<?php foreach ($stats as $index => $stat) : ?>
+							<div class="work-results__stat"<?= fdry_fade_attrs(false, 0.1 * $index); ?>>
+								<?php if ($stat['label'] !== '') : ?>
+									<dt class="work-results__label"><?= esc_html($stat['label']); ?></dt>
+								<?php endif; ?>
+								<dd class="work-results__value"><?= esc_html($stat['value']); ?></dd>
+								<?php if ($stat['description'] !== '') : ?>
+									<dd class="work-results__description"><?= esc_html($stat['description']); ?></dd>
+								<?php endif; ?>
+							</div>
+						<?php endforeach; ?>
+					</dl>
+				<?php endif; ?>
 			</div>
 		</div>
 	</div>

@@ -8,7 +8,7 @@
  * @package Foundry
  *
  * @param array $args {
- *     @type string       $variant Color modifier: primary, white, yellow, transparent. Default 'primary'.
+ *     @type string       $variant Color modifier: primary, white, yellow, green, transparent. Default 'primary'.
  *     @type string       $label   Button text. Default 'SERVICES'.
  *     @type string|array $url     Anchor href or ACF link array. Default '#'.
  *     @type string       $target  Optional link target (e.g. _blank).
@@ -28,7 +28,7 @@ $url     = $args['url'] ?? ( isset( $url ) ? $url : '#' );
 $target  = $args['target'] ?? ( isset( $target ) ? $target : '' );
 $tag     = $args['tag'] ?? ( isset( $tag ) ? $tag : 'a' );
 $class   = $args['class'] ?? ( isset( $class ) ? $class : '' );
-$allowed = array( 'primary', 'white', 'yellow', 'transparent' );
+$allowed = array( 'primary', 'white', 'yellow', 'green', 'transparent' );
 
 if ( is_array( $url ) ) {
 	if ( $target === '' && ! empty( $url['target'] ) ) {

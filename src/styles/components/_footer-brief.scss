@@ -81,7 +81,7 @@
 		height: 250px;
 		padding: 0 32px;
 		border-radius: 50%;
-		background-color: $color__btn-yellow;
+		background-color: $color__btn-green;
 		color: $color__black;
 		font-family: $text__fontname;
 		font-size: 25px;
@@ -118,11 +118,11 @@
 
 @keyframes footer-brief-pulse {
 	0% {
-		box-shadow: 0 0 0 0 rgba($color__btn-yellow, 0.35);
+		box-shadow: 0 0 0 0 rgba($color__btn-green, 0.35);
 	}
 
 	100% {
-		box-shadow: 0 0 0 35px rgba($color__btn-yellow, 0);
+		box-shadow: 0 0 0 35px rgba($color__btn-green, 0);
 	}
 }
 
