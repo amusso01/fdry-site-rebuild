@@ -6,6 +6,10 @@
 	padding-bottom: 0;
 	background-color: $color__white;
 
+	.content-block {
+		background-color: $color__btn-green;
+	}
+
 	&__cards {
 		display: grid;
 		grid-template-columns: repeat(4, 1fr);

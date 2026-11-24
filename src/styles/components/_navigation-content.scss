@@ -87,7 +87,7 @@ $nav-main-arrow-size: 2.75rem;
 		inset: 0;
 		z-index: 0;
 		border-radius: inherit;
-		background-color: $color__white;
+		background-color: $color__btn-green;
 		transform: scaleX(0);
 		transform-origin: left center;
 		transition: transform 0.45s ease;
@@ -109,7 +109,7 @@ $nav-main-arrow-size: 2.75rem;
 		width: $nav-main-arrow-size;
 		height: $nav-main-arrow-size;
 		border-radius: 50%;
-		background-color: $color__white;
+		background-color: $color__btn-green;
 		color: $color__text;
 
 		@include media('<tablet') {
