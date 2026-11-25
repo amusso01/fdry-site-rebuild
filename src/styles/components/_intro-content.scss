@@ -39,6 +39,13 @@
 		font-weight: 500;
 		line-height: 36px;
 		letter-spacing: 0;
+
+		.homepage-main .intro-content__grid & {
+			@include media('>=tablet') {
+				font-size: 82px;
+				line-height: 60px;
+			}
+		}
 	}
 
 	&__body {
