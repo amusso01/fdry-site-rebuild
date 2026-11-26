@@ -58,7 +58,7 @@ foreach (['footermenu_1', 'footermenu_2', 'footermenu_3', 'footermenu_4'] as $lo
         <div class="site-footer__actions" data-fade-up data-fade-up-delay="0.2">
           <?php
           get_template_part('components/partials/button', null, [
-            'variant' => 'white',
+            'variant' => 'green',
             'label'   => __('Book an appointment', 'foundry'),
             'url'     => 'https://www.fdry.com/brief/',
           ]);
